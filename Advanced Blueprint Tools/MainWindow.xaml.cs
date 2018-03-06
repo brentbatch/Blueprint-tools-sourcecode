@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,17 +14,834 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Assimp;
+
+
 
 namespace Advanced_Blueprint_Tools
 {
+    using System.Windows.Media;
+    using System.Windows.Media.Media3D;
+    using HelixToolkit.Wpf;
+    using Assimp.Configs;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        public static dynamic gameblocks = new Newtonsoft.Json.Linq.JObject();
+
+        public dynamic getgameblocks()
+        {
+            return gameblocks;
+        }
+        
+
+        public List<string> blueprints = new List<string>();
+        public BP OpenedBlueprint { get; set; }
+        public string PaintColor { get; set; } = "#eeeeee";
+        public Model3DGroup Model { get; set; }
+
+        OpenWindow openwindow;
+        public AdvancedConnections advancedconnections;
+        public AdvancedColor advancedcolorwindow;
+        public SwapBlocksWindow swapblockswindow;
+
+
         public MainWindow()
         {
-            InitializeComponent();
+
+            //LOAD RESOURCES:
+
+            new Thread(new ThreadStart(loadblueprints)).Start();//load recources
+            new Thread(new ThreadStart(loadallblocks)).Start();
+
+            // if (openwindow != null) openwindow.Close();
+            //openwindow = new OpenWindow(this);
+            //openwindow.Show();
+           
+        }
+        
+
+        Loadwindow l;//barely shows up
+        public void openloadwindow()
+        {
+            l = new Loadwindow(this);
+            l.Show();
+        }
+        
+        public void UpdateOpenedBlueprint()
+        {
+            //try
+            {
+                TextBox_Name.Text = OpenedBlueprint.description.name;
+                TextBox_Description.Text = OpenedBlueprint.description.description;
+                //Image_blueprint.Source = new BitmapImage(new Uri(OpenedBlueprint.icon));
+            
+                //update 3D view
+                var modelGroup = new Model3DGroup();
+            
+                bool haderror = false;
+                foreach (dynamic x in this.OpenedBlueprint.blocksxyz)
+                    foreach (dynamic y in this.OpenedBlueprint.blocksxyz[x.Name])
+                        foreach (dynamic z in this.OpenedBlueprint.blocksxyz[x.Name][y.Name])
+                            foreach (dynamic child in this.OpenedBlueprint.blocksxyz[x.Name][y.Name][z.Name].blocks)
+                            {
+                                string uuid = child.shapeId.ToString();
+
+                                string mesh = "";
+                                //The Importer to load .obj files
+                                ModelImporter importer = new ModelImporter();
+                                Model3D loadedblock = null;
+                                try
+                                {
+
+                                    if (gameblocks[uuid] != null)//missing mod?
+                                    {
+                                        if (gameblocks[uuid].mesh.ToString() != "")//its a a part
+                                        {
+                                            mesh = gameblocks[uuid].mesh;
+                                            if (System.IO.Path.GetExtension(mesh) != ".obj")
+                                            {
+                                                //check for same mesh but with extension .obj
+                                                string Directory = System.IO.Path.GetDirectoryName(mesh);
+                                                string filename = System.IO.Path.GetFileNameWithoutExtension(mesh);
+                                                if(File.Exists(Directory+"\\"+filename + ".obj"))
+                                                {
+                                                    mesh = Directory + "\\" + filename + ".obj";
+                                                }
+                                            }
+
+                                            if (System.IO.Path.GetExtension(mesh) == ".obj")
+                                            {
+                                                try
+                                                {
+
+                                                    var bc = new BrushConverter();
+                                                    //string color = "#FF" + textbox_color.Text.Substring(1);
+                                                    //textbox_color.Background = (Brush)bc.ConvertFrom(color);
+                                                    Color color = new Color();
+                                                    string colorstr = child.color.ToString();
+
+                                                    if ((child.color.ToString()[0]) == '#')
+                                                        color = Color.FromRgb(Convert.ToByte(colorstr.Substring(1, 2), 16), Convert.ToByte(colorstr.Substring(3, 2), 16), Convert.ToByte(colorstr.Substring(5, 2), 16));
+                                                    else
+                                                        color = Color.FromRgb(Convert.ToByte(colorstr.Substring(0, 2), 16), Convert.ToByte(colorstr.Substring(2, 2), 16), Convert.ToByte(colorstr.Substring(4, 2), 16));
+
+                                                    Material material = new DiffuseMaterial(new SolidColorBrush(color));
+                                                    material.AnimateOpacity(0.5, 5);
+
+                                                    string text = gameblocks[uuid].textures[0].ToString();
+                                                    //if (System.IO.Path.GetExtension(gameblocks[uuid].textures[0].ToString())!=".tga")
+                                                      //  material = MaterialHelper.CreateImageMaterial(gameblocks[uuid].textures[0].ToString());
+
+                                                    importer.DefaultMaterial = material;
+
+                                                    loadedblock = importer.Load(mesh);
+                                                    
+
+                                       
+
+                                                    #region Rotation and Translation
+
+                                                    loadedblock.Transform = new MatrixTransform3D(new Matrix3D());
+                                                    Transform3DGroup baseLinkMove = new Transform3DGroup();
+                                                    TranslateTransform3D baseLinkTranslate = new TranslateTransform3D();
+                                                    RotateTransform3D baseLinkRotatex = new RotateTransform3D();
+                                                    RotateTransform3D baseLinkRotatez = new RotateTransform3D();
+                                                    bool xpos = child.xaxis > 0;
+                                                    bool zpos = child.zaxis > 0;
+                                                    switch (Math.Abs(Convert.ToInt32(child.xaxis.ToString())))
+                                                    {
+                                                        case 1:
+                                                            baseLinkRotatex.Rotation = new AxisAngleRotation3D(new Vector3D(0, 0, xpos ? 0 : 1), 180);
+                                                            baseLinkMove.Children.Add(baseLinkRotatex);
+                                                            switch (Math.Abs(Convert.ToInt32(child.zaxis.ToString())))
+                                                            {
+                                                                case 1:
+                                                                    MessageBox.Show("Incorrect rotationset found !");
+                                                                    break;
+                                                                case 2:
+                                                                    baseLinkRotatez.Rotation = new AxisAngleRotation3D(new Vector3D(zpos ? -1 : 1, 0, 0), 90);
+                                                                    break;
+                                                                case 3:
+                                                                    baseLinkRotatez.Rotation = new AxisAngleRotation3D(new Vector3D(zpos ? 0 : 1, 0, 0), 180);
+                                                                    break;
+                                                            }
+                                                            baseLinkMove.Children.Add(baseLinkRotatez);
+                                                            break;
+                                                        case 2:
+                                                            baseLinkRotatex.Rotation = new AxisAngleRotation3D(new Vector3D(0, 0, xpos ? 1 : -1), 90);
+                                                            baseLinkMove.Children.Add(baseLinkRotatex);
+                                                            switch (Math.Abs(Convert.ToInt32(child.zaxis.ToString())))
+                                                            {
+                                                                case 1:
+                                                                    baseLinkRotatez.Rotation = new AxisAngleRotation3D(new Vector3D(0, zpos ? 1 : -1, 0), 90);
+                                                                    break;
+                                                                case 2:
+                                                                    MessageBox.Show("Incorrect rotationset found !");
+                                                                    break;
+                                                                case 3:
+                                                                    baseLinkRotatez.Rotation = new AxisAngleRotation3D(new Vector3D(0, zpos ? 0 : 1, 0), 180);
+                                                                    break;
+                                                            }
+                                                            baseLinkMove.Children.Add(baseLinkRotatez);
+                                                            break;
+                                                        case 3:
+                                                            baseLinkRotatex.Rotation = new AxisAngleRotation3D(new Vector3D(0, xpos ? -1 : 1, 0), 90);
+                                                            baseLinkMove.Children.Add(baseLinkRotatex);
+                                                            switch (Math.Abs(Convert.ToInt32(child.zaxis.ToString())))
+                                                            {
+                                                                case 1:
+                                                                    baseLinkRotatez.Rotation = new AxisAngleRotation3D(new Vector3D(0, 0, (zpos == xpos) ? 1 : 0), 180);
+                                                                    break;
+                                                                case 2:
+                                                                    baseLinkRotatez.Rotation = new AxisAngleRotation3D(new Vector3D(0, 0, (zpos == xpos) ? -1 : 1), 90);
+                                                                    break;
+                                                                case 3:
+                                                                    MessageBox.Show("Incorrect rotationset found !");
+                                                                    break;
+                                                            }
+                                                            baseLinkMove.Children.Add(baseLinkRotatez);
+                                                            break;
+                                                    } //rotations translate!
+
+                                                    int centerx = (this.OpenedBlueprint.maxx + this.OpenedBlueprint.minx) / 2;
+                                                    int centery = (this.OpenedBlueprint.maxy + this.OpenedBlueprint.miny) / 2;
+                                                    int centerz = (this.OpenedBlueprint.maxz + this.OpenedBlueprint.minz) / 2;
+
+
+                                                    baseLinkTranslate.OffsetX = Convert.ToInt32( x.Name) - centerx + (float)(child.bounds.x)/2;
+                                                    baseLinkTranslate.OffsetY = Convert.ToInt32( y.Name) - centery + (float)(child.bounds.y)/2;
+                                                    baseLinkTranslate.OffsetZ = Convert.ToInt32( z.Name) - centerz + (float)(child.bounds.z)/2;
+
+                                                    baseLinkMove.Children.Add(baseLinkTranslate);
+                                                    loadedblock.Transform = baseLinkMove;
+                                                    #endregion
+                                        
+                                                    modelGroup.Children.Add(loadedblock);
+                                                }
+                                                catch(Exception e)
+                                                {//failed to load the .obj
+                                                    MessageBox.Show(e.Message + "\n\nMesh: " + mesh, "Failed to load mesh!");
+                                                    mesh = null;
+                                                }
+                                            }
+                                            else
+                                            {//no .obj file for this block
+                                                mesh = null;
+                                            }
+                                        }
+                                        else //its a block
+                                        {
+                                            mesh = null;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(!haderror) MessageBox.Show("missing mod!\nUUID: "+uuid);
+                                        haderror = true;
+                                        mesh = null;
+                                        //missing mod!
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    MessageBox.Show(ex.Message+"\n\nMesh: "+ mesh, "unknown error!");
+                                }
+
+                                try
+                                {
+
+                                    if (child.bounds != null && mesh == null)//bp.cs assigns bounds to child , it gets it from gameblocks[]
+                                    {//previous shit failed but it's a block or whatever, attempt to build it!
+
+                                        dynamic bounds = child.bounds;
+
+                                        var bc = new BrushConverter();
+                                        //string color = "#FF" + textbox_color.Text.Substring(1);
+                                        //textbox_color.Background = (Brush)bc.ConvertFrom(color);
+                                        Color color = new Color();
+                                        string colorstr = child.color.ToString();
+
+                                        if ((child.color.ToString()[0]) == '#')
+                                            color = Color.FromRgb(Convert.ToByte(colorstr.Substring(1, 2), 16), Convert.ToByte(colorstr.Substring(3, 2), 16), Convert.ToByte(colorstr.Substring(5, 2), 16));
+                                        else
+                                            color = Color.FromRgb(Convert.ToByte(colorstr.Substring(0, 2), 16), Convert.ToByte(colorstr.Substring(2, 2), 16), Convert.ToByte(colorstr.Substring(4, 2), 16));
+
+                                        Material material = new DiffuseMaterial(new SolidColorBrush(color));
+                                        //if (System.IO.Path.GetExtension(gameblocks[uuid].textures[0].ToString()) != ".tga")
+                                          //  material = MaterialHelper.CreateImageMaterial(gameblocks[uuid].textures[0].ToString());
+
+
+                                        int centerx = (this.OpenedBlueprint.maxx + this.OpenedBlueprint.minx) / 2;
+                                        int centery = (this.OpenedBlueprint.maxy + this.OpenedBlueprint.miny) / 2;
+                                        int centerz = (this.OpenedBlueprint.maxz + this.OpenedBlueprint.minz) / 2;
+                                        // Create a mesh builder and add a box to it
+                                        var meshBuilder = new MeshBuilder(false, false);
+                                        meshBuilder.AddBox(new Point3D(Convert.ToInt32(x.Name) - centerx + (float)(bounds.x) / 2,
+                                            Convert.ToInt32(y.Name) - centery + (float)(bounds.y) / 2,
+                                            Convert.ToInt32(z.Name) - centerz + (float)(bounds.z) / 2),
+                                            Convert.ToInt32(bounds.x), Convert.ToInt32(bounds.y), Convert.ToInt32(bounds.z));
+                                        // Create a mesh from the builder (and freeze it)
+                                        var Mesh = meshBuilder.ToMesh(true);
+
+
+                                        modelGroup.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
+
+                                    }
+
+                                }
+                                catch (Exception e)
+                                {
+                                    MessageBox.Show(e.Message+"\n\n", "Failed to Create mesh!");
+                                }
+
+                                //string mesh = MainWindow.gameblocks[uuid].renderable.lodList[0].mesh; //game_data/whatever
+
+                                //string meshpath;
+
+
+                                //mesh = @"D:\Program Files (x86)\Steam\SteamApps\common\Scrap Mechanic\Data\Objects\Mesh\industrial\obj_industrial_satellite02.fbx";
+                                //The Importer to load .obj files
+                                //ModelImporter importer = new ModelImporter();
+                                //The Material (Color) that is applyed to the importet objects
+                                //Material material = new DiffuseMaterial(new SolidColorBrush(Colors.White));
+                                //importer.DefaultMaterial = material;
+                                //Model3D block = importer.Load(mesh);
+                                //modelGroup.Children.Add(block);
+                            }//end of foreach
+
+                try
+                {
+                    this.Model = modelGroup;
+
+                    //Image_blueprint.DataContext = new MainViewModel();//'refresh'
+                    Image_blueprint.DataContext = "";
+                    Image_blueprint.DataContext = this;
+                    if(menuitem1.IsEnabled==false)
+                    {
+                        menuitem1.IsEnabled = true;
+                        menuitem2.IsEnabled = true;
+                        menuitem3.IsEnabled = true;
+                        menuitem4.IsEnabled = true;
+                        menuitem5.IsEnabled = true;
+                        menuitem6.IsEnabled = true;
+                        menuitem7.IsEnabled = true;
+                        menuitem8.IsEnabled = true;
+                        menuitem9.IsEnabled = true;
+                        menuitem10.IsEnabled = true;
+                        menuitem11.IsEnabled = true;
+                        menuitem12.IsEnabled = true;
+                    }
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show(e.Message, "Failed to import into rendering box!");
+                }
+
+
+
+            }
+            //catch (Exception e)
+            {
+              //  MessageBox.Show(e.Message);
+            }
+        }
+
+        
+        private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(gameblocks!=null)
+            {
+                if (openwindow != null && openwindow.IsLoaded)
+                {
+                    openwindow.Focus();
+
+                }
+                else
+                {
+                    openwindow = new OpenWindow(this);
+                    openwindow.Show();
+                }
+                openwindow.TextBox_Search.Focus();
+
+            }
+            else
+            {
+                MessageBox.Show("Game-file resources are not fully loaded yet!\nplease take a moment\nshouldn't take longer than 'modamount'/300 seconds");
+            }
+        }
+
+        private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)//possible to save/saveas?
+        {
+            e.CanExecute = false;
+            if (OpenedBlueprint != null) e.CanExecute = true;
+        }
+
+        private void SaveCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            button_overwrite_click(sender, e);
+        }
+        private void SaveAsCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            button_save_click(sender, e);
+        }
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+        }
+
+
+        private void button_overwrite_click(object sender, RoutedEventArgs e)//save/overwrite
+        {
+            if (OpenedBlueprint != null)
+            {
+                save();
+                OpenedBlueprint.Save();
+            }
+        }
+        private void button_save_click(object sender, RoutedEventArgs e)//save as
+        {
+            if (OpenedBlueprint != null)
+            {
+                save();
+                Random r = new Random(); //GENERATE NEW UUID AND CHANGE DESCRIPTION LOCALID
+                OpenedBlueprint.SaveAs("Blueprint" + r.Next() + "-" + r.Next());
+            }
+        }
+
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            //connection
+            if (advancedconnections != null) advancedconnections.Close();
+            advancedconnections = new AdvancedConnections(this);
+            advancedconnections.Owner = this;
+            advancedconnections.Show();
+        }//advancedwirefeature
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_2(object sender, RoutedEventArgs e)
+        {//paint tool
+            if (advancedcolorwindow != null) advancedcolorwindow.Close();
+            advancedcolorwindow = new AdvancedColor(this);
+            advancedcolorwindow.Owner = this;
+            advancedcolorwindow.Show();
+        }//advancedcolorfeature
+
+        private void MenuItem_Click_3(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_4(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_5(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_6(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_7(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_8(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click_9(object sender, RoutedEventArgs e)
+        {
+
+            if (swapblockswindow != null) swapblockswindow.Close();
+            swapblockswindow = new SwapBlocksWindow(this);
+            swapblockswindow.Owner = this;
+            swapblockswindow.Show();
+        }
+
+        private void MenuItem_Click_10(object sender, RoutedEventArgs e) //paint picker
+        {
+            PaintSelector p = new PaintSelector(this);
+            p.Owner = this;
+            p.Show();
+        }
+
+        private void save()//textbox to BP()
+        {
+            OpenedBlueprint.description.name = TextBox_Name.Text;
+            OpenedBlueprint.description.description = TextBox_Description.Text;
+            MessageBox.Show("Blueprint Saved!");
+        }
+
+        //PRE LOAD BLUEPRINTS AND CRAP
+
+        public string blueprintdir = "";
+        public void loadblueprints()
+        {//Find the correct blueprint dir:
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (Directory.Exists(appdata + @"\Axolot Games\Scrap Mechanic\User"))
+            {
+                string scrapdir = appdata + "\\Axolot Games\\Scrap Mechanic\\User";
+                DateTime lasthigh = new DateTime(1900, 1, 1);
+                string dir = "";
+                foreach (string subdir in Directory.GetDirectories(scrapdir)) //get user_numbers folder that is last used
+                {
+                    DirectoryInfo fi1 = new DirectoryInfo(subdir + @"\blueprints");
+                    DateTime created = fi1.LastWriteTime;
+                    fi1 = new DirectoryInfo(subdir);
+
+                    if (created > lasthigh)
+                    {
+                        dir = subdir;
+                        lasthigh = created;
+                    }
+                }
+                blueprintdir = dir + "\\blueprints";
+            }
+
+            foreach (string blueprint in Directory.GetDirectories(blueprintdir))
+            {
+                if (File.Exists(blueprint + @"\blueprint.json") && File.Exists(blueprint + @"\icon.png") && File.Exists(blueprint + @"\description.json"))
+                {
+                    this.blueprints.Add(blueprint);
+                }
+            }
+            while (true)
+            {
+                DateTime t = Directory.GetLastWriteTime(blueprintdir);
+                if (Directory.GetLastWriteTime(blueprintdir) > DateTime.Now.AddSeconds(-2))
+                {
+                    this.blueprints = new List<string>();
+                    // a blueprint is added/removed!
+                    foreach (string blueprint in Directory.GetDirectories(blueprintdir))
+                    {
+                        if (File.Exists(blueprint + @"\blueprint.json") && File.Exists(blueprint + @"\icon.png") && File.Exists(blueprint + @"\description.json"))
+                        {
+                            this.blueprints.Add(blueprint);
+                        }
+                    }
+                }
+                Thread.Sleep(1500);
+            }
+        }
+
+
+        public void loadallblocks()
+        {
+            string ScrapData = "";
+            string ModDatabase = "";
+            {
+                string steamapps = Properties.Resources.steamapps;
+                if (steamapps == null) steamapps = "";
+
+                if (System.IO.Directory.Exists(Environment.GetEnvironmentVariable("ProgramFiles(x86)") + @"\Steam\SteamApps\common\Scrap Mechanic\Data\Objects\Database\ShapeSets"))
+                {
+                    steamapps = Environment.GetEnvironmentVariable("ProgramFiles(x86)") + "\\steam\\SteamApps";
+                }
+                else
+                if (System.IO.Directory.Exists(@"C:\Program Files (x86)\Steam\SteamApps\common\Scrap Mechanic\Data\Objects\Database\ShapeSets"))
+                {
+                    steamapps = @"C:\Program Files (x86)\Steam\SteamApps";
+                }
+                else
+                if (System.IO.Directory.Exists(@"D:\Program Files (x86)\Steam\SteamApps\common\Scrap Mechanic\Data\Objects\Database\ShapeSets"))
+                {
+                    steamapps = @"D:\Program Files (x86)\Steam\SteamApps";
+                }
+                else
+                {   
+                    while (!System.IO.Directory.Exists(ScrapData))
+                    {
+                        
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {//this refer to form in WPF application 
+                            MessageBoxResult result = MessageBox.Show("could not find the gamefiles folder which is needed to get the block properties\nPlease select the Scrap Mechanic folder, It contains: Cache,Data,Logs,Release,...\n\nSteam Library > Right click scrap mechanic > properties > Local Files > browse local files > Copy path from the folder", "Unusual folder location!",MessageBoxButton.OKCancel);
+                            if(result != MessageBoxResult.OK)
+                            {
+                                this.Close();
+                                MessageBox.Show("continuing without loading resources.\nWorking processes: \n- Loading blueprints -although a bit broken\n- sphere generator\n- mirror mode");
+                            }
+
+                            System.Windows.Forms.FolderBrowserDialog fbD = new System.Windows.Forms.FolderBrowserDialog();
+                            fbD.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                            fbD.ShowDialog();
+                            string scrap = fbD.SelectedPath;
+                            steamapps = System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(scrap));
+                            ScrapData = scrap+"\\Data";
+                        }));
+                    }
+                }
+                if(ScrapData=="")
+                ScrapData = steamapps + @"\common\Scrap Mechanic\Data";
+                ModDatabase = steamapps + @"\workshop\content\387990";
+
+                Properties.Resources.steamapps.Insert(0, steamapps);
+
+            }//get paths
+
+            dynamic blocks = new Newtonsoft.Json.Linq.JObject();
+            int amountloaded=0;
+
+            //VANILLA BLOCKS: 
+            dynamic blockz = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(ScrapData + @"\Objects\Database\basicmaterials.json"));
+            foreach (dynamic prop in blockz)
+            {
+                foreach (dynamic part in blockz[prop.Name]) //added cuz i need textures
+                {
+                    blocks[part.uuid.ToString()] = part;
+                    blocks[part.uuid.ToString()].Name = "unnamed shape " + part.uuid;
+                    blocks[part.uuid.ToString()].Mod = "vanilla";
+                    blocks[part.uuid.ToString()].textures = new Newtonsoft.Json.Linq.JArray();
+                    blocks[part.uuid.ToString()].textures.Add(ScrapData+ @"\Objects\Textures\Blocks\" + System.IO.Path.GetFileName(part.dif.ToString()));
+                    blocks[part.uuid.ToString()].textures.Add(ScrapData + @"\Objects\Textures\Blocks\" + System.IO.Path.GetFileName(part.asg.ToString()));
+                    blocks[part.uuid.ToString()].textures.Add(ScrapData + @"\Objects\Textures\Blocks\" + System.IO.Path.GetFileName(part.nor.ToString()));
+                    blocks[part.uuid.ToString()].mesh = "";
+                    amountloaded++;
+                }
+            }
+            //VANILLA PARTS:
+            string ScrapShapeSets = ScrapData + @"\Objects\Database\ShapeSets";
+            foreach (string file in System.IO.Directory.GetFiles(ScrapShapeSets))
+            {
+                dynamic parts = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(file));
+                foreach (dynamic prop in parts)
+                {
+                    foreach (dynamic part in parts[prop.Name])
+                    {
+                        try
+                        {
+                            blocks[part.uuid.ToString()] = part;
+                            blocks[part.uuid.ToString()].Name = "unnamed shape " + part.uuid;
+                            blocks[part.uuid.ToString()].Mod = "vanilla";
+                            blocks[part.uuid.ToString()].textures = new Newtonsoft.Json.Linq.JArray();
+                            if(part.renderable.lodList[0].subMeshList!=null)
+                            {
+                                 foreach(string texture in part.renderable.lodList[0].subMeshList[0].textureList)
+                                    if(texture != "")
+                                        blocks[part.uuid.ToString()].textures.Add(ScrapData + @"\Objects\Textures\" + System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(texture))+ "\\" + System.IO.Path.GetFileName(texture));
+                            }
+                            else
+                            {
+                                foreach (string texture in part.renderable.lodList[0].subMeshMap.Shark.textureList)//TEMPORARY SOLUTION, WILL CRASH IF NEW OBJECT ADDED
+                                    if (texture != "")
+                                        blocks[part.uuid.ToString()].textures.Add(ScrapData + @"\Objects\Textures\" + System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(texture)) + "\\" + System.IO.Path.GetFileName(texture));
+
+                            }
+                            blocks[part.uuid.ToString()].mesh = ScrapData + @"\Objects\Mesh\" + System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.renderable.lodList[0].mesh.ToString())) + "\\" + System.IO.Path.GetFileName(part.renderable.lodList[0].mesh.ToString());
+                            amountloaded++;
+                        }
+                        catch(Exception e)
+                        {
+                            MessageBox.Show("found unusual file in vanilla gamefiles: " + file + " " + part.ToString());
+                            blocks[part.uuid.ToString()].mesh = "";
+                        }
+                    }
+                }
+            }
+            //name the vanilla blocks:
+            string basicmat = ScrapData + @"\Gui\Language\English\InventoryItemDescriptions.json";
+            dynamic inventoryitemdesc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(basicmat));
+            foreach (dynamic block in inventoryitemdesc)
+            {
+                if(blocks[block.Name.ToString()] != null) blocks[block.Name.ToString()].Name = block.Value.title.ToString();
+            }
+            
+
+            List<String> workshoppages = new List<string>();
+            //MODDED BLOCKS:
+            foreach (string folder in System.IO.Directory.GetDirectories(ModDatabase))
+            {
+                int conflictusemod = 0; //(1 use old, 2 use new
+                //modded blocks:
+                if (System.IO.Directory.Exists(folder + @"\Objects\Database\ShapeSets"))
+                {
+                    foreach (string file in System.IO.Directory.GetFiles(folder + @"\Objects\Database\ShapeSets"))
+                        if (System.IO.Path.GetExtension(file).ToLower() == ".json")
+                        {
+                            dynamic parts = null;
+                            try
+                            {
+                                parts = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(file));
+                            }
+                            catch(Exception e)
+                            {
+                                MessageBox.Show(e.Message + "\n\n" + file);
+                                parts = null;
+                            }
+                            if(parts !=null)
+                            foreach (dynamic prop in parts)
+                            {
+                                foreach (dynamic part in parts[prop.Name])
+                                {
+                                    try
+                                    {
+                                        dynamic moddesc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(folder + @"\description.json"));
+
+                                        if (moddesc.name != null)
+                                        {
+                                            if (conflictusemod == 0 && blocks[part.uuid.ToString()] != null && blocks[part.uuid.ToString()].Modfolder != folder)
+                                            {
+                                                conflictusemod = 1;//keep mod1
+
+                                                string uuid = part.uuid.ToString();
+                                                string mod1 = blocks[part.uuid.ToString()].Mod;
+                                                string mod2 = moddesc.name;
+
+                                                MessageBoxResult messageBoxResult = MessageBox.Show
+                                                    ("\"" + mod1 + "\" is using some(or all) uuid's of mod \"" + mod2 + "\"\n\nOverwrite blocks from \"" + mod1 + "\" with the blocks from \"" + mod2 + "\" ?\n\n"+file, "Conflicting mods!!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
+                                                if (messageBoxResult == MessageBoxResult.Yes)
+                                                {
+                                                    conflictusemod = 2;//overwrite!
+                                                }
+
+                                                //System.Diagnostics.Process.Start(blocks[part.uuid.ToString()].Modfolder.ToString());
+                                                //System.Diagnostics.Process.Start(folder);
+                                            }
+
+                                            if (conflictusemod != 1)//OVERWRITE if 2 , 0=no conflict
+                                            {
+                                                string p = part.ToString();
+                                                blocks[part.uuid.ToString()] = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(p);
+                                                blocks[part.uuid.ToString()].Name = "unnamed shape " + part.uuid;
+                                                blocks[part.uuid.ToString()].Modfolder = folder;
+                                                blocks[part.uuid.ToString()].Mod = moddesc.name;
+                                                blocks[part.uuid.ToString()].textures = new Newtonsoft.Json.Linq.JArray();
+                                                if (part.renderable != null)
+                                                {
+                                                    foreach (string texture in part.renderable.lodList[0].subMeshList[0].textureList)
+                                                        if (texture != "")
+                                                            blocks[part.uuid.ToString()].textures.Add(folder + @"\Objects\Textures\" + (System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(texture))=="Textures"?"": System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(texture))+"\\") + System.IO.Path.GetFileName(texture));
+                                                    blocks[part.uuid.ToString()].mesh = folder + @"\Objects\Mesh\" + ((System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.renderable.lodList[0].mesh.ToString())) == "Mesh" )? "" : (System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.renderable.lodList[0].mesh.ToString())) + "\\")) + System.IO.Path.GetFileName(part.renderable.lodList[0].mesh.ToString());
+                                                    string test = blocks[part.uuid.ToString()].mesh;
+                                                    if (System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.renderable.lodList[0].mesh.ToString())) != "Mesh")
+                                                    {
+                                                        string t ="ee";
+                                                        t = "";
+                                                    }
+                                                }
+                                                else
+                                                {//its a block!
+                                                    blocks[part.uuid.ToString()].textures.Add(folder + @"\Objects\Textures\" +(( System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.dif.ToString())) == "Textures") ? "" : (System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.dif.ToString())) + "\\")) + System.IO.Path.GetFileName(part.dif.ToString()));
+                                                    blocks[part.uuid.ToString()].textures.Add(folder + @"\Objects\Textures\" +(( System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.asg.ToString())) == "Textures") ? "" : (System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.asg.ToString())) + "\\")) + System.IO.Path.GetFileName(part.asg.ToString()));
+                                                    blocks[part.uuid.ToString()].textures.Add(folder + @"\Objects\Textures\" +(( System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.nor.ToString())) == "Textures") ? "" : (System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(part.nor.ToString())) + "\\")) + System.IO.Path.GetFileName(part.nor.ToString()));
+                                                    blocks[part.uuid.ToString()].mesh = "";
+                                                    dynamic t = blocks[part.uuid.ToString()].textures.ToString();
+                                                    t = null;
+                                                }
+                                                amountloaded++;
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            MessageBox.Show("you have a broken mod!\nFile: " + file);
+                                        }
+
+                                    }
+                                    catch(Exception e)
+                                    {
+                                        MessageBox.Show(e.Message);
+                                    }
+                                }
+                            }
+                        }   
+                }
+
+                //names:
+                if (System.IO.Directory.Exists(folder + @"\Gui\Language\English"))
+                {
+                    foreach(string file in Directory.GetFiles(folder + @"\Gui\Language\English\"))
+                    if(System.IO.File.Exists(folder + @"\Gui\Language\English\inventoryDescriptions.json"))
+                    {
+                        try
+                        {
+                            
+                            inventoryitemdesc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(folder + @"\Gui\Language\English\inventoryDescriptions.json"));
+                            if (inventoryitemdesc != null)
+                                foreach (dynamic block in inventoryitemdesc)
+                                    if (conflictusemod != 1 && blocks[block.Name.ToString()] != null)
+                                    {
+                                        string test = block.Value.title;
+                                        blocks[block.Name.ToString()].Name = test;
+                                    }
+
+                        }
+                        catch (Exception e)
+                        {
+                            workshoppages.Add("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder));
+                        }
+                    }
+                    //else MessageBox.Show("Mod Found with incorrect capitalized letter for 'inventoryDescriptions.json'");
+                }
+            }
+            if (workshoppages.Count !=0)
+            {
+                System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Modded blocks loaded: "+ amountloaded +"\n\nFound mods that weren't able to be loaded\nEither broken or made by a lazy dev\n\nRemove or Unsub\n\nOpen Workshop pages? (No=continue without this/these mod(s))", "Found unloadable mods!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    foreach (string page in workshoppages)
+                    {
+                        System.Diagnostics.Process.Start(page);
+                    }
+                }
+            }
+            this.Dispatcher.Invoke((Action)(() =>
+            {//this refer to form in WPF application 
+                gameblocks = blocks;
+            }));
+        }
+
+        private void MenuItem_Click_11(object sender, RoutedEventArgs e)//mirror mode
+        {
+            dynamic blueprint = this.OpenedBlueprint.blueprint;
+
+            foreach(dynamic body in blueprint.bodies)
+                foreach(dynamic block in body.childs)
+                {
+
+                    if(block.bounds == null )
+                    {
+                        if(Math.Abs( block.xaxis)==1)
+                        {
+                            block.xaxis = -block.xaxis;
+                        }
+                        if(Math.Abs(block.zaxis)==1)
+                        {
+                            block.xaxis = -block.zaxis;
+                        }
+                        block.pos.x = -block.pos.x;
+                    }
+                    else
+                        block.pos.x = -Convert.ToInt32( block.pos.x) - Convert.ToInt32( block.bounds.x);
+                }
+            this.OpenedBlueprint.setblueprint(blueprint);
+            this.UpdateOpenedBlueprint();
+
+        }
+
+        Sphere_generator sphere_Generator;
+        private void MenuItem_Click_12(object sender, RoutedEventArgs e) // sphere generator
+        {
+            if (sphere_Generator != null) sphere_Generator.Close();
+            sphere_Generator = new Sphere_generator(this);
+            sphere_Generator.Owner = this;
+            sphere_Generator.Show();
+
         }
     }
 }

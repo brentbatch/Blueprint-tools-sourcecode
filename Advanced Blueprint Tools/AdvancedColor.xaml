@@ -1,0 +1,30 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.AdvancedColor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow"
+        Title="AdvancedColor" Height="223.667" Width="344.667" Background="#8093A0">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+        <Grid HorizontalAlignment="Center" Height="77" Margin="0,95,0,0" VerticalAlignment="Top" Width="316" Background="#61737C">
+            <Label x:Name="label1" Content="Old:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="31"/>
+            <Label x:Name="label1_Copy" Content="New:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="37"/>
+            <ComboBox x:Name="comboBox_old" HorizontalAlignment="Left" Margin="47,10,0,0" VerticalAlignment="Top" Width="105" Height="26"/>
+            <ComboBox x:Name="comboBox_new" HorizontalAlignment="Left" Margin="47,41,0,0" VerticalAlignment="Top" Width="105" Height="26" Visibility="Hidden"/>
+            <TextBox x:Name="textBox_color1" HorizontalAlignment="Left" Height="26" Margin="157,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="textBox_color_TextChanged"/>
+            <TextBox x:Name="textBox_color2" HorizontalAlignment="Left" Height="26" Margin="157,41,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="textBox_color_TextChanged"/>
+            <Button x:Name="button3" Content="&lt; SET" HorizontalAlignment="Left" Margin="255,10,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button3_Click"/>
+            <Button x:Name="button3_Copy" Content="&lt; SET" HorizontalAlignment="Left" Margin="255,41,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button3_Copy_Click"/>
+        </Grid>
+        <Grid HorizontalAlignment="Center" Height="88" VerticalAlignment="Top" Width="316" Background="#61737C" Margin="0,0,0,0" >
+            <Button x:Name="button" Content="Color!" HorizontalAlignment="Left" Margin="256,47,0,0" VerticalAlignment="Top" Width="50" Height="32" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button_Click"/>
+            <Button x:Name="button1" Content="Help" HorizontalAlignment="Left" Margin="256,10,0,0" VerticalAlignment="Top" Width="50" Height="32" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button1_Click" />
+            <ListBox HorizontalAlignment="Left" Height="68" Margin="10,10,0,0" VerticalAlignment="Top" Width="241"/>
+
+        </Grid>
+
+    </Grid>
+</Window>

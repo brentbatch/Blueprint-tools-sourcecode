@@ -1,0 +1,101 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.PaintSelector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        ResizeMode="NoResize"
+        Title="PaintSelector" Height="245" Width="611" Background="#101010">
+    <Grid>
+        <Grid HorizontalAlignment="Left" Height="184" VerticalAlignment="Center" Width="460" Margin="10,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Button x:Name="button00" Content="" Height="40" Width="40" Grid.Column="0" Grid.Row="0" Margin="3" Background="#eeeeee" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button01" Content="" Height="40" Width="40" Grid.Column="1" Grid.Row="0" Margin="3" Background="#F5F071" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button02" Content="" Height="40" Width="40" Grid.Column="2" Grid.Row="0" Margin="3" Background="#CBF66F" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button03" Content="" Height="40" Width="40" Grid.Column="3" Grid.Row="0" Margin="3"  Background="#68FF88" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button04" Content="" Height="40" Width="40" Grid.Column="4" Grid.Row="0" Margin="3"  Background="#7EEDED" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button05" Content="" Height="40" Width="40" Grid.Column="5" Grid.Row="0" Margin="3"  Background="#4C6FE3" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button06" Content="" Height="40" Width="40" Grid.Column="6" Grid.Row="0" Margin="3"  Background="#AE79F0" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button07" Content="" Height="40" Width="40" Grid.Column="7" Grid.Row="0" Margin="3"  Background="#EE7BF0" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button08" Content="" Height="40" Width="40" Grid.Column="8" Grid.Row="0" Margin="3"  Background="#F06767" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button09" Content="" Height="40" Width="40" Grid.Column="9" Grid.Row="0" Margin="3"  Background="#EEAF5C" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button10" Content="" Height="40" Width="40" Grid.Column="0" Grid.Row="1" Margin="3"  Background="#7F7F7F" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button11" Content="" Height="40" Width="40" Grid.Column="1" Grid.Row="1" Margin="3"  Background="#E2DB13" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button12" Content="" Height="40" Width="40" Grid.Column="2" Grid.Row="1" Margin="3"  Background="#A0EA00" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button13" Content="" Height="40" Width="40" Grid.Column="3" Grid.Row="1" Margin="3"  Background="#19E753" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button14" Content="" Height="40" Width="40" Grid.Column="4" Grid.Row="1" Margin="3"  Background="#2CE6E6" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button15" Content="" Height="40" Width="40" Grid.Column="5" Grid.Row="1" Margin="3"  Background="#0A3EE2" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button16" Content="" Height="40" Width="40" Grid.Column="6" Grid.Row="1" Margin="3"  Background="#7514ED" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button17" Content="" Height="40" Width="40" Grid.Column="7" Grid.Row="1" Margin="3"  Background="#CF11D2" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button18" Content="" Height="40" Width="40" Grid.Column="8" Grid.Row="1" Margin="3"  Background="#D02525" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button19" Content="" Height="40" Width="40" Grid.Column="9" Grid.Row="1" Margin="3"  Background="#DF7F00" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button20" Content="" Height="40" Width="40" Grid.Column="0" Grid.Row="2" Margin="3"  Background="#4A4A4A" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button21" Content="" Height="40" Width="40" Grid.Column="1" Grid.Row="2" Margin="3"  Background="#817C00" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button22" Content="" Height="40" Width="40" Grid.Column="2" Grid.Row="2" Margin="3"  Background="#577D07" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button23" Content="" Height="40" Width="40" Grid.Column="3" Grid.Row="2" Margin="3"  Background="#0E8031" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button24" Content="" Height="40" Width="40" Grid.Column="4" Grid.Row="2" Margin="3"  Background="#118787" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button25" Content="" Height="40" Width="40" Grid.Column="5" Grid.Row="2" Margin="3"  Background="#0F2E91" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button26" Content="" Height="40" Width="40" Grid.Column="6" Grid.Row="2" Margin="3"  Background="#500AA6" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button27" Content="" Height="40" Width="40" Grid.Column="7" Grid.Row="2" Margin="3"  Background="#720A74" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button28" Content="" Height="40" Width="40" Grid.Column="8" Grid.Row="2" Margin="3"  Background="#7C0000" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button29" Content="" Height="40" Width="40" Grid.Column="9" Grid.Row="2" Margin="3"  Background="#673B00" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button30" Content="" Height="40" Width="40" Grid.Column="0" Grid.Row="3" Margin="3"  Background="#222222" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button31" Content="" Height="40" Width="40" Grid.Column="1" Grid.Row="3" Margin="3"  Background="#323000" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button32" Content="" Height="40" Width="40" Grid.Column="2" Grid.Row="3" Margin="3"  Background="#375000" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button33" Content="" Height="40" Width="40" Grid.Column="3" Grid.Row="3" Margin="3"  Background="#064023" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button34" Content="" Height="40" Width="40" Grid.Column="4" Grid.Row="3" Margin="3"  Background="#0A4444" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button35" Content="" Height="40" Width="40" Grid.Column="5" Grid.Row="3" Margin="3"  Background="#0A1D5A" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button36" Content="" Height="40" Width="40" Grid.Column="6" Grid.Row="3" Margin="3"  Background="#35086C" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button37" Content="" Height="40" Width="40" Grid.Column="7" Grid.Row="3" Margin="3"  Background="#520653" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button38" Content="" Height="40" Width="40" Grid.Column="8" Grid.Row="3" Margin="3"  Background="#560202" BorderThickness="0" Click="button_Click"/>
+            <Button x:Name="button39" Content="" Height="40" Width="40" Grid.Column="9" Grid.Row="3" Margin="3"  Background="#472800" BorderThickness="0" Click="button_Click"/>
+        </Grid>
+        <TextBox x:Name="textbox_color" HorizontalAlignment="Right" VerticalContentAlignment="Center" Height="23" Margin="0,0,10,18" TextWrapping="Wrap" Text="#EEEEEE" VerticalAlignment="Bottom" Width="101" Background="#eeeeee" TextChanged="textbox_color_TextChanged" BorderThickness="0" FontWeight="Black" MouseEnter="textbox_color_MouseEnter"/>
+        <Grid HorizontalAlignment="Right" Height="121" Margin="0,10,10,0" VerticalAlignment="Top" Width="101">
+            <Slider x:Name="slider_red" HorizontalAlignment="Center" Margin="15,0,65,0" Orientation="Vertical" VerticalAlignment="Top" Height="121" BorderBrush="Red" BorderThickness="1" Opacity="0.7" ValueChanged="slider_ValueChanged" Maximum="255" SmallChange="1">
+                <Slider.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Red"/>
+                        <GradientStop Color="Black" Offset="1"/>
+                    </LinearGradientBrush>
+                </Slider.Background>
+            </Slider>
+            <Slider x:Name="slider_green" HorizontalAlignment="Center" Margin="0,0,0,0" Orientation="Vertical" VerticalAlignment="Top" Height="121" BorderBrush="Green" BorderThickness="1" Opacity="0.7" ValueChanged="slider_ValueChanged" Maximum="255" SmallChange="1">
+                <Slider.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black" Offset="1"/>
+                        <GradientStop Color="Lime"/>
+                    </LinearGradientBrush>
+                </Slider.Background>
+            </Slider>
+            <Slider x:Name="slider_blue" HorizontalAlignment="Center" Margin="65,0,15,0" Orientation="Vertical" VerticalAlignment="Top" Height="121" BorderBrush="Blue" BorderThickness="1" Opacity="0.7" ValueChanged="slider_ValueChanged" Maximum="255" SmallChange="1">
+                <Slider.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black" Offset="1"/>
+                        <GradientStop Color="Blue"/>
+                    </LinearGradientBrush>
+                </Slider.Background>
+            </Slider>
+        </Grid>
+        <Button Content="Any Color" HorizontalAlignment="Right" Margin="0,0,10,46" VerticalAlignment="Bottom" Width="101" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button_Click_1" />
+
+    </Grid>
+</Window>

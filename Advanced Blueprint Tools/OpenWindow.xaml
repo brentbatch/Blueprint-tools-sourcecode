@@ -1,0 +1,34 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.OpenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Title="Open" Height="720" Width="419" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+    <Grid>
+        <TextBox x:Name="TextBox_Search" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" Height="63" FontSize="24" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#61737D" Width="386" ToolTip="Search!" Margin="0,10,0,0" TextChanged="button_refresh_Copy_Click"/>
+        <Label x:Name="Label_name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" Content="/" VerticalAlignment="Bottom" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="10,0,0,10" Height="63" Width="268"/>
+
+        <Button x:Name="button_LOAD" Content="LOAD" HorizontalAlignment="Right" Margin="0,0,10,44" VerticalAlignment="Bottom" Width="86" Height="30" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button_LOAD_Click"/>
+
+        <Button x:Name="button_DELETE" Content="DELETE" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="86" Height="29" Background="#B93533" Foreground="#fff" FontWeight="Bold" Click="button_DELETE_Click"/>
+
+        <ListBox x:Name="listBox_blueprints" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="510" VerticalAlignment="Center" Width="380" Background="#8093A0" SelectionChanged="ListBox_Selectionchanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Grid.Column="3" Grid.ColumnSpan="3" Orientation="Horizontal" Background="{x:Null}" HorizontalAlignment="Center">
+                        <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
+
+                        <Image Height="100" Width="100" Margin="3" Source="{Binding image}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+    </Grid>
+</Window>
