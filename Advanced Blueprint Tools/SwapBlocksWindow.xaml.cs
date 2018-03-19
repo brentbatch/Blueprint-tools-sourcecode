@@ -104,8 +104,6 @@ namespace Advanced_Blueprint_Tools
                 {
                     dynamic part = blocklist[bindex.Name];
                     dynamic bounds = getbounds(part);
-                    if (bounds != null)
-                        bounds = bounds;
                     if ((selectedblok.bounds != null && bounds != null && bounds.x == selectedblok.bounds.x && bounds.y == selectedblok.bounds.y && bounds.z == selectedblok.bounds.z) || bounds == null)
                     {
                         dynamic b = new JObject();

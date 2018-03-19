@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
         mc:Ignorable="d"
-        Title="Loadwindow" Height="137.791" Width="177.907" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Loading..." Height="27.093" Width="118.688" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
         <Label x:Name="label" Content="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
 

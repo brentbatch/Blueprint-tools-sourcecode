@@ -21,6 +21,7 @@ namespace Advanced_Blueprint_Tools
     {
         MainWindow window;
         string PaintColor;
+        
         public PaintSelector(MainWindow window)
         {
             InitializeComponent();

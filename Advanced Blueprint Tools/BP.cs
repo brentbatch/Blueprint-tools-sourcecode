@@ -24,6 +24,7 @@ namespace Advanced_Blueprint_Tools
         public dynamic blocksxyz = new JObject();
 
         public int minx = 10000,maxx = -10000, miny = 10000, maxy = -10000, minz = 10000, maxz = -10000;
+        public int centerx, centery, centerz;
 
         public override string ToString()
         {
@@ -72,6 +73,9 @@ namespace Advanced_Blueprint_Tools
                         if (!useduuids.Contains(joint.shapeId.ToString()))
                             useduuids.Add(joint.shapeId.ToString());
                     }
+                centerx = (maxx + minx) / 2;
+                centery = (maxy + miny) / 2;
+                centerz = (maxz + minz) / 2;
             }
             if (missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!");
         }
@@ -144,6 +148,10 @@ namespace Advanced_Blueprint_Tools
 
                             blocksxyz[x][y][z].blocks.Add(this.blueprint.joints[i]);
                         }
+
+                    centerx = (maxx + minx) / 2;
+                    centery = (maxy + miny) / 2;
+                    centerz = (maxz + minz) / 2;
                 }
                 if(missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!");
 
@@ -276,7 +284,7 @@ namespace Advanced_Blueprint_Tools
         }
         //get new pos and correct ingame bounds for child
         bool missingmod = false;
-        private dynamic getposandbounds(dynamic whatever)
+        public dynamic getposandbounds(dynamic whatever)
         {
             dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));
             string uuid = child.shapeId;

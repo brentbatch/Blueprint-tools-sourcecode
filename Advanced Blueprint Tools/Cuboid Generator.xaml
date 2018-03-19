@@ -1,0 +1,20 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.Cuboid_Generator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Title="Cuboid_Generator" Height="127.283" Width="382.115" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+    <Grid HorizontalAlignment="Center" Height="78" Margin="0" VerticalAlignment="Center" Width="357" Background="#61737C">
+        <Label Content="Lengths" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="shell thickness:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="TextBox_X" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="26" Margin="67,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Text="100" IsUndoEnabled="False" MaxLines="1" TextChanged="TextBox_TextChanged"/>
+        <TextBox Name="TextBox_Y" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  HorizontalAlignment="Left" Height="26" Margin="129,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Text="100" IsUndoEnabled="False" MaxLines="1" TextChanged="TextBox_TextChanged"/>
+        <TextBox Name="TextBox_Z" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  HorizontalAlignment="Left" Height="26" Margin="191,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Text="100" IsUndoEnabled="False" MaxLines="1" TextChanged="TextBox_TextChanged"/>
+        <TextBox Name="TextBox_thickness" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="26" Margin="117,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Text="1"  IsUndoEnabled="False" MaxLines="1" TextChanged="TextBox_TextChanged"/>
+        <Button Name="Button_Create" Content="Create Cuboid!" HorizontalAlignment="Left" Margin="253,42,0,0" VerticalAlignment="Top" Width="95" Height="26" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button_Create_Click"/>
+        <Button Name="Button_Help" Content="Help!" HorizontalAlignment="Left" Margin="253,10,0,0" VerticalAlignment="Top" Width="95" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button_Help_Click"/>
+
+    </Grid>
+</Window>

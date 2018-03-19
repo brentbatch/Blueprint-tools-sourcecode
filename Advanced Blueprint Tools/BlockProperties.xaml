@@ -1,0 +1,168 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.BlockProperties"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Title="BlockProperties" Height="742.333" Width="447" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Height="203"  Width="421" Background="#61737C">
+            <Label Content="Filter options:" HorizontalAlignment="Left" Margin="9,6,0,0" VerticalAlignment="Top"/>
+            <ComboBox Name="filter_type" HorizontalAlignment="Left" Margin="8,37,0,0" VerticalAlignment="Top" Width="203" SelectionChanged="filter_type_SelectionChanged"/>
+            <TextBox Name="filter_color" HorizontalAlignment="Left" Height="22" Margin="8,64,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="92" TextChanged="filter_color_TextChanged"/>
+            <Button Name="filter_SET" Content="&lt; SET" HorizontalAlignment="Left" Margin="105,64,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="filter_SET_Click"/>
+
+            <ListBox Name="filter_output" HorizontalAlignment="Left" Height="98" Margin="8,95,0,0" VerticalAlignment="Top" Width="404"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" Background="#8093A0" SelectionChanged="filter_output_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" Height="25">
+                            <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
+                            <Label Content="X:"/>
+                            <TextBlock Width="32" VerticalAlignment="Center" Text="{Binding pos.x}"/>
+                            <Label Content="Y:"/>
+                            <TextBlock Width="32" VerticalAlignment="Center" Text="{Binding pos.y}"/>
+                            <Label Content="Z:"/>
+                            <TextBlock Width="32" VerticalAlignment="Center" Text="{Binding pos.z}"/>
+                            <TextBlock Width="170" VerticalAlignment="Center" Text="{Binding blockname}"/>
+                            <TextBlock Width="60" VerticalAlignment="Center" Text="{Binding color}"/>
+                            <!--<Image Height="50" Width="50" Margin="3" Source="{Binding image}" />-->
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+            <Rectangle Name="filter_output_color" Fill="#fff" HorizontalAlignment="Left" Height="12" Margin="158,69,0,0" Stroke="#4a4a4a" VerticalAlignment="Top" Width="12" />
+            <Label Content="&lt;  x  &lt;" HorizontalAlignment="Left" Margin="287,5,0,0" VerticalAlignment="Top" FontSize="15"/>
+            <Label Content="&lt;  y  &lt;" HorizontalAlignment="Left" Margin="287,32,0,0" VerticalAlignment="Top" FontSize="15"/>
+            <Label Content="&lt;  z  &lt;" HorizontalAlignment="Left" Margin="287,59,0,0" VerticalAlignment="Top" FontSize="15"/>
+            <TextBox Name="filter_x1" HorizontalAlignment="Left" Height="22" Margin="216,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_y1" HorizontalAlignment="Left" Height="22" Margin="216,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_z1" HorizontalAlignment="Left" Height="22" Margin="216,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_z2" HorizontalAlignment="Left" Height="22" Margin="341,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_y2" HorizontalAlignment="Left" Height="22" Margin="341,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_x2" HorizontalAlignment="Left" Height="22" Margin="341,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+
+
+
+        </Grid>
+
+        <Grid Name="Edit_general" HorizontalAlignment="Center" Margin="0,208,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="True">
+            <Label Content="x:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,6,0,0"/>
+            <TextBox Name="new_x" HorizontalAlignment="Left" Height="22" Margin="33,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35"/>
+            <TextBox Name="new_y" HorizontalAlignment="Left" Height="22" Margin="97,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+            <TextBox Name="new_z" HorizontalAlignment="Left" Height="22" Margin="159,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35"/>
+            <Label Content="y:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="73,6,0,0"/>
+            <Label Content="z:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,6,0,0"/>
+            <Label Content="xaxis:" HorizontalAlignment="Left" Margin="255,6,0,0" VerticalAlignment="Top"/>
+            <Label Content="zaxis:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="344,6,0,0"/>
+            <TextBox Name="new_xaxis" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30"/>
+            <TextBox Name="new_zaxis" HorizontalAlignment="Left" Height="22" Margin="382,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="29"/>
+        </Grid>
+
+        <Grid Name="Edit_sensor" HorizontalAlignment="Center" Margin="0,255,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="SensorRange:" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.065,0.692"/>
+            <TextBox Name="new_sensorrange" HorizontalAlignment="Left" Height="22" Margin="97,10,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35"/>
+            <CheckBox Name="new_sensorcolormode" Content="ColorMode" HorizontalAlignment="Left" Margin="207,10,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="22" Width="86"/>
+            <TextBox Name="new_sensorcolor" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="65" TextChanged="color_TextChanged"/>
+            <Button x:Name="SET_Copy" Content="&lt; SET" HorizontalAlignment="Left" Margin="363,10,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="SET_Copy_Click"/>
+
+        </Grid>
+
+        <Grid Name="Edit_gate" HorizontalAlignment="Center" Margin="0,349,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="Type:" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
+            <ComboBox Name="new_gatemode" Text="AND" HorizontalAlignment="Left" Margin="97,10,0,0" VerticalAlignment="Top" Width="90">
+                <ComboBoxItem Name="Gate_AND">AND</ComboBoxItem>
+                <ComboBoxItem Name="Gate_OR">OR</ComboBoxItem>
+                <ComboBoxItem Name="Gate_XOR">XOR</ComboBoxItem>
+                <ComboBoxItem Name="Gate_NAND">NAND</ComboBoxItem>
+                <ComboBoxItem Name="Gate_NOR">NOR</ComboBoxItem>
+                <ComboBoxItem Name="Gate_XNOR">XNOR</ComboBoxItem>
+            </ComboBox>
+        </Grid>
+
+        <Grid Name="Edit_Timer"  HorizontalAlignment="Center" Margin="0,396,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="seconds:" HorizontalAlignment="Left" Margin="10,9,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_timerseconds" HorizontalAlignment="Left" Height="23" Margin="97,10,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+            <Label Content="ticks:" HorizontalAlignment="Left" Margin="136,10,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_timerticks" HorizontalAlignment="Left" Height="23" Margin="187,11,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+
+        </Grid>
+        <Grid Name="Edit_controller" HorizontalAlignment="Center" Margin="0,443,0,89"  Width="421" Background="#61737C" IsEnabled="true">
+            <ListBox Name="new_controllercontrolls" HorizontalAlignment="Left" Height="73" VerticalAlignment="Top" Width="401" Margin="10,10,0,0" SelectionChanged="new_controllercontrolls_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" Height="25">
+                            <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
+                            <TextBlock Width="20" VerticalAlignment="Center" Text="{Binding startAngle}" />
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller0}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller1}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller2}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller3}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller4}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller5}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller6}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller7}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller8}" />
+                            <TextBlock Text=" "/>
+                            <TextBlock  VerticalAlignment="Center" Text="{Binding controller9}" />
+                            <Label Content="Reverse:"/>
+                            <TextBlock Width="25" VerticalAlignment="Center" Text="{Binding reverse}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+            <Grid DataContext="" Name="new_selectedcontroller">
+                <TextBox Name="new_controllerstart" HorizontalAlignment="Left" Height="23" Margin="10,89,0,0" TextWrapping="Wrap" Text="{Binding startAngle}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller0" HorizontalAlignment="Left" Height="23" Margin="66,89,0,0" TextWrapping="Wrap" Text="{Binding controller0}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller1" HorizontalAlignment="Left" Height="23" Margin="101,89,0,0" TextWrapping="Wrap" Text="{Binding controller1}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller2" HorizontalAlignment="Left" Height="23" Margin="136,89,0,0" TextWrapping="Wrap" Text="{Binding controller2}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller3" HorizontalAlignment="Left" Height="23" Margin="171,89,0,0" TextWrapping="Wrap" Text="{Binding controller3}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller4" HorizontalAlignment="Left" Height="23" Margin="206,89,0,0" TextWrapping="Wrap" Text="{Binding controller4}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller5" HorizontalAlignment="Left" Height="23" Margin="241,89,0,0" TextWrapping="Wrap" Text="{Binding controller5}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller6" HorizontalAlignment="Left" Height="23" Margin="276,89,0,0" TextWrapping="Wrap" Text="{Binding controller6}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller7" HorizontalAlignment="Left" Height="23" Margin="311,89,0,0" TextWrapping="Wrap" Text="{Binding controller7}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller8" HorizontalAlignment="Left" Height="23" Margin="346,89,0,0" TextWrapping="Wrap" Text="{Binding controller8}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <TextBox Name="new_controller9" HorizontalAlignment="Left" Height="23" Margin="381,89,0,0" TextWrapping="Wrap" Text="{Binding controller9}" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" TextChanged="new_controller_joint_Changed"/>
+                <CheckBox Name="new_controllerreverse" IsChecked="{Binding reverse}" Content="Reverse" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="10,119,0,0" VerticalAlignment="Top" Height="23" Click="new_controllerreverse_Click"/>
+
+            </Grid>
+            <TextBox x:Name="new_controllertimeperframe" HorizontalAlignment="Left" Height="23" Margin="386,119,0,0" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="25" RenderTransformOrigin="1.16,0.681" ToolTip="lower = faster"/>
+            <CheckBox Name="new_controllerloopmode"  Content="LoopMode" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" Margin="210,121,0,0" Height="24"/>
+            <Label Content="TimePerFrame:" HorizontalAlignment="Left" Margin="293,119,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.412,-0.103" ToolTip="lower = faster"/>
+
+        </Grid>
+        <Grid HorizontalAlignment="Center" Margin="0,600,0,0" VerticalAlignment="Top" Height="84"  Width="421" Background="#61737C" IsEnabled="True">
+            <Button Name="button_render" Content="Apply&amp;Render" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="195" Height="64" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Margin="216,10,0,0" IsEnabled="False" Click="button_render_Click" />
+            <Button Name="button_help" Content="Help" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="195" Height="64" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Margin="10,10,0,0" Click="button_help_Click_1" />
+        </Grid>
+        <Grid Name="Edit_lamp" HorizontalAlignment="Center" Margin="0,302,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="luminance:" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_luminance" HorizontalAlignment="Left" Height="22" Margin="97,8,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35" ToolTip="= distance"/>
+            <Label Content="ConeAngle:" HorizontalAlignment="Left" Margin="132,6,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_coneangle" HorizontalAlignment="Left" Height="22" Margin="203,8,0,0" TextWrapping="Wrap" Text="130" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35" RenderTransformOrigin="0.357,0.568"/>
+            <Label Content="Color2:" HorizontalAlignment="Left" Margin="245,6,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_lampcolor" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="65" ToolTip="Available property in blueprint,\nNo official support by devs yet" TextChanged="color_TextChanged"/>
+            <Button x:Name="SET_Copy1" Content="&lt; SET" HorizontalAlignment="Left" Margin="363,10,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="SET_Copy1_Click"/>
+        </Grid>
+    </Grid>
+</Window>

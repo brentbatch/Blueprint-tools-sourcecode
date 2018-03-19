@@ -33,17 +33,15 @@
             </MenuItem>
             <MenuItem Header="_Edit">
                 <MenuItem Name="menuitem1" Header="Advanced Connections" Click="MenuItem_Click" IsEnabled="False"/>
-                <MenuItem Name="menuitem2" Header="Block Move/Glitchweld" Click="MenuItem_Click_1" IsEnabled="False" />
                 <MenuItem Name="menuitem3" Header="Advanced Paint" Click="MenuItem_Click_2" IsEnabled="False" />
-                <MenuItem Name="menuitem4" Header="Logic Gate Type" Click="MenuItem_Click_3" IsEnabled="False" />
-                <MenuItem Name="menuitem5" Header="Timer Range" Click="MenuItem_Click_4" IsEnabled="False" />
-                <MenuItem Name="menuitem6" Header="Controller Speed" Click="MenuItem_Click_5" IsEnabled="False" />
-                <MenuItem Name="menuitem7" Header="Light Range" Click="MenuItem_Click_6" IsEnabled="False" />
-                <MenuItem Name="menuitem8" Header="Sensor Range" Click="MenuItem_Click_7"  IsEnabled="False"/>
-                <MenuItem Name="menuitem9" Header="Joint Settings" Click="MenuItem_Click_8" IsEnabled="False" />
+                <MenuItem Name="menuitem2" Header="Block Properties" Click="MenuItem_Click_1" IsEnabled="False" />
+                <MenuItem Name="menuitem9" Header="Joint Properties" Click="MenuItem_Click_8" IsEnabled="False" />
+                <MenuItem Name="menuitem4" Header="Remove joints &amp; weld" Click="menuitem_Click_4" IsEnabled="False" />
+                <MenuItem Name="menuitem14" Header="Check Required mods" Click="menuitem_Click14" IsEnabled="False" />
                 <MenuItem Name="menuitem10" Header="Swap Blocks" Click="MenuItem_Click_9" IsEnabled="False" />
                 <MenuItem Name="menuitem12" Header="Mirror Creation!" Click="MenuItem_Click_11" IsEnabled="False" />
                 <MenuItem Name="menuitem13" Header="Sphere Generator" Click="MenuItem_Click_12"/>
+                <MenuItem Name="menuitem15" Header="Cuboid Generator" Click="MenuItem_Click_15"/>
                 <MenuItem Name="menuitem11" Header="Paint Selector" Click="MenuItem_Click_10" Background="#dddddd"/>
             </MenuItem>
         </Menu>
@@ -64,6 +62,9 @@
 
                     <!-- The content of this visual is defined in MainViewModel.cs -->
                     <ModelVisual3D Content="{Binding Model}"/>
+                    <ModelVisual3D Content="{Binding Marker}"/>
+                    <ModelVisual3D Content="{Binding Marker2}"/>
+                    <ModelVisual3D Content="{Binding Glass}"/>
 
                     <!-- You can also add elements here in the xaml -->
                 </HelixToolkit:HelixViewport3D>

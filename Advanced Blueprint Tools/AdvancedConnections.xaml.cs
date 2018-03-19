@@ -97,11 +97,13 @@ namespace Advanced_Blueprint_Tools
 
         private void button3_Click(object sender, RoutedEventArgs e)
         {
+            window.openpaintpicker();
             textBox_color1.Text = this.window.PaintColor;
         }
 
         private void button3_Copy_Click(object sender, RoutedEventArgs e)
         {
+            window.openpaintpicker();
             textBox_color2.Text = this.window.PaintColor;
         }
 

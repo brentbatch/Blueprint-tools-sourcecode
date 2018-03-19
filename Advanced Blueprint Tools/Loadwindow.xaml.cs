@@ -20,31 +20,9 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class Loadwindow : Window
     {
-        MainWindow w;
-        public Loadwindow(MainWindow window)
+        public Loadwindow()
         {
             InitializeComponent();
-
-
-
-            w = window;
-
-            Thread t = new Thread(new ThreadStart(checkifloaded));
-            t.Start();
-        }
-        
-        public void checkifloaded()
-        {
-            while(true)
-            {
-                MainWindow win=null;
-                this.Dispatcher.Invoke((Action)(() =>
-                {//this refer to form in WPF application 
-                    win = w;
-                }));
-                if (win.IsLoaded)
-                    this.Close();
-            }
         }
     }
 }

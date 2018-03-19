@@ -51,8 +51,8 @@ namespace Advanced_Blueprint_Tools
                     for (float z = -Z; z < Z; z++)
                     {
 
-                        if ((Math.Pow(x / X, 2) + Math.Pow(y / Y, 2) + Math.Pow(z / Z, 2)) < 1 &&
-                            (Math.Pow((x + (x > 0 ? t : -t)) / X, 2) + Math.Pow((y + (y > 0 ? t : -t)) / Y, 2) + Math.Pow((z + (z > 0 ? t : -t)) / Z, 2)) > 1)
+                        if ((Math.Pow(x / X, 2) + Math.Pow(y / Y, 2) + Math.Pow(z / Z, 2)) < 0.95 &&
+                            (Math.Pow((x + (x > 0 ? t : -t)) / X, 2) + Math.Pow((y + (y > 0 ? t : -t)) / Y, 2) + Math.Pow((z + (z > 0 ? t : -t)) / Z, 2)) > 0.95)
                         {
                             if (blocksXYZ[x.ToString()] == null)
                                 blocksXYZ[x.ToString()] = new JObject();
@@ -76,16 +76,13 @@ namespace Advanced_Blueprint_Tools
                         dynamic bounds = z.Value.bounds;
                         if (bounds != null)
                         {
-                            for (int i = Convert.ToInt32(x.Name) + 1; i < 64; i++)
+                            for (int i = Convert.ToInt32(z.Name) + 1; i < 64; i++)
                             {
-                                if (blocksXYZ[i.ToString()] != null && blocksXYZ[i.ToString()][y.Name] != null && blocksXYZ[i.ToString()][y.Name][z.Name] != null &&
-                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds != null &&
-                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds.z == blocksXYZ[x.Name][y.Name][z.Name].bounds.z &&
-                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds.y == blocksXYZ[x.Name][y.Name][z.Name].bounds.y)
+                                if (blocksXYZ[x.Name][y.Name][i.ToString()] != null && blocksXYZ[x.Name][y.Name][i.ToString()].bounds != null)
                                 {
-                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds = null;
+                                    blocksXYZ[x.Name][y.Name][i.ToString()].bounds = null;
 
-                                    blocksXYZ[x.Name][y.Name][z.Name].bounds.x = Convert.ToInt32(blocksXYZ[x.Name][y.Name][z.Name].bounds.x) + 1;
+                                    blocksXYZ[x.Name][y.Name][z.Name].bounds.z = Convert.ToInt32(blocksXYZ[x.Name][y.Name][z.Name].bounds.z) + 1;
                                 }
                                 else
                                     break;
@@ -115,7 +112,6 @@ namespace Advanced_Blueprint_Tools
                             }
                         }
                     }
-
             foreach (dynamic x in blocksXYZ)
                 foreach (dynamic y in x.Value)
                     foreach (dynamic z in y.Value)
@@ -123,19 +119,23 @@ namespace Advanced_Blueprint_Tools
                         dynamic bounds = z.Value.bounds;
                         if (bounds != null)
                         {
-                            for (int i = Convert.ToInt32(z.Name) + 1; i < 64; i++)
+                            for (int i = Convert.ToInt32(x.Name) + 1; i < 64; i++)
                             {
-                                if (blocksXYZ[x.Name][y.Name][i.ToString()] != null && blocksXYZ[x.Name][y.Name][i.ToString()].bounds != null)
+                                if (blocksXYZ[i.ToString()] != null && blocksXYZ[i.ToString()][y.Name] != null && blocksXYZ[i.ToString()][y.Name][z.Name] != null &&
+                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds != null &&
+                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds.z == blocksXYZ[x.Name][y.Name][z.Name].bounds.z &&
+                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds.y == blocksXYZ[x.Name][y.Name][z.Name].bounds.y)
                                 {
-                                    blocksXYZ[x.Name][y.Name][i.ToString()].bounds = null;
+                                    blocksXYZ[i.ToString()][y.Name][z.Name].bounds = null;
 
-                                    blocksXYZ[x.Name][y.Name][z.Name].bounds.z = Convert.ToInt32(blocksXYZ[x.Name][y.Name][z.Name].bounds.z) + 1;
+                                    blocksXYZ[x.Name][y.Name][z.Name].bounds.x = Convert.ToInt32(blocksXYZ[x.Name][y.Name][z.Name].bounds.x) + 1;
                                 }
                                 else
                                     break;
                             }
                         }
                     }
+
 
             foreach (dynamic x in blocksXYZ)
                 foreach (dynamic y in x.Value)
@@ -145,9 +145,8 @@ namespace Advanced_Blueprint_Tools
 
             if (amountgenerated > 0)
             {
-                int count = Sphere.bodies[0].childs.Count;
                 string message = "++ An ellipsoid with " + amountgenerated + " blocks has been generated!";
-                MessageBox.Show(message+"\n\nOptimized to: "+count+" shapes");
+                //MessageBox.Show(message+"\n\nOptimized to: "+count+" shapes");
                 Random r = new Random();
                 string blueprintdir = this.mainwindow.blueprintdir+"\\GeneratedEllipsoid-"+r.Next()+r.Next();
                 dynamic description = new JObject();

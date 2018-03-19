@@ -20,8 +20,6 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class AdvancedColor : Window
     {
-
-        string steam = "";
         MainWindow window;
         List<Item> ItemList;
         dynamic uuidsbackup;
@@ -92,11 +90,13 @@ namespace Advanced_Blueprint_Tools
 
         private void button3_Click(object sender, RoutedEventArgs e)
         {
+            window.openpaintpicker();
             textBox_color1.Text = this.window.PaintColor;
         }
 
         private void button3_Copy_Click(object sender, RoutedEventArgs e)
         {
+            window.openpaintpicker();
             textBox_color2.Text = this.window.PaintColor;
         }
 
@@ -125,7 +125,7 @@ namespace Advanced_Blueprint_Tools
                     string token = "#";
                     string color = child.color.ToString();
                     if (color[0] == '#') token = "";
-                    if ((token+child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#"|| textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString().ToLower() == ItemList[comboBox_old.SelectedIndex].UUID.ToLower()))
+                    if ((token + child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#" || textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString().ToLower() == ItemList[comboBox_old.SelectedIndex].UUID.ToLower()))
                     {
                         amountcolored++;
                         child.color = newcolor;
@@ -133,15 +133,15 @@ namespace Advanced_Blueprint_Tools
                 }
             }
             if (comboBox_old.SelectedIndex < 0) comboBox_old.SelectedIndex = 0;
-            string message = "++ " + amountcolored + " "  + oldcolor + " " + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
+            string message = "++ " + amountcolored + " " + oldcolor + " " + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
             if (textBox_color1.Text == "#" || textBox_color1.Text == "")
                 message = "++ " + amountcolored + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
             MessageBox.Show(message);
-            if(amountcolored>0)
+            if (amountcolored > 0)
             {
                 window.OpenedBlueprint.setblueprint(window.OpenedBlueprint.blueprint);
 
-                   window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n" + message;
+                window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n" + message;
                 window.UpdateOpenedBlueprint();
             }
 
@@ -153,7 +153,7 @@ namespace Advanced_Blueprint_Tools
     {
         public string Name { get; set; }
         public string UUID { get; set; }
-        
+
         public Item(string Name, string UUID)
         {
             this.Name = Name;

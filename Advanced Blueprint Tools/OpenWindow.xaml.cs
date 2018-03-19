@@ -66,6 +66,20 @@ namespace Advanced_Blueprint_Tools
                         }
                 }
                 Thread.Sleep(3);
+                try
+                {
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {//this refer to form in WPF application 
+                     //check if window still active
+
+                        if (this.IsActive)
+                        { }
+                    }));
+                }
+                catch
+                {
+                    break;
+                }//end thread if window closed
             }
 
         }   
@@ -101,30 +115,40 @@ namespace Advanced_Blueprint_Tools
         public void load()
         {
             BP bp = null;
-            try
+            dynamic blocks = mainwindow.getgameblocks();
+            if (((JObject)blocks).Count > 100)
             {
-                string bppath="";
-                this.Dispatcher.Invoke((Action)(() =>
-                {//this refer to form in WPF application 
-                    bppath = Directory.GetParent(((Blueprint)listBox_blueprints.SelectedItem).image).ToString();
-                }));
-                bp = new BP(bppath);
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
-            if(bp!=null)
-            this.Dispatcher.Invoke((Action)(() =>
-            {//this refer to form in WPF application 
-                mainwindow.OpenedBlueprint = bp;
-                mainwindow.UpdateOpenedBlueprint();
-            }));
+                try
+                {
+                    string bppath = "";
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {//this refer to form in WPF application 
+                        bppath = Directory.GetParent(((Blueprint)listBox_blueprints.SelectedItem).image).ToString();
+                    }));
+                    bp = new BP(bppath);
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+                if (bp != null)
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {//this refer to form in WPF application 
+                        Loadwindow l = new Loadwindow();
+                        l.Show();
+                        mainwindow.OpenedBlueprint = bp;
+                        mainwindow.UpdateOpenedBlueprint();
+                        if (mainwindow.advancedconnections != null && mainwindow.advancedconnections.IsLoaded) mainwindow.advancedconnections.update();
+                        if (mainwindow.advancedcolorwindow != null && mainwindow.advancedcolorwindow.IsLoaded) mainwindow.advancedcolorwindow.update();
+                        if (mainwindow.swapblockswindow != null && mainwindow.swapblockswindow.IsLoaded) mainwindow.swapblockswindow.update();
+                        if (mainwindow.blockProperties != null && mainwindow.blockProperties.IsLoaded) mainwindow.blockProperties.Close();
 
-            if (mainwindow.advancedconnections != null) mainwindow.advancedconnections.update();
-            if (mainwindow.advancedcolorwindow != null) mainwindow.advancedcolorwindow.update();
-            if (mainwindow.swapblockswindow != null) mainwindow.swapblockswindow.update();
+                        l.Close();
 
+                    }));
+            }
+            else
+                MessageBox.Show("Resources aren't loaded yet, please give it a moment");
         }
 
         private void button_DELETE_Click(object sender, RoutedEventArgs e)
