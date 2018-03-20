@@ -43,18 +43,18 @@ namespace Advanced_Blueprint_Tools
 
         public void update()
         {
-            usedblocks = new List<Item>();
-            usedblocks.Add(new Item("any", "*"));
 
             if (uuidsbackup != this.mainwindow.OpenedBlueprint.useduuids)
             {
+                usedblocks = new List<Item>();
+                usedblocks.Add(new Item("any", "*"));
                 foreach (string uuid in this.mainwindow.OpenedBlueprint.useduuids)
                 {
                     if (this.mainwindow.getgameblocks()[uuid] != null)
                     {
 
                         dynamic part = this.mainwindow.getgameblocks()[uuid];
-                            usedblocks.Add(new Item(part.Name.ToString(), part.uuid.ToString())); // fill the combobox!   only runs once!
+                        usedblocks.Add(new Item(part.Name.ToString(), part.uuid.ToString())); // fill the combobox!   only runs once!
                     }
                 }
                 filter_type.Items.Clear();
@@ -63,7 +63,7 @@ namespace Advanced_Blueprint_Tools
 
             }
             uuidsbackup = this.mainwindow.OpenedBlueprint.useduuids;
-
+            filter_type.SelectedIndex = 0;
             int i = 0;
             {
                 backuplist = new JObject(); //fill 'backup'list with all childs!
@@ -71,6 +71,8 @@ namespace Advanced_Blueprint_Tools
                 foreach (dynamic body in this.mainwindow.OpenedBlueprint.blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
+                        if (child.color.ToString().StartsWith("#"))
+                            child.color = child.color.ToString().Substring(1);
                         child.blueprintIndex = i;
                         dynamic blocks = this.mainwindow.getgameblocks();
                         child.blockname = blocks[child.shapeId.ToString()].Name;
@@ -282,15 +284,19 @@ namespace Advanced_Blueprint_Tools
                                         }
                                     }
 
-                this.Dispatcher.Invoke((Action)(() =>
-                {//this refer to form in WPF application 
-                    disableAll();
-                }));
-                l.Close();
-                
+                try
+                {
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {//this refer to form in WPF application 
+                        disableAll();
+                    }));
+
+                    l.Close();
+                }
+                catch { }
             }
         }
-
+        int selectedchildindex=-1;
         private void filter_output_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             disableAll();
@@ -300,7 +306,7 @@ namespace Advanced_Blueprint_Tools
                 var bc = new BrushConverter();
                 string selectedcolor = ((dynamic)filter_output.SelectedItem).color;
                 string color = "#FF" + (selectedcolor.StartsWith("#")==true? selectedcolor.Substring(1): selectedcolor);
-                filter_output_color.Fill = (Brush)bc.ConvertFrom(color);
+                //filter_output_color.Fill = (Brush)bc.ConvertFrom(color);
                 //clear other options, enable/disable several
 
                 dynamic selectedblock = ((dynamic)filter_output.SelectedItem);
@@ -308,11 +314,12 @@ namespace Advanced_Blueprint_Tools
                 dynamic realpos = this.mainwindow.OpenedBlueprint.getposandbounds(selectedblock);
                 this.mainwindow.setMarker(Convert.ToInt32(realpos.pos.x) + (Convert.ToDouble(selectedblock.bounds.x)/2), Convert.ToInt32(realpos.pos.y) + (Convert.ToDouble(selectedblock.bounds.y) / 2), Convert.ToDouble(realpos.pos.z) + (Convert.ToDouble(selectedblock.bounds.z) / 2));
 
-                button_render.Visibility = Visibility.Visible;
+                selectedchildindex = selectedblock.blueprintIndex;
                 Edit_general.Visibility = Visibility.Visible;
                 new_x.Text = selectedblock.pos.x;
                 new_y.Text = selectedblock.pos.y;
                 new_z.Text = selectedblock.pos.z;
+                new_color.Text = "#" + selectedblock.color;
                 new_xaxis.Text = selectedblock.xaxis;
                 new_zaxis.Text = selectedblock.zaxis;
                 if(selectedblock.controller != null) //
@@ -330,8 +337,8 @@ namespace Advanced_Blueprint_Tools
                         new_sensorcolormode.IsChecked = selectedblock.controller.colorMode;
                         if (selectedblock.controller.colorMode == null) new_sensorcolormode.IsChecked = false;
                         new_sensorrange.Text = selectedblock.controller.range;
-                        new_sensorcolor.Text = selectedblock.controller.color;
-                        if(selectedblock.controller.color==null)
+                        new_sensorcolor.Text = "#"+selectedblock.controller.color;
+                        if (selectedblock.controller.color == null) new_sensorcolor.Text = "#eeeeee";
                         Edit_sensor.Visibility = Visibility.Visible;
                     }
                     if (selectedblock.controller.luminance != null)//light!
@@ -345,7 +352,7 @@ namespace Advanced_Blueprint_Tools
                     {
                         //seconds ticks
                         new_timerseconds.Text = selectedblock.controller.seconds;
-                        new_luminance.Text = selectedblock.controller.ticks;
+                        new_timerticks.Text = selectedblock.controller.ticks;
                         Edit_Timer.Visibility = Visibility.Visible;
                     }
 
@@ -374,9 +381,10 @@ namespace Advanced_Blueprint_Tools
                         Edit_controller.Visibility = Visibility.Visible;
                     }
                 }
+                button_render.IsEnabled = true;
 
 
-                
+
             }
         }
 
@@ -402,11 +410,15 @@ namespace Advanced_Blueprint_Tools
             new_sensorcolor.Text = this.mainwindow.PaintColor;
 
         }
-
         private void SET_Copy1_Click(object sender, RoutedEventArgs e)
         {
             mainwindow.openpaintpicker();
             new_lampcolor.Text = this.mainwindow.PaintColor;
+        }
+        private void SET_Copy2_Click(object sender, RoutedEventArgs e)
+        {
+            mainwindow.openpaintpicker();
+            new_color.Text = this.mainwindow.PaintColor;
         }
 
 
@@ -432,7 +444,57 @@ namespace Advanced_Blueprint_Tools
 
         private void button_render_Click(object sender, RoutedEventArgs e)
         {
+            //blueprintIndex
+            foreach(dynamic body in this.mainwindow.OpenedBlueprint.blueprint.bodies)
+                foreach(dynamic child in body.childs)
+                    if (Convert.ToInt32(child.blueprintIndex) == selectedchildindex)
+                    {
 
+                        if (Edit_controller.IsVisible)
+                        {
+                            child.controller = (dynamic)new_controllercontrolls.Items;
+                        }
+                        if(Edit_gate.IsVisible)
+                        {
+                            child.controller.mode = new_gatemode.SelectedIndex;
+                        }
+                        if(Edit_general.IsVisible)
+                        {
+                            child.pos.x = Convert.ToInt32(new_x.Text);
+                            child.pos.y = Convert.ToInt32(new_y.Text);
+                            child.pos.z = Convert.ToInt32(new_z.Text);
+                            child.color = new_color.Text;
+                            child.xaxis = new_xaxis.Text;
+                            child.zaxis = new_zaxis.Text;
+                        }
+                        if(Edit_sensor.IsVisible)
+                        {
+                            child.controller.colorMode = new_sensorcolormode.IsChecked;
+                            child.controller.range = Convert.ToInt32(new_sensorrange.Text);
+                            child.controller.color = new_sensorcolor.Text;
+                        }
+                        if(Edit_lamp.IsVisible)
+                        {
+                            child.controller.coneAngle = Convert.ToInt32(new_coneangle.Text);
+                            child.controller.luminance = Convert.ToInt32(new_luminance.Text);
+                        }
+                        if(Edit_Timer.IsVisible)
+                        {
+                            child.controller.seconds = Convert.ToInt32(new_timerseconds.Text);
+                            child.controller.ticks = Convert.ToInt32(new_timerticks.Text);
+                        }
+                }
+
+
+            Loadwindow w = new Loadwindow();
+            w.Show();
+
+            update();
+            this.mainwindow.OpenedBlueprint.description.description = this.mainwindow.OpenedBlueprint.description.description += "++ Applied some block property changes ";
+            this.mainwindow.OpenedBlueprint.setblueprint(this.mainwindow.OpenedBlueprint.blueprint);
+            this.mainwindow.UpdateOpenedBlueprint();
+
+            w.Close();
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -441,5 +503,6 @@ namespace Advanced_Blueprint_Tools
             this.mainwindow.Marker = null;
             this.mainwindow.setMarker2(0, 0, 0, 0, 0, 0);
         }
+
     }
 }

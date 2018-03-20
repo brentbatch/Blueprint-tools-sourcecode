@@ -11,8 +11,8 @@
         <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Height="203"  Width="421" Background="#61737C">
             <Label Content="Filter options:" HorizontalAlignment="Left" Margin="9,6,0,0" VerticalAlignment="Top"/>
             <ComboBox Name="filter_type" HorizontalAlignment="Left" Margin="8,37,0,0" VerticalAlignment="Top" Width="203" SelectionChanged="filter_type_SelectionChanged"/>
-            <TextBox Name="filter_color" HorizontalAlignment="Left" Height="22" Margin="8,64,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="92" TextChanged="filter_color_TextChanged"/>
-            <Button Name="filter_SET" Content="&lt; SET" HorizontalAlignment="Left" Margin="105,64,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="filter_SET_Click"/>
+            <TextBox Name="filter_color" HorizontalAlignment="Left" Height="22" Margin="66,64,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="92" TextChanged="filter_color_TextChanged"/>
+            <Button Name="filter_SET" Content="&lt; SET" HorizontalAlignment="Left" Margin="163,64,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="filter_SET_Click"/>
 
             <ListBox Name="filter_output" HorizontalAlignment="Left" Height="98" Margin="8,95,0,0" VerticalAlignment="Top" Width="404"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" Background="#8093A0" SelectionChanged="filter_output_SelectionChanged">
@@ -38,7 +38,6 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <Rectangle Name="filter_output_color" Fill="#fff" HorizontalAlignment="Left" Height="12" Margin="158,69,0,0" Stroke="#4a4a4a" VerticalAlignment="Top" Width="12" />
             <Label Content="&lt;  x  &lt;" HorizontalAlignment="Left" Margin="287,5,0,0" VerticalAlignment="Top" FontSize="15"/>
             <Label Content="&lt;  y  &lt;" HorizontalAlignment="Left" Margin="287,32,0,0" VerticalAlignment="Top" FontSize="15"/>
             <Label Content="&lt;  z  &lt;" HorizontalAlignment="Left" Margin="287,59,0,0" VerticalAlignment="Top" FontSize="15"/>
@@ -55,15 +54,17 @@
 
         <Grid Name="Edit_general" HorizontalAlignment="Center" Margin="0,208,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="True">
             <Label Content="x:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,6,0,0"/>
-            <TextBox Name="new_x" HorizontalAlignment="Left" Height="22" Margin="33,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35"/>
-            <TextBox Name="new_y" HorizontalAlignment="Left" Height="22" Margin="97,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
-            <TextBox Name="new_z" HorizontalAlignment="Left" Height="22" Margin="159,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35"/>
-            <Label Content="y:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="73,6,0,0"/>
-            <Label Content="z:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,6,0,0"/>
-            <Label Content="xaxis:" HorizontalAlignment="Left" Margin="255,6,0,0" VerticalAlignment="Top"/>
-            <Label Content="zaxis:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="344,6,0,0"/>
-            <TextBox Name="new_xaxis" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30"/>
-            <TextBox Name="new_zaxis" HorizontalAlignment="Left" Height="22" Margin="382,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="29"/>
+            <TextBox Name="new_x" HorizontalAlignment="Left" Height="22" Margin="24,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+            <TextBox Name="new_y" HorizontalAlignment="Left" Height="22" Margin="72,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+            <TextBox Name="new_z" HorizontalAlignment="Left" Height="22" Margin="118,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="36"/>
+            <Label Content="y:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="58,6,0,0"/>
+            <Label Content="z:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="104,6,0,0"/>
+            <Label Content="xaxis:" HorizontalAlignment="Left" Margin="163,6,0,0" VerticalAlignment="Top"/>
+            <Label Content="zaxis:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,6,0,0"/>
+            <TextBox Name="new_xaxis" HorizontalAlignment="Left" Height="22" Margin="197,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="30" RenderTransformOrigin="1.244,0.667"/>
+            <TextBox Name="new_zaxis" HorizontalAlignment="Left" Height="22" Margin="258,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="28"/>
+            <TextBox x:Name="new_color" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="65" TextChanged="color_TextChanged"/>
+            <Button x:Name="SET_Copy2" Content="&lt; SET" HorizontalAlignment="Left" Margin="363,10,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="SET_Copy2_Click"/>
         </Grid>
 
         <Grid Name="Edit_sensor" HorizontalAlignment="Center" Margin="0,255,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">

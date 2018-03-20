@@ -345,5 +345,18 @@ namespace Advanced_Blueprint_Tools
                 child.pos.z -= child.bounds.z;
             return child;
         }
+        public dynamic calcbppos(dynamic whatever)
+        {
+            dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));
+
+            //this updating pos only applies to parts, blocks do not get affected as they always have xaxis 1 zaxis 3
+            if (child.xaxis == -1 | child.zaxis == -1 | (child.xaxis == 2 && child.zaxis == 3) | (child.xaxis == 3 && child.zaxis == -2) | (child.xaxis == -2 && child.zaxis == -3) | (child.xaxis == -3 && child.zaxis == 2))
+                child.pos.x += child.bounds.x;
+            if (child.xaxis == -2 | child.zaxis == -2 | (child.xaxis == -1 && child.zaxis == 3) | (child.xaxis == -3 && child.zaxis == -1) | (child.xaxis == 1 && child.zaxis == -3) | (child.xaxis == 3 && child.zaxis == 1))
+                child.pos.y += child.bounds.y;
+            if (child.xaxis == -3 | child.zaxis == -3 | (child.xaxis == -2 && child.zaxis == 1) | (child.xaxis == -1 && child.zaxis == -2) | (child.xaxis == 1 && child.zaxis == 2) | (child.xaxis == 2 && child.zaxis == -1))
+                child.pos.z += child.bounds.z;
+            return child;
+        }
     }
 }

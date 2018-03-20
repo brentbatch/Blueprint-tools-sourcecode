@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,10 +35,10 @@ namespace Advanced_Blueprint_Tools
 
         public void update()
         {
-            ItemList = new List<Item>();
-            ItemList.Add(new Item("any", "*"));
             if (uuidsbackup != this.window.OpenedBlueprint.useduuids)
             {
+                ItemList = new List<Item>();
+                ItemList.Add(new Item("any", "*"));
                 foreach (string uuid in this.window.OpenedBlueprint.useduuids)
                 {
                     if (this.window.getgameblocks()[uuid] != null)
@@ -45,8 +46,27 @@ namespace Advanced_Blueprint_Tools
 
                         dynamic part = this.window.getgameblocks()[uuid];
                         ItemList.Add(new Item(part.Name.ToString(), part.uuid.ToString()));
+
+
                     }
                 }
+                dynamic colorlist = new JObject();
+                foreach (dynamic body in this.window.OpenedBlueprint.blueprint.bodies)
+                    foreach(dynamic child in body.childs)
+                    {
+                        if (child.color.ToString().StartsWith("#")) child.color = child.color.ToString().subString(1);
+                        if (colorlist[child.color.ToString().ToLower()] == null)
+                        {
+                            colorlist[child.color.ToString().ToLower()] = true;
+                            string c = child.color.ToString();
+
+                            Button b = new Button();
+                            var bc = new BrushConverter();
+                            b.Background = (Brush)bc.ConvertFrom("#"+c);
+                            color_list.Items.Add(b);
+                        }
+
+                    }
 
                 this.Dispatcher.Invoke((Action)(() =>
                 {//this refer to form in WPF application 
@@ -146,6 +166,11 @@ namespace Advanced_Blueprint_Tools
             }
 
 
+        }
+
+        private void color_list_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.window.PaintColor = ((dynamic)sender).Background;
         }
     }
 

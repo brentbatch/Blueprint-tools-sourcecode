@@ -8,12 +8,12 @@
         ResizeMode="NoResize" 
         Title="AdvancedConnections" Height="288" Width="412" Background="#8093A0">
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Grid HorizontalAlignment="Center" Height="35" Margin="14,82,147,0" VerticalAlignment="Top" Width="234" Background="#61737C">
-            <CheckBox x:Name="checkBox_X" Content="X" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,10,102,9"/>
-            <CheckBox x:Name="checkBox_Y" Content="Y" HorizontalAlignment="Right" Margin="0,10,74,9" VerticalAlignment="Center"/>
-            <CheckBox x:Name="checkBox_Z" Content="Z" HorizontalAlignment="Right" Margin="0,10,48,9" VerticalAlignment="Center" />
+        <Grid HorizontalAlignment="Center" Height="35" Margin="14,82,14,0" VerticalAlignment="Top" Width="367" Background="#61737C">
+            <CheckBox x:Name="checkBox_X" Content="X" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,10,131,11"/>
+            <CheckBox x:Name="checkBox_Y" Content="Y" HorizontalAlignment="Right" Margin="0,10,99,10" VerticalAlignment="Center"/>
+            <CheckBox x:Name="checkBox_Z" Content="Z" HorizontalAlignment="Right" Margin="0,10,67,10" VerticalAlignment="Center" />
             <Label x:Name="label" Content="Wiring Direction:" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" VerticalContentAlignment="Center"/>
-            <CheckBox x:Name="checkBox_0" Content="self" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,10,5,10"/>
+            <CheckBox x:Name="checkBox_0" Content="self" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,10,24,10"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="77" Margin="0,0,0,0" VerticalAlignment="Top" Width="367" Background="#61737C">
             <Label x:Name="label1" Content="Source:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="83"/>
@@ -25,7 +25,7 @@
             <Button x:Name="button3" Content="&lt; SET" HorizontalAlignment="Left" Margin="306,10,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button3_Click"/>
             <Button x:Name="button3_Copy" Content="&lt; SET" HorizontalAlignment="Left" Margin="306,41,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button3_Copy_Click"/>
         </Grid>
-        <Grid HorizontalAlignment="Center" Height="35" Margin="253,82,14,0" VerticalAlignment="Top" Width="128" Background="#61737C">
+        <Grid HorizontalAlignment="Center" Height="35" Margin="253,82,14,0" VerticalAlignment="Top" Width="128" Background="#61737C" Visibility="Collapsed">
             <Button x:Name="button" Content="Open Paint Picker" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#5DB7E7" Foreground="#fff" Width="110" Click="button_Click"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="110" Margin="15,122,178,0" VerticalAlignment="Top" Width="202" Background="#61737C">

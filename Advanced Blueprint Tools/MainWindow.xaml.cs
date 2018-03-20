@@ -402,7 +402,7 @@ namespace Advanced_Blueprint_Tools
             Model3DGroup marker = new Model3DGroup();
             Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(100, 20, 50, 50)));
             var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), boundsx, boundsy, boundsz);
+            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), boundsx+0.1, boundsy+0.1, boundsz+0.1);
             // Create a mesh from the builder (and freeze it)
             var Mesh = meshBuilder.ToMesh(true);
             marker.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
@@ -413,7 +413,7 @@ namespace Advanced_Blueprint_Tools
 
         private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if(gameblocks!=null)
+            if(((JObject)gameblocks).Count>0)
             {
                 if (openwindow != null && openwindow.IsLoaded)
                 {
@@ -423,6 +423,7 @@ namespace Advanced_Blueprint_Tools
                 else
                 {
                     openwindow = new OpenWindow(this);
+                    openwindow.Owner = this;
                     openwindow.Show();
                 }
                 openwindow.TextBox_Search.Focus();
@@ -430,7 +431,7 @@ namespace Advanced_Blueprint_Tools
             }
             else
             {
-                MessageBox.Show("Game-file resources are not fully loaded yet!\nplease take a moment\nshouldn't take longer than 'modamount'/300 seconds");
+                MessageBox.Show("Game-file resources are not fully loaded yet!\nplease take a moment\nthis won't take long");
             }
         }
 
@@ -443,10 +444,12 @@ namespace Advanced_Blueprint_Tools
         private void SaveCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             button_overwrite_click(sender, e);
+
         }
         private void SaveAsCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             button_save_click(sender, e);
+            MessageBox.Show("saved as new creation,\nif game is running: will need to be restarted to be able to see the blueprints, complain to the devs about this, not me");
         }
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -1085,7 +1088,7 @@ namespace Advanced_Blueprint_Tools
         }
 
         private void MenuItem_Click_11(object sender, RoutedEventArgs e)//mirror mode
-        {
+         {
             dynamic blueprint = this.OpenedBlueprint.blueprint;
             if (blueprint.joints == null)
             {
@@ -1098,12 +1101,29 @@ namespace Advanced_Blueprint_Tools
                             //block.xaxis = -block.xaxis;
                             block.pos.x = -block.pos.x; 
                             throw new Exception(); //every block should have gotten bounds
-
-                            //get real position, then rotate block and calculate bp pos from rotation and real position
                         }
-                        else
+
+
                         {
+
+                            dynamic realpos = this.OpenedBlueprint.calcbppos(block);
+
+                            block.pos = realpos.pos;
+
                             block.pos.x = -Convert.ToInt32(block.pos.x) - Convert.ToInt32(block.bounds.x);
+                            //works thus far for blocks, not parts tho
+
+                            block.pos = this.OpenedBlueprint.getposandbounds(block).pos;
+
+                            /*
+                            if(Math.Abs(Convert.ToInt32(block.zaxis)) == 3 || Math.Abs(Convert.ToInt32(block.zaxis)) == 2)
+                            {
+                                block.xaxis = -Convert.ToInt32(block.xaxis);
+                            }
+                            if(Math.Abs(Convert.ToInt32(block.zaxis)) == 1)
+                            {
+                                block.zaxis = -Convert.ToInt32(block.zaxis);
+                            }*/
                             /*block.pos.x = -Convert.ToInt32(block.pos.x);
                             if(Convert.ToInt32(block.xaxis) == 1 || Convert.ToInt32(block.xaxis) == -1)
                                 block.xaxis = -Convert.ToInt32(block.xaxis);
@@ -1116,6 +1136,7 @@ namespace Advanced_Blueprint_Tools
             }
             else
                 MessageBox.Show("Mirror mode can't mirror blueprints with joints inside yet!");
+            MessageBox.Show("Mirror mode did it's best to mirror things though there may be some parts that didn't turn out great.");
 
         }
 
@@ -1129,7 +1150,7 @@ namespace Advanced_Blueprint_Tools
 
         }
 
-        private void menuitem_Click14(object sender, RoutedEventArgs e)
+        private void menuitem_Click14(object sender, RoutedEventArgs e)//cuboid
         {
             List<string> useduuids = this.OpenedBlueprint.useduuids;
             

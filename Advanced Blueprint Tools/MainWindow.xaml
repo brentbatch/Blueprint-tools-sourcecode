@@ -35,7 +35,7 @@
                 <MenuItem Name="menuitem1" Header="Advanced Connections" Click="MenuItem_Click" IsEnabled="False"/>
                 <MenuItem Name="menuitem3" Header="Advanced Paint" Click="MenuItem_Click_2" IsEnabled="False" />
                 <MenuItem Name="menuitem2" Header="Block Properties" Click="MenuItem_Click_1" IsEnabled="False" />
-                <MenuItem Name="menuitem9" Header="Joint Properties" Click="MenuItem_Click_8" IsEnabled="False" />
+                <MenuItem Name="menuitem9" Header="Joint Properties" Click="MenuItem_Click_8" IsEnabled="False" Visibility="Collapsed"/>
                 <MenuItem Name="menuitem4" Header="Remove joints &amp; weld" Click="menuitem_Click_4" IsEnabled="False" />
                 <MenuItem Name="menuitem14" Header="Check Required mods" Click="menuitem_Click14" IsEnabled="False" />
                 <MenuItem Name="menuitem10" Header="Swap Blocks" Click="MenuItem_Click_9" IsEnabled="False" />

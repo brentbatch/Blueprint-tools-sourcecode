@@ -22,7 +22,22 @@
         <Grid HorizontalAlignment="Center" Height="88" VerticalAlignment="Top" Width="316" Background="#61737C" Margin="0,0,0,0" >
             <Button x:Name="button" Content="Color!" HorizontalAlignment="Left" Margin="256,47,0,0" VerticalAlignment="Top" Width="50" Height="32" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button_Click"/>
             <Button x:Name="button1" Content="Help" HorizontalAlignment="Left" Margin="256,10,0,0" VerticalAlignment="Top" Width="50" Height="32" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button1_Click" />
-            <ListBox HorizontalAlignment="Left" Height="68" Margin="10,10,0,0" VerticalAlignment="Top" Width="241"/>
+            <ListBox HorizontalAlignment="Left" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" Height="68" Margin="10,10,0,0" VerticalAlignment="Top" Width="241" Name="color_list" DataContext="" SelectionChanged="color_list_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Grid.Column="3" Grid.ColumnSpan="3" Orientation="Horizontal" Background="{x:Null}" HorizontalAlignment="Center">
+                            <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
+                            <Rectangle Height="15" Width="15" Margin="0" Fill="{Binding Background}"></Rectangle>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+            </ListBox>
 
         </Grid>
 
