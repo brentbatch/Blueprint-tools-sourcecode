@@ -68,10 +68,25 @@ namespace Advanced_Blueprint_Tools
                         if (correctedchild.pos.z > maxz) maxz = correctedchild.pos.z;
                     }
                 if (blueprint.joints != null)
-                    foreach (dynamic joint in blueprint.joints)
+                    for (int i = 0; i < blueprint.joints.Count; i++)
                     {
-                        if (!useduuids.Contains(joint.shapeId.ToString()))
-                            useduuids.Add(joint.shapeId.ToString());
+                        if (!useduuids.Contains(blueprint.joints[i].shapeId.ToString()))
+                            useduuids.Add(blueprint.joints[i].shapeId.ToString());
+                        blueprint.joints[i].xaxis = blueprint.joints[i].xaxisA;
+                        blueprint.joints[i].zaxis = blueprint.joints[i].zaxisA;
+                        blueprint.joints[i].pos = blueprint.joints[i].posA;
+                        dynamic correctedchild = getposandbounds(blueprint.joints[i]);//outputs corrected child (default rotation, correct position)
+                        correctedchild.pos = blueprint.joints[i].posA;
+                        string x = correctedchild.pos.x.ToString();
+                        string y = correctedchild.pos.y.ToString();
+                        string z = correctedchild.pos.z.ToString();
+                        if (blueprint.joints[i].bounds == null) blueprint.joints[i].bounds = correctedchild.bounds;
+                        if (blocksxyz[x] == null) blocksxyz[x] = new JObject();
+                        if (blocksxyz[x][y] == null) blocksxyz[x][y] = new JObject();
+                        if (blocksxyz[x][y][z] == null) blocksxyz[x][y][z] = new JObject();
+                        if (blocksxyz[x][y][z].blocks == null) blocksxyz[x][y][z].blocks = new JArray();
+
+                        blocksxyz[x][y][z].blocks.Add(this.blueprint.joints[i]);
                     }
                 centerx = (maxx + minx) / 2;
                 centery = (maxy + miny) / 2;
@@ -120,12 +135,13 @@ namespace Advanced_Blueprint_Tools
                             blocksxyz[x][y][z].blocks.Add(this.blueprint.bodies[i].childs[j]);
 
                             //get whole creation bounds:
+                            
                             if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
-                            if (correctedchild.pos.x > maxx) maxx = correctedchild.pos.x;
                             if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
-                            if (correctedchild.pos.y > maxy) maxy = correctedchild.pos.y;
                             if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
-                            if (correctedchild.pos.z > maxz) maxz = correctedchild.pos.z;
+                            if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
+                            if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
+                            if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
                         }
                     if(blueprint.joints != null)
                         for (int i = 0; i < blueprint.joints.Count; i++)
@@ -153,7 +169,7 @@ namespace Advanced_Blueprint_Tools
                     centery = (maxy + miny) / 2;
                     centerz = (maxz + minz) / 2;
                 }
-                if(missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!");
+                if(missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!\n\n suggested: run the 'check required mods' feature");
 
             }
             catch (Exception e)
@@ -345,6 +361,8 @@ namespace Advanced_Blueprint_Tools
                 child.pos.z -= child.bounds.z;
             return child;
         }
+
+
         public dynamic calcbppos(dynamic whatever)
         {
             dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));

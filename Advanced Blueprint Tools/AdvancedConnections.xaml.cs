@@ -46,7 +46,7 @@ namespace Advanced_Blueprint_Tools
 
                         dynamic part = this.window.getgameblocks()[uuid];
 
-                        if (part.spotlight != null || part.engine != null || part.thruster != null || part.timedjoint != null || part.lever != null || part.button != null || part.sensor != null || part.logic != null || part.timer != null || part.piston != null || part.simpleInteractive != null)
+                        if (part.spotlight != null || part.engine != null || part.thruster != null || part.steering != null || part.seat != null || part.timedjoint != null || part.lever != null || part.button != null || part.sensor != null || part.logic != null || part.timer != null || part.piston != null || part.simpleInteractive != null)
                         {
                             connectable_UUIDS.Add(new connectable(uuid.ToString(), getbounds(part), part.Name.ToString()));
                         }
@@ -125,6 +125,7 @@ namespace Advanced_Blueprint_Tools
                 connectable sourceblock = connectable_UUIDS[comboBox_items1.SelectedIndex];
                 connectable destinationblock = connectable_UUIDS[comboBox_items2.SelectedIndex];
 
+                dynamic backupbp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(window.OpenedBlueprint.blueprint.ToString());
                 //list all destionationblocks and their ID's
                 dynamic destids = new JObject();
                 /*
@@ -146,6 +147,7 @@ namespace Advanced_Blueprint_Tools
                             string x = dest.pos.x.ToString();
                             string y = dest.pos.y.ToString();
                             string z = dest.pos.z.ToString();
+
                             if (destids[x] == null)
                                 destids[x] = new JObject();
                             if (destids[x][y] == null)
@@ -158,6 +160,7 @@ namespace Advanced_Blueprint_Tools
                             id.id = child.controller.id;
                             destids[x][y][z].ids.Add(id);
                             destids[x][y][z].color = child.color;
+
                             //get whole creation bounds:
                             if (dest.pos.x < minx) minx = dest.pos.x;
                             if (dest.pos.x > maxx) maxx = dest.pos.x;
@@ -165,8 +168,52 @@ namespace Advanced_Blueprint_Tools
                             if (dest.pos.y > maxy) maxy = dest.pos.y;
                             if (dest.pos.z < minz) minz = dest.pos.z;
                             if (dest.pos.z > maxz) maxz = dest.pos.z;
+                           /* {//test
+                                if (destids[x + "." + y + "." + z] == null) destids[x + "." + y + "." + z] = new JArray();
+                                dynamic blockproperties = new JObject();
+                                blockproperties.id = new JObject();
+                                blockproperties.id.id = child.controller.id;
+                                blockproperties.uuid = child.shapeId;
+                                if (child.color.ToString().StartsWith("#")) child.color = child.color.ToString().subString(1);
+                                blockproperties.color = child.color;
+                                destids[x + "." + y + "." + z].Add(blockproperties);
+                            }*/
                         }
                     }
+                }
+                if(window.OpenedBlueprint.blueprint.joints != null)
+                foreach(dynamic child in window.OpenedBlueprint.blueprint.joints)
+                {
+                    if (child.shapeId.Value.ToLower() == destinationblock.UUID.ToLower() /*&& (child.color.Value.ToLower() == destinationcolor.ToLower() || "#"+child.color.Value.ToLower() == destinationcolor.ToLower() || destinationcolor == "" || destinationcolor == "#")*/)
+                    {
+                        dynamic dest = (child);//outputs corrected child (default rotation, correct position)
+
+                        string x = dest.pos.x.ToString();
+                        string y = dest.pos.y.ToString();
+                        string z = dest.pos.z.ToString();
+
+                        if (destids[x] == null)
+                            destids[x] = new JObject();
+                        if (destids[x][y] == null)
+                            destids[x][y] = new JObject();
+                        if (destids[x][y][z] == null)
+                            destids[x][y][z] = new JObject();
+                        if (destids[x][y][z].ids == null)
+                            destids[x][y][z].ids = new JArray();
+                        dynamic id = new JObject();
+                        id.id = child.controller.id;
+                        destids[x][y][z].ids.Add(id);
+                        destids[x][y][z].color = child.color;
+
+                        //get whole creation bounds:
+                        if (dest.pos.x < minx) minx = dest.pos.x;
+                        if (dest.pos.x > maxx) maxx = dest.pos.x;
+                        if (dest.pos.y < miny) miny = dest.pos.y;
+                        if (dest.pos.y > maxy) maxy = dest.pos.y;
+                        if (dest.pos.z < minz) minz = dest.pos.z;
+                        if (dest.pos.z > maxz) maxz = dest.pos.z;
+                    }
+
                 }
 
                 int amountwired=0;
@@ -187,7 +234,7 @@ namespace Advanced_Blueprint_Tools
                                 if (checkBox_X.IsChecked == false)
                                 {
                                     minx = source.pos.x;
-                                    maxx = source.pos.x;
+                                    maxx = source.pos.x;//bounds?
                                 }
                                 if (checkBox_Y.IsChecked == false)
                                 {
@@ -199,6 +246,7 @@ namespace Advanced_Blueprint_Tools
                                     minz = source.pos.z;
                                     maxz = source.pos.z;
                                 }
+
 
                                 for (int i = minx; i <= maxx; i++)
                                     if (destids[i.ToString()] != null)
@@ -216,30 +264,54 @@ namespace Advanced_Blueprint_Tools
                                                                         child.controller.controllers.Add(id);
                                                                         amountwired++;
                                                                     }
-                                
+
+                                /*
+                                for (int i = minx; i <= maxx; i++)
+                                    for (int j = miny; j <= maxy; j++)
+                                        for (int k = minz; k <= maxz; k++)
+                                            if (
+                                                destids[i.ToString() + "." + j.ToString() + "." + k.ToString()] != null &&
+                                                destids[(i + Convert.ToInt32(textBox_X.Text)).ToString() + "." +
+                                                        (j + Convert.ToInt32(textBox_Y.Text)).ToString() + "." +
+                                                        (k + Convert.ToInt32(textBox_Z.Text)).ToString()] != null
+                                                )
+                                                foreach ( dynamic destblocknooffset in destids[i.ToString() + "." + j.ToString() + "." + k.ToString()])
+                                                    if((destblocknooffset.color.ToLower() == destinationcolor.ToLower() || destinationcolor == "" || destinationcolor == "#"))
+                                                        foreach(dynamic blockoffset in destids[(i + Convert.ToInt32(textBox_X.Text)).ToString() + "." + (j + Convert.ToInt32(textBox_Y.Text)).ToString() + "." + (k + Convert.ToInt32(textBox_Z.Text)).ToString()])
+                                                            if(!(checkBox_0.IsChecked == false && child.controller.id == blockoffset.id.id))
+                                                            {
+                                                                if (child.controller.controllers == null)
+                                                                    child.controller.controllers = new JArray();
+                                                                child.controller.controllers.Add(blockoffset.id);
+                                                                amountwired++;
+                                                            }
+                                */
+
                             }
 
                     MessageBox.Show("Successfully made " + amountwired + " connections! :D");
-                    window.UpdateOpenedBlueprint();
+                    //window.UpdateOpenedBlueprint();
                     if (amountwired>0)
                         window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n--> " + amountwired + " connections made between " + sourcecolor + " " + sourceblock.name + " and " + destinationcolor + " " + destinationblock.name;
                    
                 }
                 catch(Exception exception)
                 {
-                    MessageBox.Show(exception.Message+"\n\n Blueprint Connections may be halfway done,\n reloading blueprint suggested","ERROR");
-
+                    MessageBox.Show(exception.Message+"\n\n Blueprint connections abrupted\nrestoring blueprint","ERROR");
+                    window.OpenedBlueprint.blueprint = backupbp;
                 }
             }
             else
             {
-                MessageBox.Show("Something went wrong!");
+                MessageBox.Show("Something went wrong!\nno harm done");
             }
 
 
 
 
         }
+
+
 
         //get bounds from 
         private dynamic getbounds(dynamic part)
@@ -388,11 +460,22 @@ namespace Advanced_Blueprint_Tools
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Watch this video on how to use: \nhttps://www.youtube.com/c/brentbatch", "Tutorial?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
-            if (messageBoxResult.ToString() == "Yes")
-            { System.Diagnostics.Process.Start("https://www.youtube.com/c/brentbatch"); }
+            System.Diagnostics.Process.Start("https://youtu.be/glLgQemUS2I?t=270");
         }//help
-        
+
+        private void textBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox t = (TextBox)sender;
+            try
+            {
+                if (Convert.ToInt32(t.Text) >= 0 || Convert.ToInt32(t.Text) <= 0) { }
+            }
+            catch
+            {
+                t.Text = "0";
+            }
+        }
+
 
         //
     }

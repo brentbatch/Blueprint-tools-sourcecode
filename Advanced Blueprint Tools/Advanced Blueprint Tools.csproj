@@ -15,6 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>D:\youtube\Scrap Mechanic Advanced Blueprint Tools\Advanced Blueprint Tools\Advanced Blueprint Tools\Publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +26,12 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>false</MapFileExtensions>
-    <ApplicationRevision>40</ApplicationRevision>
+    <SupportUrl>http://youtube.com/c/brentbatch</SupportUrl>
+    <ErrorReportUrl>http://youtube.com/c/brentbatch</ErrorReportUrl>
+    <ProductName>Advanced Blueprint Tools</ProductName>
+    <PublisherName>Brent Batch</PublisherName>
+    <SuiteName>BB corp.</SuiteName>
+    <ApplicationRevision>62</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -81,6 +87,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ScrapMechanic.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AssimpNet">
@@ -243,6 +252,7 @@
   <ItemGroup>
     <Content Include="Assimp32.dll" />
     <Content Include="Assimp64.dll" />
+    <Resource Include="ScrapMechanic.ico" />
     <None Include="Resources\green.png" />
     <None Include="Resources\red.png" />
   </ItemGroup>

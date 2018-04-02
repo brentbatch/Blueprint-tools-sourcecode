@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
         mc:Ignorable="d"
-        Title="required_mods" Height="389.792" Width="482.292" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="CanResizeWithGrip" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+        Title="required_mods                      - made possible by: Xesau" Height="389.792" Width="482.292" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="CanResizeWithGrip" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
     
     <ListBox x:Name="listBox_mods" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="350" Width="450" VerticalAlignment="Center" Background="#8093A0">
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center">
                     <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
-                    <Grid Margin="50,0,0,0">
-                        <Image Height="50" Width="50" HorizontalAlignment="Left" Name="ImageName"/>
+                    <Grid Margin="0,0,0,0" Background="{Binding Background}">
 
-                        <Grid Margin="0,0,0,0">
+                        <TextBlock Height="15" Width="15" HorizontalAlignment="Left" Text="{Binding ok}" Margin="10" VerticalAlignment="Center"/>
+                        <Grid Margin="30,0,0,0">
 
                             <TextBlock Height="17" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding name}"/>
                             <TextBlock Height="17" Margin="0,15,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding author}" />

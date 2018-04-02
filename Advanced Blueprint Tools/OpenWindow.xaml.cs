@@ -53,15 +53,29 @@ namespace Advanced_Blueprint_Tools
                     foreach (string blueprint in blueprints)
                         if (File.Exists(blueprint + @"\blueprint.json") && File.Exists(blueprint + @"\icon.png") && File.Exists(blueprint + @"\description.json"))
                         {
-                            dynamic desc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(blueprint + @"\description.json"));
-                            string descname = desc.name.ToString().ToLower();
-                            if (searchby == "" || descname.Contains(searchby.ToLower()))
+                            try
                             {
-                                this.Dispatcher.Invoke((Action)(() =>
+                                dynamic desc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(blueprint + @"\description.json"));
+                                string descname = desc.name.ToString().ToLower();
+                                if (searchby == "" || descname.Contains(searchby.ToLower()))
                                 {
-                                    listBox_blueprints.Items.Add(new Blueprint(blueprint + @"\icon.png"));
-                                }));
-                                i++;
+                                    this.Dispatcher.Invoke((Action)(() =>
+                                    {
+                                        listBox_blueprints.Items.Add(new Blueprint(blueprint + @"\icon.png"));
+                                    }));
+                                    i++;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                if(e.HResult != -2146233040)
+                                {
+                                    MessageBoxResult result = MessageBox.Show(e.Message + "\n\n" + blueprint + "\n\nWould you like to open this location?", "Couldn't load this blueprint!", MessageBoxButton.YesNo);
+                                    if (result == MessageBoxResult.Yes)
+                                    {
+                                        System.Diagnostics.Process.Start(blueprint);
+                                    }
+                                }
                             }
                         }
                 }

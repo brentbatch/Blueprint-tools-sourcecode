@@ -134,7 +134,7 @@ namespace Advanced_Blueprint_Tools
                 foreach (dynamic body in this.window.OpenedBlueprint.blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
-                        if (child.shapeId == blocktoreplace.uuid && (textBox_color1.Text == child.color.ToString() || textBox_color1.Text == "#"+child.color.ToString() || textBox_color1.Text == "" || textBox_color1.Text =="#"))
+                        if (child.shapeId == blocktoreplace.uuid && (textBox_color1.Text.ToString().ToLower() == child.color.ToString().ToLower() || textBox_color1.Text.ToString().ToLower() == "#"+child.color.ToString().ToLower() || textBox_color1.Text == "" || textBox_color1.Text =="#"))
                         {
                             if (child.bounds == null)
                             {

@@ -54,7 +54,7 @@ namespace Advanced_Blueprint_Tools
                 foreach (dynamic body in this.window.OpenedBlueprint.blueprint.bodies)
                     foreach(dynamic child in body.childs)
                     {
-                        if (child.color.ToString().StartsWith("#")) child.color = child.color.ToString().subString(1);
+                        if (child.color.ToString().StartsWith("#")) child.color = child.color.ToString().Substring(1);
                         if (colorlist[child.color.ToString().ToLower()] == null)
                         {
                             colorlist[child.color.ToString().ToLower()] = true;
@@ -122,9 +122,7 @@ namespace Advanced_Blueprint_Tools
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Watch this video on how to use: \nhttps://www.youtube.com/c/brentbatch", "Tutorial?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
-            if (messageBoxResult.ToString() == "Yes")
-            { System.Diagnostics.Process.Start("https://www.youtube.com/c/brentbatch"); }
+            System.Diagnostics.Process.Start("https://youtu.be/glLgQemUS2I?t=677");
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -152,6 +150,18 @@ namespace Advanced_Blueprint_Tools
                     }
                 }
             }
+            if(window.OpenedBlueprint.blueprint.joints != null)
+                foreach (dynamic child in window.OpenedBlueprint.blueprint.joints)
+                {
+                    string token = "#";
+                    string color = child.color.ToString();
+                    if (color[0] == '#') token = "";
+                    if ((token + child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#" || textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString().ToLower() == ItemList[comboBox_old.SelectedIndex].UUID.ToLower()))
+                    {
+                        amountcolored++;
+                        child.color = newcolor.Substring(1);
+                    }
+                }
             if (comboBox_old.SelectedIndex < 0) comboBox_old.SelectedIndex = 0;
             string message = "++ " + amountcolored + " " + oldcolor + " " + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
             if (textBox_color1.Text == "#" || textBox_color1.Text == "")
@@ -170,7 +180,10 @@ namespace Advanced_Blueprint_Tools
 
         private void color_list_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.window.PaintColor = ((dynamic)sender).Background;
+            this.window.openpaintpicker();
+            this.window.PaintColor = "#" + ((string)((dynamic)color_list.SelectedItem).Background.ToString()).Substring(3,6);
+            if (this.window.paintSelector.IsLoaded)
+                this.window.paintSelector.textbox_color.Text = this.window.PaintColor;
         }
     }
 

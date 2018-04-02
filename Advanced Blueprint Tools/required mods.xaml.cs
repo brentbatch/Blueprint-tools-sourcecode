@@ -28,7 +28,7 @@ namespace Advanced_Blueprint_Tools
             InitializeComponent();
             foreach (dynamic mod in this.Mods)
             {
-                listBox_mods.Items.Add(mod);
+                listBox_mods.Items.Add(mod);//new mod(mod.name.ToString(), mod.author.ToString(), mod.url.ToString(), true)
             }
             listBox_mods.MouseDoubleClick += new MouseButtonEventHandler(Mod_Click);
             listBox_mods.SelectionChanged += new SelectionChangedEventHandler(Mod_Click);
@@ -41,7 +41,7 @@ namespace Advanced_Blueprint_Tools
             ListBox b = (ListBox)sender;
             dynamic mod = (b.SelectedItem);
             MessageBoxResult messageBoxResult = MessageBox.Show
-                ("Name: "+mod.name+"\nAuthor: "+mod.author+"\nUrl: "+mod.url+"\n\nWould you like to go to this mod page?", "Selected Mod     -provided by http://scrapmechanic.xesau.eu/uuidservice/", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
+                ("Name: "+mod.name+"\nAuthor: "+mod.author+"\nUrl: "+mod.url+"\n\nWould you like to go to this mod page?", "Selected Mod   -provided by http://scrapmechanic.xesau.eu/uuidservice/", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
                 System.Diagnostics.Process.Start(@"steam://openurl/"+mod.url);
@@ -49,5 +49,32 @@ namespace Advanced_Blueprint_Tools
 
         }
         
+
+
+    }
+    public class mod
+    {
+        public string name;
+        public string author;
+        public string url;
+
+        public Brush Background;
+
+        public mod(string name, string author, string url, bool hasit)
+        {
+            this.name = name;
+            this.author = author;
+            this.url = url;
+            if(hasit)
+            {
+                var bc = new BrushConverter();
+                this.Background = (Brush)bc.ConvertFrom("#5522ff22");
+            }
+            else
+            {
+                var bc = new BrushConverter();
+                this.Background = (Brush)bc.ConvertFrom("#55ff2222");
+            }
+        }
     }
 }
