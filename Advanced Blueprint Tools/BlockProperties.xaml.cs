@@ -37,7 +37,6 @@ namespace Advanced_Blueprint_Tools
             update();
 
             w.Close();
-            //update();
 
         }
 
@@ -189,17 +188,19 @@ namespace Advanced_Blueprint_Tools
 
         private void filterupdate()
         {
-            if (filter != null && filter.IsAlive) filter.Abort();
-            filter = new Thread(new ThreadStart(filter_output_update));
-            filter.SetApartmentState(ApartmentState.STA);
-            filter.Start();
+            // if (filter != null && filter.IsAlive) filter.Abort();
+            // filter = new Thread(new ThreadStart(filter_output_update));
+            // filter.SetApartmentState(ApartmentState.STA);
+            // filter.Start();
+            Loadwindow l = new Loadwindow();
+            l.Show();
+            filter_output_update();
+            l.Close();
         }
         Thread filter;
 
         private void filter_output_update()
         {
-            Loadwindow l = new Loadwindow();
-            l.Show();
 
             { 
                 int x1 = this.mainwindow.OpenedBlueprint.minx-2, y1 = this.mainwindow.OpenedBlueprint.miny-2, z1 = this.mainwindow.OpenedBlueprint.minz-2, x2 = this.mainwindow.OpenedBlueprint.maxx+2, y2 = this.mainwindow.OpenedBlueprint.maxy+2, z2 = this.mainwindow.OpenedBlueprint.maxz+2;
@@ -290,8 +291,6 @@ namespace Advanced_Blueprint_Tools
                     {//this refer to form in WPF application 
                         disableAll();
                     }));
-
-                    l.Close();
                 }
                 catch { }
             }
@@ -362,21 +361,40 @@ namespace Advanced_Blueprint_Tools
                         new_controllerloopmode.IsChecked = selectedblock.controller.playMode;
                         new_controllertimeperframe.Text = selectedblock.controller.timePerFrame;
                         new_controllercontrolls.Items.Clear();
-                        foreach (dynamic joint in selectedblock.controller.joints)
-                        {
-                            joint.controller0 = joint.frames[0].targetAngle.ToString();
-                            joint.controller1 = joint.frames[1].targetAngle.ToString();
-                            joint.controller2 = joint.frames[2].targetAngle.ToString();
-                            joint.controller3 = joint.frames[3].targetAngle.ToString();
-                            joint.controller4 = joint.frames[4].targetAngle.ToString();
-                            joint.controller5 = joint.frames[5].targetAngle.ToString();
-                            joint.controller6 = joint.frames[6].targetAngle.ToString();
-                            joint.controller7 = joint.frames[7].targetAngle.ToString();
-                            joint.controller8 = joint.frames[8].targetAngle.ToString();
-                            joint.controller9 = joint.frames[9].targetAngle.ToString();
-                            new_controllercontrolls.Items.Add(joint);
+                        if (selectedblock.controller.joints != null)
+                            foreach (dynamic joint in selectedblock.controller.joints)
+                            {
 
-                        }
+                                joint.controller0 = joint.frames[0].targetAngle.ToString();
+                                joint.controller1 = joint.frames[1].targetAngle.ToString();
+                                joint.controller2 = joint.frames[2].targetAngle.ToString();
+                                joint.controller3 = joint.frames[3].targetAngle.ToString();
+                                joint.controller4 = joint.frames[4].targetAngle.ToString();
+                                joint.controller5 = joint.frames[5].targetAngle.ToString();
+                                joint.controller6 = joint.frames[6].targetAngle.ToString();
+                                joint.controller7 = joint.frames[7].targetAngle.ToString();
+                                joint.controller8 = joint.frames[8].targetAngle.ToString();
+                                joint.controller9 = joint.frames[9].targetAngle.ToString();
+                                new_controllercontrolls.Items.Add(joint);
+
+                            }
+                        /*
+                        if (selectedblock.controller.controllers != null)
+                            foreach (dynamic joint in selectedblock.controller.frames)
+                            {
+                                joint.controller0 = joint.frames[0].targetAngle.ToString();
+                                joint.controller1 = joint.frames[1].targetAngle.ToString();
+                                joint.controller2 = joint.frames[2].targetAngle.ToString();
+                                joint.controller3 = joint.frames[3].targetAngle.ToString();
+                                joint.controller4 = joint.frames[4].targetAngle.ToString();
+                                joint.controller5 = joint.frames[5].targetAngle.ToString();
+                                joint.controller6 = joint.frames[6].targetAngle.ToString();
+                                joint.controller7 = joint.frames[7].targetAngle.ToString();
+                                joint.controller8 = joint.frames[8].targetAngle.ToString();
+                                joint.controller9 = joint.frames[9].targetAngle.ToString();
+                                new_controllercontrolls.Items.Add(joint);
+
+                            }*/
 
                         Edit_controller.Visibility = Visibility.Visible;
                     }
@@ -425,6 +443,8 @@ namespace Advanced_Blueprint_Tools
         private void new_controllercontrolls_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             new_selectedcontroller.DataContext = (dynamic)new_controllercontrolls.SelectedItem;
+            if (new_controllercontrolls.SelectedItem != null && ((dynamic)new_controllercontrolls.SelectedItem).reverse == true)
+                new_controllerreverse.IsChecked = true;
         }
 
         private void new_controller_joint_Changed(object sender, TextChangedEventArgs e)
@@ -439,7 +459,9 @@ namespace Advanced_Blueprint_Tools
 
         private void button_help_Click_1(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("for help: youtube.com/c/brentbatch");
+            System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Watch this video on how to use: \nhttps://www.youtube.com/c/brentbatch", "Tutorial?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk);
+            if (messageBoxResult.ToString() == "Yes")
+            { System.Diagnostics.Process.Start("https://youtu.be/glLgQemUS2I?t=799"); }
         }
 
         private void button_render_Click(object sender, RoutedEventArgs e)
@@ -452,7 +474,22 @@ namespace Advanced_Blueprint_Tools
 
                         if (Edit_controller.IsVisible)
                         {
-                            child.controller = (dynamic)new_controllercontrolls.Items;
+                            child.controller.joints.Clear();
+                            foreach (dynamic item in (dynamic)new_controllercontrolls.Items)
+                            {
+                                item.startAngle = Convert.ToInt32(item.startAngle);
+                                item.frames[0].targetAngle = Convert.ToInt32(item.controller0);
+                                item.frames[1].targetAngle = Convert.ToInt32(item.controller1);
+                                item.frames[2].targetAngle = Convert.ToInt32(item.controller2);
+                                item.frames[3].targetAngle = Convert.ToInt32(item.controller3);
+                                item.frames[4].targetAngle = Convert.ToInt32(item.controller4);
+                                item.frames[5].targetAngle = Convert.ToInt32(item.controller5);
+                                item.frames[6].targetAngle = Convert.ToInt32(item.controller6);
+                                item.frames[7].targetAngle = Convert.ToInt32(item.controller7);
+                                item.frames[8].targetAngle = Convert.ToInt32(item.controller8);
+                                item.frames[9].targetAngle = Convert.ToInt32(item.controller9);
+                                child.controller.joints.Add(item);
+                            }
                         }
                         if(Edit_gate.IsVisible)
                         {
@@ -464,8 +501,8 @@ namespace Advanced_Blueprint_Tools
                             child.pos.y = Convert.ToInt32(new_y.Text);
                             child.pos.z = Convert.ToInt32(new_z.Text);
                             child.color = new_color.Text;
-                            child.xaxis = new_xaxis.Text;
-                            child.zaxis = new_zaxis.Text;
+                            child.xaxis = Convert.ToInt32(new_xaxis.Text);
+                            child.zaxis = Convert.ToInt32(new_zaxis.Text);
                         }
                         if(Edit_sensor.IsVisible)
                         {
@@ -489,11 +526,10 @@ namespace Advanced_Blueprint_Tools
             Loadwindow w = new Loadwindow();
             w.Show();
 
-            update();
             this.mainwindow.OpenedBlueprint.description.description = this.mainwindow.OpenedBlueprint.description.description += "++ Applied some block property changes ";
             this.mainwindow.OpenedBlueprint.setblueprint(this.mainwindow.OpenedBlueprint.blueprint);
             this.mainwindow.UpdateOpenedBlueprint();
-
+            update();
             w.Close();
         }
 

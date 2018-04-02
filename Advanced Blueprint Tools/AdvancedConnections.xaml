@@ -30,12 +30,13 @@
         </Grid>
         <Grid HorizontalAlignment="Center" Height="110" Margin="15,122,178,0" VerticalAlignment="Top" Width="202" Background="#61737C">
             <Label x:Name="label2" Content="Offset:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-            <Label x:Name="label3" Content="X" HorizontalAlignment="Left" Margin="60,10,0,0" VerticalAlignment="Top"/>
-            <Label x:Name="label3_Copy" Content="Y" HorizontalAlignment="Left" Margin="60,41,0,0" VerticalAlignment="Top"/>
-            <Label x:Name="label3_Copy1" Content="Z" HorizontalAlignment="Left" Margin="60,72,0,-2" VerticalAlignment="Top"/>
-            <TextBox x:Name="textBox_X" HorizontalAlignment="Left" Height="26" Margin="82,10,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="textBox_Y" HorizontalAlignment="Left" Height="26" Margin="82,41,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="textBox_Z" HorizontalAlignment="Left" Height="26" Margin="82,72,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center"/>
+            <Label x:Name="label3" Content="X" HorizontalAlignment="Left" Margin="102,10,0,0" VerticalAlignment="Top"/>
+            <Label x:Name="label3_Copy" Content="Y" HorizontalAlignment="Left" Margin="102,41,0,0" VerticalAlignment="Top"/>
+            <Label x:Name="label3_Copy1" Content="Z" HorizontalAlignment="Left" Margin="102,72,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="textBox_X" HorizontalAlignment="Left" Height="26" Margin="124,10,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="textBox_TextChanged"/>
+            <TextBox x:Name="textBox_Y" HorizontalAlignment="Left" Height="26" Margin="124,41,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="textBox_TextChanged"/>
+            <TextBox x:Name="textBox_Z" HorizontalAlignment="Left" Height="26" Margin="124,72,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="textBox_TextChanged"/>
+            <CheckBox Content="Match offset&#xA;block color" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="10,55,0,0" VerticalAlignment="Top" Height="43" Width="87" ToolTip="when off: search for matching block&amp;color in given direction, connect to offset block(s).&#xA;when on: connect to matching offset block&amp;color in given direction (glitchwelded gates-friendlier)" Visibility="Hidden"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="53" Margin="222,179,14,0" VerticalAlignment="Top" Width="159" Background="#61737C">
             <Button x:Name="button1" Content="Wire it!" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="40" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button1_Click"/>

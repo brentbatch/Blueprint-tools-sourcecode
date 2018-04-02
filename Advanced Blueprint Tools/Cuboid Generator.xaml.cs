@@ -29,7 +29,7 @@ namespace Advanced_Blueprint_Tools
 
         private void Button_Help_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("no help yet");
+            System.Diagnostics.Process.Start("https://youtu.be/glLgQemUS2I?t=1627");
         }
 
         private void Button_Create_Click(object sender, RoutedEventArgs e)
