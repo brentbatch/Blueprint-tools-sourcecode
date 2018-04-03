@@ -44,6 +44,7 @@
                 <MenuItem Name="menuitem15" Header="Cuboid Generator" Click="MenuItem_Click_15"/>
                 <MenuItem Name="menuitem11" Header="Paint Selector" Click="MenuItem_Click_10" Background="#dddddd"/>
             </MenuItem>
+            <MenuItem Header="Settings" Click="MenuItem_Click_Settings" Visibility="Collapsed"/>
         </Menu>
         <Grid Background="#8093A0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="641" Width="1275" Margin="0,5,0,25" >
 
