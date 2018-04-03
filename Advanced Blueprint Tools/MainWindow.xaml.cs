@@ -1447,5 +1447,9 @@ namespace Advanced_Blueprint_Tools
             cuboid_Generator.Show();
         }
 
+        private void MenuItem_Click_Settings(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

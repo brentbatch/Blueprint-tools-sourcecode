@@ -91,7 +91,7 @@ namespace Advanced_Blueprint_Tools
             }
 
             //fill xyz:
-            int x1 = this.mainwindow.OpenedBlueprint.minx, y1 = this.mainwindow.OpenedBlueprint.miny, z1 = this.mainwindow.OpenedBlueprint.minz, x2 = this.mainwindow.OpenedBlueprint.maxx + 1, y2 = this.mainwindow.OpenedBlueprint.maxy + 1, z2 = this.mainwindow.OpenedBlueprint.maxz + 1;
+            int x1 = this.mainwindow.OpenedBlueprint.minx, y1 = this.mainwindow.OpenedBlueprint.miny, z1 = this.mainwindow.OpenedBlueprint.minz, x2 = this.mainwindow.OpenedBlueprint.maxx, y2 = this.mainwindow.OpenedBlueprint.maxy, z2 = this.mainwindow.OpenedBlueprint.maxz;
             filter_x1.Text = x1.ToString();
             filter_y1.Text = y1.ToString();
             filter_z1.Text = z1.ToString();
@@ -197,7 +197,7 @@ namespace Advanced_Blueprint_Tools
             filter_output_update();
             l.Close();
         }
-        Thread filter;
+        //Thread filter;
 
         private void filter_output_update()
         {

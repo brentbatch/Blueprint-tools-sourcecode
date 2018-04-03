@@ -137,7 +137,16 @@ namespace Advanced_Blueprint_Tools
                     string bppath = "";
                     this.Dispatcher.Invoke((Action)(() =>
                     {//this refer to form in WPF application 
-                        bppath = Directory.GetParent(((Blueprint)listBox_blueprints.SelectedItem).image).ToString();
+                        try
+                        {
+                            bppath = Directory.GetParent(((Blueprint)listBox_blueprints.SelectedItem).image).ToString();
+
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(e.Message);
+                            throw new Exception("Unable to load blueprint!");
+                        }
                     }));
                     bp = new BP(bppath);
                 }

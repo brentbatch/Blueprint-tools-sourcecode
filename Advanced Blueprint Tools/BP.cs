@@ -189,9 +189,24 @@ namespace Advanced_Blueprint_Tools
             if(!Directory.Exists(blueprintpath))
                 System.IO.Directory.CreateDirectory(blueprintpath);
 
+            backup();
             System.IO.File.WriteAllText(blueprintpath + "\\blueprint.json", blueprinttext); //save blueprint
             System.IO.File.WriteAllText(blueprintpath + "\\description.json", descriptiontext); //save description
 
+        }
+        public void backup()
+        {
+            if(File.Exists(blueprintpath + "\\blueprint.json"))
+            {
+                for(int i = 1; i<30; i++)
+                {
+                    if (!File.Exists(blueprintpath + "\\blueprint_backup_" + i.ToString() + ".json"))
+                    {
+                        System.IO.File.Copy(blueprintpath + "\\blueprint.json", blueprintpath + "\\blueprint_backup_" + i.ToString() + ".json");
+                        break;
+                    }
+                }
+            }
         }
         public void SaveAs(string name)
         {
@@ -203,8 +218,9 @@ namespace Advanced_Blueprint_Tools
 
             System.IO.File.WriteAllText(newbp + "\\blueprint.json", blueprinttext); //save blueprint
             System.IO.File.WriteAllText(newbp + "\\description.json", descriptiontext); //save description
-           if(icon!=null) System.IO.File.Copy(icon, newbp + @"\icon.png");
+           if(icon!=null) System.IO.File.Copy(icon, newbp + @"\icon.png");//needs to create new icon!
 
+            MessageBox.Show("Saved as new blueprint!\nwill require game restart to be able to find it in-game!\n(blame axolot)");
 
         }
 
