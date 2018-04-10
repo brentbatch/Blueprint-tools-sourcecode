@@ -31,7 +31,7 @@
     <ProductName>Advanced Blueprint Tools</ProductName>
     <PublisherName>Brent Batch</PublisherName>
     <SuiteName>BB corp.</SuiteName>
-    <ApplicationRevision>63</ApplicationRevision>
+    <ApplicationRevision>70</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -129,6 +129,7 @@
     <Compile Include="Cuboid Generator.xaml.cs">
       <DependentUpon>Cuboid Generator.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Lib.cs" />
     <Compile Include="required mods.xaml.cs">
       <DependentUpon>required mods.xaml</DependentUpon>
     </Compile>
@@ -253,11 +254,11 @@
   <ItemGroup>
     <Content Include="Assimp32.dll" />
     <Content Include="Assimp64.dll" />
+    <Resource Include="missingicon.bmp" />
+    <Resource Include="Resources\ScrapMechanic.ico" />
     <Resource Include="ScrapMechanic.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

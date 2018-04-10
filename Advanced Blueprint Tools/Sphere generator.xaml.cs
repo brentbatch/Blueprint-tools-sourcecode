@@ -18,10 +18,10 @@ namespace Advanced_Blueprint_Tools
     /// <summary>
     /// Interaction logic for Sphere_generator.xaml
     /// </summary>
-    public partial class Sphere_generator : Window
+    public partial class Ellipsoid_Generator : Window
     {
         private MainWindow mainwindow;
-        public Sphere_generator(MainWindow window)
+        public Ellipsoid_Generator(MainWindow window)
         {
             this.mainwindow = window;
             InitializeComponent();
@@ -148,7 +148,7 @@ namespace Advanced_Blueprint_Tools
                 string message = "++ An ellipsoid with " + amountgenerated + " blocks has been generated!";
                 //MessageBox.Show(message+"\n\nOptimized to: "+count+" shapes");
                 Random r = new Random();
-                string blueprintdir = this.mainwindow.blueprintdir+"\\GeneratedEllipsoid-"+r.Next()+r.Next();
+                string blueprintpath = Database.User_ + "\\Blueprints\\GeneratedEllipsoid-"+r.Next()+r.Next();
                 dynamic description = new JObject();
                 description.description = "generated ellipsoid";
                 description.name = "generated sphere" + r.Next();
@@ -157,7 +157,7 @@ namespace Advanced_Blueprint_Tools
 
                 if (mainwindow.OpenedBlueprint== null)
                 {
-                    mainwindow.OpenedBlueprint = new BP(blueprintdir, Sphere, description);
+                    mainwindow.OpenedBlueprint = new BP(blueprintpath, Sphere, description);
                 }
                 else
                 {

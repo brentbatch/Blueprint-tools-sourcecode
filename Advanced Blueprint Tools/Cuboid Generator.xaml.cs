@@ -54,7 +54,7 @@ namespace Advanced_Blueprint_Tools
 
             string message = "++ A Cuboid has been generated!";
             Random r = new Random();
-            string blueprintdir = this.mainWindow.blueprintdir + "\\GeneratedCuboid-" + r.Next() + r.Next();
+            string blueprintdir = Database.User_ + "\\Blueprints" + "\\GeneratedCuboid-" + r.Next() + r.Next();
             dynamic description = new JObject();
             description.description = "generated cuboid";
             description.name = "generated cuboid" + r.Next();

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Windows;
 using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace Advanced_Blueprint_Tools
 {
@@ -14,10 +15,9 @@ namespace Advanced_Blueprint_Tools
         public string blueprintpath { get; set; } 
 
         public dynamic blueprint { get; set; }
-
         public dynamic description { get; set; }
 
-        public string icon { get; set; }
+        public PngBitmapEncoder icon { get; set; }
 
         public List<string> useduuids { get; set; } = new List<string>();
 
@@ -52,7 +52,7 @@ namespace Advanced_Blueprint_Tools
                         string x = correctedchild.pos.x.ToString();
                         string y = correctedchild.pos.y.ToString();
                         string z = correctedchild.pos.z.ToString();
-                        if (child.bounds == null) child.bounds = correctedchild.bounds;
+                        //if (child.bounds == null) child.bounds = correctedchild.bounds;
                         if (blocksxyz[x] == null) blocksxyz[x] = new JObject();
                         if (blocksxyz[x][y] == null) blocksxyz[x][y] = new JObject();
                         if (blocksxyz[x][y][z] == null) blocksxyz[x][y][z] = new JObject();
@@ -76,7 +76,20 @@ namespace Advanced_Blueprint_Tools
                         blueprint.joints[i].zaxis = blueprint.joints[i].zaxisA;
                         blueprint.joints[i].pos = blueprint.joints[i].posA;
                         dynamic correctedchild = getposandbounds(blueprint.joints[i]);//outputs corrected child (default rotation, correct position)
-                        correctedchild.pos = blueprint.joints[i].posA;
+                        if (Convert.ToInt32(blueprint.joints[i].zaxis.ToString()) > 0 || !(correctedchild.bounds.x != 1 || correctedchild.bounds.y != 1 || correctedchild.bounds.z != 1))
+                            correctedchild.pos = blueprint.joints[i].posA;
+                        else
+                        {
+                            correctedchild.pos = blueprint.joints[i].posB;
+
+                            int zaxis = Convert.ToInt32(blueprint.joints[i].zaxis.ToString());
+                            if (zaxis == -1)
+                                correctedchild.pos.x += 1;
+                            if (zaxis == -2)
+                                correctedchild.pos.y += 1;
+                            if (zaxis == -3)
+                                correctedchild.pos.z += 1;
+                        }
                         string x = correctedchild.pos.x.ToString();
                         string y = correctedchild.pos.y.ToString();
                         string z = correctedchild.pos.z.ToString();
@@ -108,7 +121,6 @@ namespace Advanced_Blueprint_Tools
             this.blueprintpath = blueprintpath;
             try
             {
-                this.icon = blueprintpath + @"\icon.png";
                 this.blueprint = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(blueprintpath + @"\blueprint.json"));
                 this.description = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(blueprintpath + @"\description.json"));
 
@@ -152,7 +164,21 @@ namespace Advanced_Blueprint_Tools
                             blueprint.joints[i].zaxis = blueprint.joints[i].zaxisA;
                             blueprint.joints[i].pos = blueprint.joints[i].posA;
                             dynamic correctedchild = getposandbounds(blueprint.joints[i]);//outputs corrected child (default rotation, correct position)
-                            correctedchild.pos = blueprint.joints[i].posA;
+                            if(Convert.ToInt32(blueprint.joints[i].zaxis.ToString())>0 || !(correctedchild.bounds.x != 1 || correctedchild.bounds.y != 1 || correctedchild.bounds.z != 1))
+                                correctedchild.pos = blueprint.joints[i].posA;
+                            else
+                            {
+                                correctedchild.pos = blueprint.joints[i].posB;
+
+                                int zaxis = Convert.ToInt32(blueprint.joints[i].zaxis.ToString());
+                                if (zaxis == -1)
+                                    correctedchild.pos.x += 1;
+                                if (zaxis == -2)
+                                    correctedchild.pos.y += 1;
+                                if (zaxis == -3)
+                                    correctedchild.pos.z += 1;
+                            }
+
                             string x = correctedchild.pos.x.ToString();
                             string y = correctedchild.pos.y.ToString();
                             string z = correctedchild.pos.z.ToString();
@@ -193,6 +219,15 @@ namespace Advanced_Blueprint_Tools
             System.IO.File.WriteAllText(blueprintpath + "\\blueprint.json", blueprinttext); //save blueprint
             System.IO.File.WriteAllText(blueprintpath + "\\description.json", descriptiontext); //save description
 
+            using (Stream stm = File.Create(blueprintpath + "\\icon.png"))
+            {
+                icon.Save(stm);
+            }
+            Database.LoadBpsIn(Database.User_ + "\\blueprints");//refresh icon
+            Database.bprefresh = true;
+            new System.Threading.Thread(new System.Threading.ThreadStart(()=> { MessageBox.Show("Blueprint saved!"); })).Start();
+            
+
         }
         public void backup()
         {
@@ -208,9 +243,9 @@ namespace Advanced_Blueprint_Tools
                 }
             }
         }
-        public void SaveAs(string name)
+        public void SaveAs(string name)//in scrapdata dir
         {
-            string newbp = System.IO.Directory.GetParent(blueprintpath) + @"\" + name;
+            string newbp = Database.ScrapData + @"\" + name;
             System.IO.Directory.CreateDirectory(newbp);
 
             string blueprinttext = Convert.ToString(blueprint);
@@ -218,9 +253,15 @@ namespace Advanced_Blueprint_Tools
 
             System.IO.File.WriteAllText(newbp + "\\blueprint.json", blueprinttext); //save blueprint
             System.IO.File.WriteAllText(newbp + "\\description.json", descriptiontext); //save description
-           if(icon!=null) System.IO.File.Copy(icon, newbp + @"\icon.png");//needs to create new icon!
-
-            MessageBox.Show("Saved as new blueprint!\nwill require game restart to be able to find it in-game!\n(blame axolot)");
+            using (Stream stm = File.Create(newbp+"\\icon.png"))
+            {
+                icon.Save(stm);
+            }
+            Database.LoadBpsIn(Database.User_ + "\\blueprints");
+            Database.bprefresh = true;
+            
+            
+            new System.Threading.Thread(new System.Threading.ThreadStart(() => { MessageBox.Show("Saved as new blueprint!\nwill require game restart to be able to find it in-game!\n(blame axolot)"); })).Start();
 
         }
 
@@ -323,10 +364,14 @@ namespace Advanced_Blueprint_Tools
 
             if (child.bounds == null) //add bounds to parts (blocks do not get affected)
             {
-                JObject gameblocks = MainWindow.gameblocks;
-                if (gameblocks[child.shapeId.Value.ToLower()] != null)
+                if (Database.blocks.ContainsKey(child.shapeId.Value.ToLower()))
                 {
-                    child.bounds = getbounds(gameblocks[child.shapeId.Value.ToLower()]);
+                    xyzpair bounds = ((Part)Database.blocks[child.shapeId.Value.ToLower()]).GetBounds();
+                    child.bounds = new JObject();
+                    child.bounds.x = bounds.x;
+                    child.bounds.y = bounds.y;
+                    child.bounds.z = bounds.z;
+                    //child.bounds = getbounds(gameblocks[child.shapeId.Value.ToLower()]);
                 }
                 else
                 {

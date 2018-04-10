@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
         mc:Ignorable="d"
+        
         Title="Open" Height="720" Width="419" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+
+    <Window.Resources>
+        <local:ImageToBitmapSourceConverter x:Key="ImageConverter"/>
+    </Window.Resources>
     <Grid>
         <TextBox x:Name="TextBox_Search" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" Height="63" FontSize="24" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#61737D" Width="386" ToolTip="Search!" Margin="0,10,0,0" TextChanged="button_refresh_Copy_Click"/>
         <Label x:Name="Label_name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" Content="/" VerticalAlignment="Bottom" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="10,0,0,10" Height="63" Width="268"/>
@@ -20,7 +25,8 @@
                     <StackPanel Grid.Column="3" Grid.ColumnSpan="3" Orientation="Horizontal" Background="{x:Null}" HorizontalAlignment="Center">
                         <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
 
-                        <Image Height="100" Width="100" Margin="3" Source="{Binding image}" />
+                        <Image Height="100" Width="100" Margin="3" Source="{Binding imsource}" Stretch="Fill" />
+                        <!--Source="{Binding image}"-->
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
