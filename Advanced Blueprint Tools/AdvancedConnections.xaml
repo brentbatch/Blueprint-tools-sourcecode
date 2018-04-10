@@ -20,29 +20,29 @@
             <Label x:Name="label1_Copy" Content="Destination:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="83"/>
             <ComboBox x:Name="comboBox_items1" HorizontalAlignment="Left" Margin="98,10,0,0" VerticalAlignment="Top" Width="105" Height="26" />
             <ComboBox x:Name="comboBox_items2" HorizontalAlignment="Left" Margin="98,41,0,0" VerticalAlignment="Top" Width="105" Height="26"/>
-            <TextBox x:Name="textBox_color1" HorizontalAlignment="Left" Height="26" Margin="208,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="textBox_color_TextChanged"/>
-            <TextBox x:Name="textBox_color2" HorizontalAlignment="Left" Height="26" Margin="208,41,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="textBox_color_TextChanged"/>
-            <Button x:Name="button3" Content="&lt; SET" HorizontalAlignment="Left" Margin="306,10,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button3_Click"/>
-            <Button x:Name="button3_Copy" Content="&lt; SET" HorizontalAlignment="Left" Margin="306,41,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button3_Copy_Click"/>
+            <TextBox x:Name="textBox_color1" HorizontalAlignment="Left" Height="26" Margin="208,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="TextBox_color_TextChanged"/>
+            <TextBox x:Name="textBox_color2" HorizontalAlignment="Left" Height="26" Margin="208,41,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="TextBox_color_TextChanged"/>
+            <Button x:Name="button3" Content="&lt; SET" HorizontalAlignment="Left" Margin="306,10,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button3_Click"/>
+            <Button x:Name="button3_Copy" Content="&lt; SET" HorizontalAlignment="Left" Margin="306,41,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button3_Copy_Click"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="35" Margin="253,82,14,0" VerticalAlignment="Top" Width="128" Background="#61737C" Visibility="Collapsed">
-            <Button x:Name="button" Content="Open Paint Picker" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#5DB7E7" Foreground="#fff" Width="110" Click="button_Click"/>
+            <Button x:Name="button" Content="Open Paint Picker" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#5DB7E7" Foreground="#fff" Width="110" Click="Button_Click"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="110" Margin="15,122,178,0" VerticalAlignment="Top" Width="202" Background="#61737C">
             <Label x:Name="label2" Content="Offset:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
             <Label x:Name="label3" Content="X" HorizontalAlignment="Left" Margin="102,10,0,0" VerticalAlignment="Top"/>
             <Label x:Name="label3_Copy" Content="Y" HorizontalAlignment="Left" Margin="102,41,0,0" VerticalAlignment="Top"/>
             <Label x:Name="label3_Copy1" Content="Z" HorizontalAlignment="Left" Margin="102,72,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="textBox_X" HorizontalAlignment="Left" Height="26" Margin="124,10,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="textBox_TextChanged"/>
-            <TextBox x:Name="textBox_Y" HorizontalAlignment="Left" Height="26" Margin="124,41,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="textBox_TextChanged"/>
-            <TextBox x:Name="textBox_Z" HorizontalAlignment="Left" Height="26" Margin="124,72,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="textBox_TextChanged"/>
+            <TextBox x:Name="textBox_X" HorizontalAlignment="Left" Height="26" Margin="124,10,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged"/>
+            <TextBox x:Name="textBox_Y" HorizontalAlignment="Left" Height="26" Margin="124,41,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged"/>
+            <TextBox x:Name="textBox_Z" HorizontalAlignment="Left" Height="26" Margin="124,72,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="68" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged"/>
             <CheckBox Content="Match offset&#xA;block color" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="10,55,0,0" VerticalAlignment="Top" Height="43" Width="87" ToolTip="when off: search for matching block&amp;color in given direction, connect to offset block(s).&#xA;when on: connect to matching offset block&amp;color in given direction (glitchwelded gates-friendlier)" Visibility="Hidden"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="53" Margin="222,179,14,0" VerticalAlignment="Top" Width="159" Background="#61737C">
-            <Button x:Name="button1" Content="Wire it!" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="40" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button1_Click"/>
+            <Button x:Name="button1" Content="Wire it!" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="40" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button1_Click"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Height="52" Margin="222,122,14,0" VerticalAlignment="Top" Width="159" Background="#61737C">
-            <Button x:Name="button2" Content="Help!" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="40" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button2_Click"/>
+            <Button x:Name="button2" Content="Help!" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="40" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button2_Click"/>
         </Grid>
 
     </Grid>

@@ -20,17 +20,18 @@ using System.Runtime.InteropServices;
 
 namespace Advanced_Blueprint_Tools
 {
-    public class Database
+    public static class Database
     {
         public static string steamapps { get; private set; }
+        public static string User_ { get; private set; } //path
         public static string ScrapData { get; private set; } = "";
         private static string ModDatabase = "";
-        public static string User_ { get; private set; } //path
 
         public static long UserID { get; private set; }
-        public static Dictionary<string, Blockobject> blocks = new Dictionary<string, Blockobject>();
+
+        public static Dictionary<string, Blockobject> blocks = new Dictionary<string, Blockobject>();//uuid, block
         public static Dictionary<string, string> usedmods = new Dictionary<string, string>();//id, name
-        public static Dictionary<string, BitmapSource> blueprints = new Dictionary<string, BitmapSource>();
+        public static Dictionary<string, BitmapSource> blueprints = new Dictionary<string, BitmapSource>();//path, img
 
         public static bool bprefresh;
 
@@ -61,13 +62,21 @@ namespace Advanced_Blueprint_Tools
 
             if (steamapps != null) return steamapps;
 
-            dynamic config = new JObject();
-            config.steamapps = "";
-            config.times = 0;
+            
+            if(steamapps == "not a path")
+            {//not yet
+                steamapps = Properties.Settings.Default.steamapps;
+                if(Properties.Settings.Default.times == 3)
+                    System.Diagnostics.Process.Start("http://www.youtube.com/c/brentbatch?sub_confirmation=1");
+                
+                Properties.Settings.Default.times += 1;
+            }
 
             if (File.Exists("steamapps") && !File.Exists("config"))
                 File.Copy("steamapps", "config");
-
+            dynamic config = new JObject();
+            config.steamapps = "";
+            config.times = 0;
             if (File.Exists("config"))
             {
                 try
@@ -75,14 +84,12 @@ namespace Advanced_Blueprint_Tools
                     config = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(File.ReadAllText("steamapps"));
                 }
                 catch { }
-
                 if (config.steamapps != null)
                     steamapps = config.steamapps.ToString();
                 if (config.times != null && Convert.ToInt32(config.times) == 3)
                 {
                     System.Diagnostics.Process.Start("http://www.youtube.com/c/brentbatch?sub_confirmation=1");
                 }
-
             }
             if (steamapps == null)
             {
@@ -107,7 +114,7 @@ namespace Advanced_Blueprint_Tools
             }
             else
             {
-                while (!System.IO.Directory.Exists(ScrapData))
+                while (!System.IO.Directory.Exists(ScrapData + @"\Objects\Database\ShapeSets"))
                 {
                     MessageBoxResult result = MessageBox.Show("could not find the gamefiles folder which is needed to get the block properties\nPlease select the Scrap Mechanic folder, It contains: Cache,Data,Logs,Release,...\n\nSteam Library > Right click scrap mechanic > properties > Local Files > browse local files > Copy path from the folder", "Unusual folder location!", MessageBoxButton.OKCancel);
                     if (result != MessageBoxResult.OK)
@@ -139,6 +146,8 @@ namespace Advanced_Blueprint_Tools
             config.steamapps = steamapps;
             //Properties.Resources.steamapps = steamapps;
             File.WriteAllText("config", config.ToString());
+
+            Properties.Settings.Default.steamapps = steamapps;
 
             return steamapps;
         }
@@ -515,7 +524,8 @@ namespace Advanced_Blueprint_Tools
 
             if (workshoppages.Count != 0)
             {
-                new Thread(new ThreadStart(() =>
+                
+                new Task(() =>
                 {
                     System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Mods: " + usedmods.Count() + "\nBlocks loaded: " + blocks.Count() + "\n\nFound mods that weren't able to be loaded\nEither broken or made by a lazy modder\n\npls Remove or Unsub\n\nOpen Workshop pages?", "Found unloadable mods!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
                     if (messageBoxResult == MessageBoxResult.Yes)
@@ -525,7 +535,7 @@ namespace Advanced_Blueprint_Tools
                             System.Diagnostics.Process.Start(page);
                         }
                     }
-                })).Start();
+                }).Start();
             }
         }
         
@@ -538,6 +548,7 @@ namespace Advanced_Blueprint_Tools
         public string Name { get; private set; } = "unnamed shape";//block name
         public int id { get; private set; }//mod id
 
+        
 
         public bool glass { get; protected set; } = false;
 
@@ -597,7 +608,11 @@ namespace Advanced_Blueprint_Tools
             if (glass == true)
                 c.A = 120;
             System.Windows.Media.Media3D.Material material = new DiffuseMaterial(new SolidColorBrush(c));
-            
+
+            //for textures: prob need to switch to: https://www.nuget.org/packages/HelixToolkit.Wpf.SharpDX/
+            //https://github.com/helix-toolkit/helix-toolkit/issues/471
+
+
             Model3D renderedblock = new GeometryModel3D { Geometry = geometry3D, Material = material };
 
             #region Rotation and Translation
@@ -849,21 +864,6 @@ namespace Advanced_Blueprint_Tools
 
             string meshlocation = part.renderable.lodList[0].mesh.ToString();
 
-            if (meshlocation.ToLower().StartsWith("$game_data"))
-            {
-                meshlocation = meshlocation.Substring(10);
-                meshlocation = Database.ScrapData + meshlocation;
-            }
-            if (meshlocation.ToLower().StartsWith("$mod_data"))
-            {
-                meshlocation = meshlocation.Substring(9);
-                meshlocation = base.Path + meshlocation;
-            }
-            if (meshlocation.ToLower().StartsWith("../data"))
-            {
-                meshlocation = meshlocation.Substring(7);
-                meshlocation = base.Path + meshlocation;
-            }
 
             this.geometry3D = LoadMesh(meshlocation);
 
@@ -877,6 +877,24 @@ namespace Advanced_Blueprint_Tools
             Geometry3D geometry = null;
             try
             {
+                bool game = false;
+                if (meshlocation.ToLower().StartsWith("$game_data"))
+                {
+                    meshlocation = meshlocation.Substring(10);
+                    meshlocation = Database.ScrapData + meshlocation;
+                    game = true;
+                }
+                if (meshlocation.ToLower().StartsWith("$mod_data"))
+                {
+                    meshlocation = meshlocation.Substring(9);
+                    meshlocation = base.Path + meshlocation;
+                }
+                if (meshlocation.ToLower().StartsWith("../data"))
+                {
+                    meshlocation = meshlocation.Substring(7);
+                    meshlocation = base.Path + meshlocation;
+                    game = true;
+                }
                 string location = meshlocation;
 
                 if (System.IO.Path.GetExtension(meshlocation) != ".obj")
@@ -886,6 +904,8 @@ namespace Advanced_Blueprint_Tools
                         location = obj;//loading obj is prefered
 
                     string meshes = obj.Replace(System.IO.Path.GetDirectoryName(Path), "Meshes");
+                    if (game == true)
+                        meshes = obj.Replace(System.IO.Path.GetDirectoryName(Database.ScrapData), "Meshes");
                     if (File.Exists(meshes))
                     {
                         location = meshes;//if converted obj in install files exists, use it
@@ -907,6 +927,9 @@ namespace Advanced_Blueprint_Tools
                     meshBuilder.AddPolygon(vertices);
                     vertices = new List<Point3D>();
                 }
+                //meshBuilder.Normals = m.Normals;
+                //meshBuilder.Tangents = m.Tangents;
+                //meshBuilder.BiTangents = m.BiTangents;
                 geometry = meshBuilder.ToMesh(true);
 
             }

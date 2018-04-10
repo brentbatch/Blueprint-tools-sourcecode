@@ -155,17 +155,15 @@ namespace Advanced_Blueprint_Tools
                 description.type = "Blueprint";
                 description.version = 0;
 
-                if (mainwindow.OpenedBlueprint== null)
-                {
-                    mainwindow.OpenedBlueprint = new BP(blueprintpath, Sphere, description);
+                if (BP.Blueprintpath== null)
+                {//no blueprint exists, initialize new one
+                    new BP(blueprintpath, Sphere, description);
                 }
                 else
-                {
-                    mainwindow.OpenedBlueprint.blueprint = Sphere;
+                {//overwrite current blueprint
+                    BP.setblueprint(Sphere);
+                    BP.Description.description += message;
                 }
-                mainwindow.OpenedBlueprint.setblueprint(mainwindow.OpenedBlueprint.blueprint);
-
-                mainwindow.OpenedBlueprint.description.description = message;
                 mainwindow.UpdateOpenedBlueprint();
             }
             else

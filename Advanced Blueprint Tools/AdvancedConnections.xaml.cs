@@ -25,25 +25,25 @@ namespace Advanced_Blueprint_Tools
         MainWindow window;
         private dynamic uuidsbackup;
 
-        List<connectable> connectable_UUIDS = new List<connectable>();
+        List<Connectable> connectable_UUIDS = new List<Connectable>();
         //List<Item> ItemList;
         public AdvancedConnections(MainWindow window)
         {
             this.window = window;
             InitializeComponent();
-            this.update();
+            this.Update();
         }
 
-        public void update()
+        public void Update()
         {
-            if(uuidsbackup != this.window.OpenedBlueprint.useduuids)
+            if(uuidsbackup != BP.Useduuids)
             {
                 connectable_UUIDS.Clear();
-                foreach (string uuid in this.window.OpenedBlueprint.useduuids)
+                foreach (string uuid in BP.Useduuids)
                 {
                     if (Database.blocks.ContainsKey(uuid) && Database.blocks[uuid] is Part && (Database.blocks[uuid] as Part).IsConnectable)
                     {
-                        connectable_UUIDS.Add(new connectable(uuid.ToString(), ((Part)Database.blocks[uuid]).GetBounds(), Database.blocks[uuid].Name));
+                        connectable_UUIDS.Add(new Connectable(uuid.ToString(), ((Part)Database.blocks[uuid]).GetBounds(), Database.blocks[uuid].Name));
 
                     }
                 }
@@ -52,7 +52,7 @@ namespace Advanced_Blueprint_Tools
                     comboBox_items1.Items.Clear();
                     comboBox_items2.Items.Clear();
                 }));
-                foreach (connectable i in connectable_UUIDS)
+                foreach (Connectable i in connectable_UUIDS)
                 {
                     this.Dispatcher.Invoke((Action)(() =>
                     {//this refer to form in WPF application 
@@ -61,14 +61,14 @@ namespace Advanced_Blueprint_Tools
                     }));
                 }
             }
-            uuidsbackup = this.window.OpenedBlueprint.useduuids;
+            uuidsbackup = BP.Useduuids;
         }
 
         
 
-        private void textBox_color_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_color_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.update();
+            this.Update();
             TextBox textbox_color = (TextBox)sender;
             if (textbox_color.Text.Length == 7)
             {
@@ -90,37 +90,39 @@ namespace Advanced_Blueprint_Tools
             }
         }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
+        private void Button3_Click(object sender, RoutedEventArgs e)
         {
-            window.openpaintpicker();
+            MainWindow.openpaintpicker();
             textBox_color1.Text = PaintSelector.PaintColor;
         }
 
-        private void button3_Copy_Click(object sender, RoutedEventArgs e)
+        private void Button3_Copy_Click(object sender, RoutedEventArgs e)
         {
-            window.openpaintpicker();
+            MainWindow.openpaintpicker();
             textBox_color2.Text = PaintSelector.PaintColor;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.update();
-            PaintSelector p = new PaintSelector();
-            p.Owner = this.window;
+            this.Update();
+            PaintSelector p = new PaintSelector
+            {
+                Owner = this.window
+            };
             p.Show();
         }
 
         //Wire it!
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void Button1_Click(object sender, RoutedEventArgs e)
         {//WIRE IT!
-            if(comboBox_items1.SelectedIndex!=-1 && comboBox_items2.SelectedIndex != -1 && window.OpenedBlueprint != null)
+            if(comboBox_items1.SelectedIndex!=-1 && comboBox_items2.SelectedIndex != -1 && BP.Blueprint != null)
             {
                 string sourcecolor = textBox_color1.Text;
                 string destinationcolor = textBox_color2.Text;
-                connectable sourceblock = connectable_UUIDS[comboBox_items1.SelectedIndex];
-                connectable destinationblock = connectable_UUIDS[comboBox_items2.SelectedIndex];
+                Connectable sourceblock = connectable_UUIDS[comboBox_items1.SelectedIndex];
+                Connectable destinationblock = connectable_UUIDS[comboBox_items2.SelectedIndex];
 
-                dynamic backupbp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(window.OpenedBlueprint.blueprint.ToString());
+                dynamic backupbp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(BP.Blueprint.ToString());
                 //list all destionationblocks and their ID's
                 dynamic destids = new JObject();
                 /*
@@ -131,13 +133,13 @@ namespace Advanced_Blueprint_Tools
                 */
                 int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000, minz = 10000, maxz = -10000;
                 //loop over all blocks:
-                foreach (dynamic body in window.OpenedBlueprint.blueprint.bodies)
+                foreach (dynamic body in BP.Blueprint.bodies)
                 {
                     foreach(dynamic child in body.childs)
                     {
                         if(child.shapeId.Value.ToLower() == destinationblock.UUID.ToLower() /*&& (child.color.Value.ToLower() == destinationcolor.ToLower() || "#"+child.color.Value.ToLower() == destinationcolor.ToLower() || destinationcolor == "" || destinationcolor == "#")*/)
                         {
-                            dynamic dest = getposandbounds(child);//outputs corrected child (default rotation, correct position)
+                            dynamic dest = Getposandbounds(child);//outputs corrected child (default rotation, correct position)
 
                             string x = dest.pos.x.ToString();
                             string y = dest.pos.y.ToString();
@@ -176,8 +178,8 @@ namespace Advanced_Blueprint_Tools
                         }
                     }
                 }
-                if(window.OpenedBlueprint.blueprint.joints != null)
-                foreach(dynamic child in window.OpenedBlueprint.blueprint.joints)
+                if(BP.Blueprint.joints != null)
+                foreach(dynamic child in BP.Blueprint.joints)
                 {
                     if (child.shapeId.Value.ToLower() == destinationblock.UUID.ToLower() /*&& (child.color.Value.ToLower() == destinationcolor.ToLower() || "#"+child.color.Value.ToLower() == destinationcolor.ToLower() || destinationcolor == "" || destinationcolor == "#")*/)
                     {
@@ -216,11 +218,11 @@ namespace Advanced_Blueprint_Tools
                 {
                     //can be improved!
 
-                    foreach(dynamic body in window.OpenedBlueprint.blueprint.bodies)
+                    foreach(dynamic body in BP.Blueprint.bodies)
                         foreach(dynamic child in body.childs)
                             if (child.shapeId.Value.ToLower() == sourceblock.UUID.ToLower() && (child.color.Value.ToLower() == sourcecolor.ToLower() || "#" + child.color.Value.ToLower() == sourcecolor.ToLower() || sourcecolor == "" || sourcecolor == "#"))
                             {//COLOR AND UUID CORRECT, FURTHER WIRING PROCESS:
-                                dynamic source = getposandbounds(child);//outputs corrected child (default rotation, correct position)
+                                dynamic source = Getposandbounds(child);//outputs corrected child (default rotation, correct position)
 
                                 string x = source.pos.x.ToString();
                                 string y = source.pos.y.ToString();
@@ -288,13 +290,13 @@ namespace Advanced_Blueprint_Tools
                     
                     //window.UpdateOpenedBlueprint();
                     if (amountwired>0)
-                        window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n--> " + amountwired + " connections made between " + sourcecolor + " " + sourceblock.name + " and " + destinationcolor + " " + destinationblock.name;
+                        BP.Description.description = BP.Description.description + "\n--> " + amountwired + " connections made between " + sourcecolor + " " + sourceblock.name + " and " + destinationcolor + " " + destinationblock.name;
                    
                 }
                 catch(Exception exception)
                 {
                     MessageBox.Show(exception.Message+"\n\n Blueprint connections abrupted\nrestoring blueprint","ERROR");
-                    window.OpenedBlueprint.blueprint = backupbp;
+                    BP.setblueprint(backupbp);
                 }
             }
             else
@@ -310,7 +312,7 @@ namespace Advanced_Blueprint_Tools
 
 
         //get bounds from 
-        private dynamic getbounds(dynamic part)
+        private dynamic Getbounds(dynamic part)
         {
             dynamic bounds = new Newtonsoft.Json.Linq.JObject();
             if (part.box != null)
@@ -360,7 +362,7 @@ namespace Advanced_Blueprint_Tools
             return bounds;
         }
         //Reorganize bounds according to rotation:
-        private dynamic flip(dynamic child, string neworder)
+        private dynamic Flip(dynamic child, string neworder)
         {
             int x = child.bounds.x;
             int y = child.bounds.y;
@@ -398,7 +400,7 @@ namespace Advanced_Blueprint_Tools
             return child;
         }
         //get new pos and correct ingame bounds for child
-        private dynamic getposandbounds(dynamic whatever)
+        private dynamic Getposandbounds(dynamic whatever)
         {
             dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));
             string uuid = child.shapeId;
@@ -406,7 +408,7 @@ namespace Advanced_Blueprint_Tools
             if (child.bounds == null) //add bounds to parts (blocks do not get affected)
             {
 
-                foreach(connectable c in connectable_UUIDS)
+                foreach(Connectable c in connectable_UUIDS)
                 {
                     if (c.UUID.ToLower() == child.shapeId.Value)
                     {
@@ -418,29 +420,29 @@ namespace Advanced_Blueprint_Tools
                 {
                     if (Math.Abs(Convert.ToInt32(child.zaxis)) == 2)
                     {
-                        flip(child, "yzx");
+                        Flip(child, "yzx");
                     }
                     if (Math.Abs(Convert.ToInt32(child.zaxis)) == 1)
                     {
-                        flip(child, "zyx");
+                        Flip(child, "zyx");
                     }
                 }
                 if (Math.Abs(Convert.ToInt32(child.xaxis)) == 2)
                 {
                     if (Math.Abs(Convert.ToInt32(child.zaxis)) == 3)
                     {
-                        flip(child, "yxz");
+                        Flip(child, "yxz");
                     }
                     if (Math.Abs(Convert.ToInt32(child.zaxis)) == 1)
                     {
-                        flip(child, "zxy");
+                        Flip(child, "zxy");
                     }
                 }
                 if (Math.Abs(Convert.ToInt32(child.xaxis)) == 1)
                 {
                     if (Math.Abs(Convert.ToInt32(child.zaxis)) == 2)
                     {
-                        flip(child, "xzy");
+                        Flip(child, "xzy");
                     }
                 }
             }
@@ -454,12 +456,12 @@ namespace Advanced_Blueprint_Tools
             return child;
         }
 
-        private void button2_Click(object sender, RoutedEventArgs e)
+        private void Button2_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://youtu.be/glLgQemUS2I?t=270");
         }//help
 
-        private void textBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox t = (TextBox)sender;
             try
@@ -475,18 +477,18 @@ namespace Advanced_Blueprint_Tools
 
         //
     }
-    public class connectable
+    public class Connectable
     {
         public string name = "unnamed block";
         public string UUID;
         public dynamic bounds;
 
-        public connectable(string UUID, dynamic bounds)
+        public Connectable(string UUID, dynamic bounds)
         {
             this.UUID = UUID;
             this.bounds = bounds;
         }
-        public connectable(string UUID, dynamic bounds, string name)
+        public Connectable(string UUID, dynamic bounds, string name)
         {
             this.UUID = UUID;
             this.bounds = bounds;

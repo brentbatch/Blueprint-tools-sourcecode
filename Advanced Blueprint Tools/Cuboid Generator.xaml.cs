@@ -61,17 +61,15 @@ namespace Advanced_Blueprint_Tools
             description.type = "Blueprint";
             description.version = 0;
 
-            if (mainWindow.OpenedBlueprint == null)
-            {
-                mainWindow.OpenedBlueprint = new BP(blueprintdir, Cuboid, description);
+            if (BP.Blueprintpath == null)
+            {//no blueprint exists, initialize new one
+                new BP(blueprintdir, Cuboid, description);
             }
             else
-            {
-                mainWindow.OpenedBlueprint.blueprint = Cuboid;
+            {//a blueprint exists, overwrite it
+                BP.setblueprint(Cuboid);
+                BP.Description.description += message;
             }
-
-            mainWindow.OpenedBlueprint.description.description = message;
-            mainWindow.OpenedBlueprint.setblueprint(mainWindow.OpenedBlueprint.blueprint);
             mainWindow.UpdateOpenedBlueprint();
         }
 

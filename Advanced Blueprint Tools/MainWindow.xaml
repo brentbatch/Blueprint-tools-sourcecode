@@ -21,7 +21,7 @@
         <KeyBinding Modifiers="Ctrl" Key="S" Command="Save"></KeyBinding>
         <KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="SaveAs"></KeyBinding>
     </Window.InputBindings>
-    <DockPanel >
+    <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#61737D">
             <MenuItem Header="_File">
                 <MenuItem Name="menuOpen" Header="_Open" Command="Open" />
@@ -45,17 +45,18 @@
             </MenuItem>
             <MenuItem Header="Settings" Click="MenuItem_Click_Settings" Visibility="Collapsed"/>
         </Menu>
-        <Grid Background="#8093A0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="641" Width="1275" Margin="0,5,0,25" >
+        <Grid Background="#8093A0"  HorizontalAlignment="Center" VerticalAlignment="Center" Height="650"  Width="1275" Margin="0,0,0,20" >
 
-            <Grid x:Name="Image_blueprint" HorizontalAlignment="Left" Height="500" Margin="34,30,0,0" VerticalAlignment="Top" Width="500">
-                <Grid.Background>
-                    <RadialGradientBrush>
-                        <GradientStop Color="#FF55758B" Offset="1"/>
-                        <GradientStop Color="#FF7B9FB8"/>
-                    </RadialGradientBrush>
-                </Grid.Background>
+            <Grid x:Name="Image_blueprint" HorizontalAlignment="Left" Height="500" Width="500" Margin="34,30,0,0" VerticalAlignment="Top" >
+                
 
-                <HelixToolkit:HelixViewport3D Name="helix" ZoomExtentsWhenLoaded="True"  ShowCoordinateSystem="True" CameraRotationMode="Turntable" ShowViewCube="false">
+                <HelixToolkit:HelixViewport3D Name="helix" ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" CameraRotationMode="Turntable" ShowViewCube="false">
+                    <HelixToolkit:HelixViewport3D.Background>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#FF55758B" Offset="1"/>
+                            <GradientStop Color="#FF7B9FB8"/>
+                        </RadialGradientBrush>
+                    </HelixToolkit:HelixViewport3D.Background>
 
                     <!-- Remember to add light to the scene -->
                     <HelixToolkit:SunLight/>
@@ -75,8 +76,8 @@
             <TextBox x:Name="TextBox_Description" HorizontalAlignment="Right" Height="432" Margin="0,98,44,0" TextWrapping="Wrap" Text="..." FontSize="24" Foreground="#fff" VerticalAlignment="Top" Width="671" Background="#61737C" BorderThickness="5" AcceptsReturn="True" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
             <Button x:Name="button_overwrite" Content="SAVE/OVERWRITE" HorizontalAlignment="Right" Margin="0,540,395,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7"  FontWeight="Bold" Click="button_overwrite_click" />
             <Button x:Name="button_save" Content="SAVE AS NEW" HorizontalAlignment="Right" Margin="0,540,44,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Click="button_save_click"  />
-            <TextBox x:Name="TextBox_Name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" TextWrapping="Wrap" Text="NAME" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="34,540,735,0" Width="500" Height="60" BorderThickness="0"/>
-            <Button x:Name="Notifications" Content="!" HorizontalAlignment="Right" Padding="10,0,10,0" VerticalContentAlignment="Center" Margin="0,30,44,0" VerticalAlignment="Top" Height="42"  FontSize="24" Foreground="#fff" Background="#FF954444" FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBox x:Name="TextBox_Name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" TextWrapping="Wrap" Text="NAME" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="34,540,735,30" Width="500" Height="60" BorderThickness="0"/>
+            <Button x:Name="Notifications" Content="0" HorizontalAlignment="Right" Padding="10,0,10,0" VerticalContentAlignment="Center" Margin="0,30,44,0" VerticalAlignment="Top" Height="42"  FontSize="24" Foreground="#fff" Background="#FF954444" FontWeight="Bold" Visibility="Visible" Click="Notifications_Click"/>
 
         </Grid>
     </DockPanel>

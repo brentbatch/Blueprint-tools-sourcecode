@@ -28,17 +28,17 @@ namespace Advanced_Blueprint_Tools
         {
             this.window = window;
             InitializeComponent();
-            update();
+            Update();
         }
 
 
-        public void update()
+        public void Update()
         {
-            if (uuidsbackup != this.window.OpenedBlueprint.useduuids)
+            if (uuidsbackup != BP.Useduuids)
             {
                 blockstoreplace = new JArray();
                 replacebyblocks = new JArray();
-                foreach (string uuid in this.window.OpenedBlueprint.useduuids)
+                foreach (string uuid in BP.Useduuids)
                 {
                     if (Database.blocks.ContainsKey(uuid))
                     {
@@ -62,7 +62,7 @@ namespace Advanced_Blueprint_Tools
                     }));
                 }
             }
-            uuidsbackup = this.window.OpenedBlueprint.useduuids;
+            uuidsbackup = BP.Useduuids;
 
         }
 
@@ -135,7 +135,8 @@ namespace Advanced_Blueprint_Tools
                 dynamic blocktoreplace = blockstoreplace[comboBox_old.SelectedIndex];
                 dynamic replacebyblock = replacebyblocks[comboBox_new.SelectedIndex];
                 int amountchanged = 0;
-                foreach (dynamic body in this.window.OpenedBlueprint.blueprint.bodies)
+                dynamic blueprint = BP.Blueprint;
+                foreach (dynamic body in blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
                         if (child.shapeId == blocktoreplace.uuid && (textBox_color1.Text.ToString().ToLower() == child.color.ToString().ToLower() || textBox_color1.Text.ToString().ToLower() == "#"+child.color.ToString().ToLower() || textBox_color1.Text == "" || textBox_color1.Text =="#"))
@@ -153,9 +154,8 @@ namespace Advanced_Blueprint_Tools
                 MessageBox.Show(message);
                 if (amountchanged > 0)
                 {
-                    window.OpenedBlueprint.setblueprint(window.OpenedBlueprint.blueprint);
-
-                    window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n" + message;
+                    BP.setblueprint(blueprint);
+                    BP.Description.description = BP.Description.description + "\n" + message;
                     window.UpdateOpenedBlueprint();
                 }
 
