@@ -13,9 +13,8 @@
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="OpenCommand_Executed"></CommandBinding>
-        <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommandBinding_Executed"></CommandBinding>
-        <CommandBinding Command="SaveAs" CanExecute="SaveCommand_CanExecute" Executed="SaveAsCommandBinding_Executed"></CommandBinding>
-        <CommandBinding Command="Close" Executed="CommandBinding_Executed"></CommandBinding>
+        <CommandBinding Command="Save" Executed="SaveCommandBinding_Executed" CanExecute="SaveCommand_CanExecute"></CommandBinding>
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommandBinding_Executed" CanExecute="SaveCommand_CanExecute"></CommandBinding>
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="O" Command="Open"></KeyBinding>
@@ -32,17 +31,17 @@
                 <MenuItem Name="menuSaveAs" Header="_Save as..." Command="SaveAs" InputGestureText="Ctrl+Shift+S"/>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Name="menuitem1" Header="Advanced Connections" Click="MenuItem_Click" IsEnabled="False"/>
-                <MenuItem Name="menuitem3" Header="Advanced Paint" Click="MenuItem_Click_2" IsEnabled="False" />
-                <MenuItem Name="menuitem2" Header="Block Properties" Click="MenuItem_Click_1" IsEnabled="False" />
-                <MenuItem Name="menuitem9" Header="Joint Properties" Click="MenuItem_Click_8" IsEnabled="False" Visibility="Collapsed"/>
-                <MenuItem Name="menuitem4" Header="Remove joints &amp; weld" Click="menuitem_Click_4" IsEnabled="False" />
-                <MenuItem Name="menuitem14" Header="Check Required mods" Click="menuitem_Click14" IsEnabled="False" />
-                <MenuItem Name="menuitem10" Header="Swap Blocks" Click="MenuItem_Click_9" IsEnabled="False" />
-                <MenuItem Name="menuitem12" Header="Mirror Creation!" Click="MenuItem_Click_11" IsEnabled="False" />
-                <MenuItem Name="menuitem13" Header="Sphere Generator" Click="MenuItem_Click_12"/>
-                <MenuItem Name="menuitem15" Header="Cuboid Generator" Click="MenuItem_Click_15"/>
-                <MenuItem Name="menuitem11" Header="Paint Selector" Click="MenuItem_Click_10" Background="#dddddd"/>
+                <MenuItem Name="connections" Header="Advanced Connections" Click="Click_advancedwiring" IsEnabled="False"/>
+                <MenuItem Name="paint" Header="Advanced Paint" Click="Click_advancedcolor" IsEnabled="False" />
+                <MenuItem Name="blockproperties" Header="Block Properties" Click="Click_blockproperties" IsEnabled="False" />
+                <MenuItem Name="areaproperties" Header="Joint Properties" Click="Click_areaproperties" IsEnabled="False" Visibility="Collapsed"/>
+                <MenuItem Name="fixcreation" Header="fix invalid json (Removes joints)" Click="Click_fixcreation" IsEnabled="False" />
+                <MenuItem Name="requiredmods" Header="Check Required mods" Click="Click_requiredmods" IsEnabled="False" />
+                <MenuItem Name="swapblocks" Header="Swap Blocks" Click="Click_swapblocks" IsEnabled="False" />
+                <MenuItem Name="mirrorcreation" Header="Mirror Creation!" Click="Click_mirrormode" IsEnabled="False" />
+                <MenuItem Name="spheregenerator" Header="Sphere Generator" Click="Click_ellipsoidgenerator"/>
+                <MenuItem Name="cuboidgenerator" Header="Cuboid Generator" Click="Click_cuboidgenerator"/>
+                <MenuItem Name="paintpicker" Header="Paint Selector" Click="Click_paintpicker" Background="#dddddd"/>
             </MenuItem>
             <MenuItem Header="Settings" Click="MenuItem_Click_Settings" Visibility="Collapsed"/>
         </Menu>
@@ -77,6 +76,7 @@
             <Button x:Name="button_overwrite" Content="SAVE/OVERWRITE" HorizontalAlignment="Right" Margin="0,540,395,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7"  FontWeight="Bold" Click="button_overwrite_click" />
             <Button x:Name="button_save" Content="SAVE AS NEW" HorizontalAlignment="Right" Margin="0,540,44,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Click="button_save_click"  />
             <TextBox x:Name="TextBox_Name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" TextWrapping="Wrap" Text="NAME" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="34,540,735,0" Width="500" Height="60" BorderThickness="0"/>
+            <Button x:Name="Notifications" Content="!" HorizontalAlignment="Right" Padding="10,0,10,0" VerticalContentAlignment="Center" Margin="0,30,44,0" VerticalAlignment="Top" Height="42"  FontSize="24" Foreground="#fff" Background="#FF954444" FontWeight="Bold" Visibility="Collapsed"/>
 
         </Grid>
     </DockPanel>

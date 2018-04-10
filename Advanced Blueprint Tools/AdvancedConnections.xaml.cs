@@ -41,15 +41,10 @@ namespace Advanced_Blueprint_Tools
                 connectable_UUIDS.Clear();
                 foreach (string uuid in this.window.OpenedBlueprint.useduuids)
                 {
-                    if (this.window.getgameblocks()[uuid] != null)
+                    if (Database.blocks.ContainsKey(uuid) && Database.blocks[uuid] is Part && (Database.blocks[uuid] as Part).IsConnectable)
                     {
+                        connectable_UUIDS.Add(new connectable(uuid.ToString(), ((Part)Database.blocks[uuid]).GetBounds(), Database.blocks[uuid].Name));
 
-                        dynamic part = this.window.getgameblocks()[uuid];
-
-                        if (part.spotlight != null || part.engine != null || part.thruster != null || part.steering != null || part.seat != null || part.timedjoint != null || part.lever != null || part.button != null || part.sensor != null || part.logic != null || part.timer != null || part.piston != null || part.simpleInteractive != null)
-                        {
-                            connectable_UUIDS.Add(new connectable(uuid.ToString(), getbounds(part), part.Name.ToString()));
-                        }
                     }
                 }
                 this.Dispatcher.Invoke((Action)(() =>
@@ -98,19 +93,19 @@ namespace Advanced_Blueprint_Tools
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             window.openpaintpicker();
-            textBox_color1.Text = this.window.PaintColor;
+            textBox_color1.Text = PaintSelector.PaintColor;
         }
 
         private void button3_Copy_Click(object sender, RoutedEventArgs e)
         {
             window.openpaintpicker();
-            textBox_color2.Text = this.window.PaintColor;
+            textBox_color2.Text = PaintSelector.PaintColor;
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
             this.update();
-            PaintSelector p = new PaintSelector(this.window);
+            PaintSelector p = new PaintSelector();
             p.Owner = this.window;
             p.Show();
         }
@@ -289,7 +284,8 @@ namespace Advanced_Blueprint_Tools
 
                             }
 
-                    MessageBox.Show("Successfully made " + amountwired + " connections! :D");
+                    new System.Threading.Thread(new System.Threading.ThreadStart(() => { MessageBox.Show("Successfully made " + amountwired + " connections! :D");})).Start();
+                    
                     //window.UpdateOpenedBlueprint();
                     if (amountwired>0)
                         window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n--> " + amountwired + " connections made between " + sourcecolor + " " + sourceblock.name + " and " + destinationcolor + " " + destinationblock.name;
@@ -497,28 +493,6 @@ namespace Advanced_Blueprint_Tools
             this.name = name;
         }
     }
-
-    public class block
-    {
-        dynamic child;
-        int id;
-        int x;
-        int y;
-        int z;
-
-
-        public block(dynamic child)
-        {
-            this.id = child.controller.id;
-            this.child = child;
-            this.x = child.pos.x;
-            this.y = child.pos.y;
-            this.z = child.pos.z;
-
-
-
-
-        }
-    }
+    
 
 }

@@ -19,14 +19,13 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class PaintSelector : Window
     {
-        MainWindow window;
-        string PaintColor;
+        public static string PaintColor;
         
-        public PaintSelector(MainWindow window)
+        public PaintSelector()
         {
             InitializeComponent();
-            this.window = window;
-            this.PaintColor = window.PaintColor;
+            //this.window = window;
+            //PaintColor = window.PaintColor;
         }
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -60,7 +59,7 @@ namespace Advanced_Blueprint_Tools
                 var bc = new BrushConverter();
                 textbox_color.Background = (Brush)bc.ConvertFrom("#eeeeee");
             }
-            if(window!=null) window.PaintColor = textbox_color.Text;
+            PaintColor = textbox_color.Text;
         }
 
         private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

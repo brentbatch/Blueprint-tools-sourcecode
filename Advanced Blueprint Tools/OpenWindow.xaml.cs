@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json.Linq;
 using System.Threading;
-
+using System.Drawing;
 namespace Advanced_Blueprint_Tools
 {
     /// <summary>
@@ -22,173 +22,184 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class OpenWindow : Window
     {
-        MainWindow mainwindow;
+        MainWindow MainWindow;
         Thread loadbp;
-        public OpenWindow(MainWindow mainwindow)
+        public OpenWindow(MainWindow mainWindow)
         {
+            this.MainWindow = mainWindow;
             InitializeComponent();
-            this.mainwindow = mainwindow;
 
             //load mainwindow.blueprints in list
             loadbp = new Thread(new ThreadStart(Loadblueprints));
+            loadbp.SetApartmentState(ApartmentState.STA);
+            loadbp.IsBackground = true;
             loadbp.Start();
             //Loadblueprints(""); 
         }
-        public void Loadblueprints() //TextBox_Search.Text.ToString()
+        
+        public void Loadblueprints()//threaded
         {
-            string searchby="";
-            this.Dispatcher.Invoke((Action)(() =>
-            {//this refer to form in WPF application 
-                searchby = TextBox_Search.Text.ToString();
-            }));
-            List<string> blueprints = new List<string>();
-            while(true)
-            { 
-                while (blueprints.Count < mainwindow.blueprints.Count)
-                {
-                    blueprints = new List<string>();
-                    blueprints.AddRange(mainwindow.blueprints);
-
-                    int i = 0;
-                    foreach (string blueprint in blueprints)
-                        if (File.Exists(blueprint + @"\blueprint.json") && File.Exists(blueprint + @"\icon.png") && File.Exists(blueprint + @"\description.json"))
-                        {
-                            try
-                            {
-                                dynamic desc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(blueprint + @"\description.json"));
-                                string descname = desc.name.ToString().ToLower();
-                                if (searchby == "" || descname.Contains(searchby.ToLower()))
-                                {
-                                    this.Dispatcher.Invoke((Action)(() =>
-                                    {
-                                        listBox_blueprints.Items.Add(new Blueprint(blueprint + @"\icon.png"));
-                                    }));
-                                    i++;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                if(e.HResult != -2146233040)
-                                {
-                                    MessageBoxResult result = MessageBox.Show(e.Message + "\n\n" + blueprint + "\n\nWould you like to open this location?", "Couldn't load this blueprint!", MessageBoxButton.YesNo);
-                                    if (result == MessageBoxResult.Yes)
-                                    {
-                                        System.Diagnostics.Process.Start(blueprint);
-                                    }
-                                }
-                            }
-                        }
-                }
-                Thread.Sleep(3);
-                try
+            string searchby = "";
+            int totalbps = 0;
+            while (true)
+            {
+                while(totalbps != Database.blueprints.Count())
                 {
                     this.Dispatcher.Invoke((Action)(() =>
-                    {//this refer to form in WPF application 
-                     //check if window still active
-
-                        if (this.IsActive)
-                        { }
+                    {
+                        searchby = TextBox_Search.Text;
                     }));
+
+                    //filter:
+                    //if()
+                    try
+                    {
+                        List<Blueprint> items = new List<Blueprint>();
+                        foreach (string path in Database.blueprints.Keys)
+                        {
+                            Blueprint blueprint = new Blueprint(path, Database.blueprints[path]);
+                            string name = blueprint.getname();
+                            if ((searchby == "" || blueprint.getname().ToLower().Contains(searchby.ToLower()))&& Directory.Exists(path))
+                            {
+                                items.Add(blueprint);
+                            }
+                        }
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            listBox_blueprints.ItemsSource = null;
+                            listBox_blueprints.Items.Clear();
+                            listBox_blueprints.ItemsSource = items;
+                        }));
+                    }
+                    catch { }
+                    totalbps = Database.blueprints.Count();
                 }
-                catch
+                this.Dispatcher.Invoke((Action)(() =>
                 {
-                    break;
-                }//end thread if window closed
+                    if(Database.bprefresh == true)
+                    {
+                        Database.bprefresh = false;
+                        button_refresh_Copy_Click(null, null);
+                    }
+                }));
+                Thread.Sleep(1000);
             }
 
-        }   
-
-        private void ListBox_Selectionchanged(object sender, RoutedEventArgs e)
-        {
-            if(listBox_blueprints.SelectedIndex!=-1)
-            {
-                string bp = Directory.GetParent(((Blueprint)listBox_blueprints.SelectedItem).image).ToString();
-                dynamic desc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(bp + @"\description.json"));
-                Label_name.Content = desc.name;
-            }
 
         }
-
         private void button_refresh_Copy_Click(object sender, RoutedEventArgs e)
         {
-            listBox_blueprints.Items.Clear();
             Label_name.Content = "/";
             loadbp.Abort();
             loadbp = new Thread(new ThreadStart(Loadblueprints));
             loadbp.Start();
         }
 
+        private void ListBox_Selectionchanged(object sender, RoutedEventArgs e)
+        {
+            if(listBox_blueprints.SelectedIndex!=-1)
+            {
+                try
+                {
+                    string bp = ((Blueprint)listBox_blueprints.SelectedItem).blueprintpath.ToString();
+                    dynamic desc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(bp + @"\description.json"));
+                    Label_name.Content = desc.name;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+
+        }
+
+
         private void button_LOAD_Click(object sender, RoutedEventArgs e)
         {
-            //load();
-            Thread loadthread = new Thread(new ThreadStart(load));
-            loadthread.SetApartmentState(ApartmentState.STA);
-            loadthread.Start();
+            load();
         }
 
         public void load()
         {
             BP bp = null;
-            dynamic blocks = mainwindow.getgameblocks();
-            if (((JObject)blocks).Count > 100)
+            string bppath = "";
+            try
             {
-                try
-                {
-                    string bppath = "";
-                    this.Dispatcher.Invoke((Action)(() =>
-                    {//this refer to form in WPF application 
-                        try
-                        {
-                            bppath = Directory.GetParent(((Blueprint)listBox_blueprints.SelectedItem).image).ToString();
+                bppath = ((Blueprint)listBox_blueprints.SelectedItem).blueprintpath.ToString();
 
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show(e.Message);
-                            throw new Exception("Unable to load blueprint!");
-                        }
-                    }));
-                    bp = new BP(bppath);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
-                if (bp != null)
-                    this.Dispatcher.Invoke((Action)(() =>
-                    {//this refer to form in WPF application 
-                        Loadwindow l = new Loadwindow();
-                        l.Show();
-                        mainwindow.OpenedBlueprint = bp;
-                        mainwindow.UpdateOpenedBlueprint();
-                        if (mainwindow.advancedconnections != null && mainwindow.advancedconnections.IsLoaded) mainwindow.advancedconnections.update();
-                        if (mainwindow.advancedcolorwindow != null && mainwindow.advancedcolorwindow.IsLoaded) mainwindow.advancedcolorwindow.update();
-                        if (mainwindow.swapblockswindow != null && mainwindow.swapblockswindow.IsLoaded) mainwindow.swapblockswindow.update();
-                        if (mainwindow.blockProperties != null && mainwindow.blockProperties.IsLoaded) mainwindow.blockProperties.Close();
-
-                        l.Close();
-
-                    }));
+                bp = new BP(bppath);
             }
-            else
-                MessageBox.Show("Resources aren't loaded yet, please give it a moment");
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            if (bp != null)
+            {
+                Loadwindow l = new Loadwindow();
+                l.Show();
+                MainWindow.OpenedBlueprint = bp;
+                MainWindow.UpdateOpenedBlueprint();
+                if (MainWindow.advancedconnections != null && MainWindow.advancedconnections.IsLoaded) MainWindow.advancedconnections.update();
+                if (MainWindow.advancedcolorwindow != null && MainWindow.advancedcolorwindow.IsLoaded) MainWindow.advancedcolorwindow.update();
+                if (MainWindow.swapblockswindow != null && MainWindow.swapblockswindow.IsLoaded) MainWindow.swapblockswindow.update();
+                if (MainWindow.blockProperties != null && MainWindow.blockProperties.IsLoaded) MainWindow.blockProperties.Close();
+
+                l.Close();
+            }
+
         }
 
         private void button_DELETE_Click(object sender, RoutedEventArgs e)
         {
             //messagebox YES/NO
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to remove this blueprint?"," ",MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+            if(result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    Directory.Delete(((Blueprint)listBox_blueprints.SelectedItem).blueprintpath, true);
+                    //Database.LoadBpsIn(Database.User_ + "\\blueprints");
+                    Database.blueprints.Remove(((Blueprint)listBox_blueprints.SelectedItem).blueprintpath);
+                    button_refresh_Copy_Click(null, null);
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message,"failed to remove");
+                }
+            }
         }
     }
-    public class Blueprint //shit for pictures
+    public class Blueprint
     {
         public string image { get; set; }
-
         
-        public Blueprint(string image)
-        {
-            this.image = image;
-        }
-    }
 
+        public string blueprintpath { get; private set; }
+        public BitmapSource imsource { get; private set; }
+        //public string name { get; private set; }
+
+        public Blueprint(string blueprintpath, BitmapSource src)
+        {
+            this.blueprintpath = blueprintpath;
+            this.imsource = src;
+            this.image = blueprintpath + "\\icon.png";
+            //name = getname();
+        }
+
+        public string getname()
+        {
+            try
+            {
+                dynamic desc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(blueprintpath + @"\description.json"));
+                return desc.name.ToString().ToLower();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+    }
     
 }

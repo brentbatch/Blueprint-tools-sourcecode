@@ -41,13 +41,9 @@ namespace Advanced_Blueprint_Tools
                 ItemList.Add(new Item("any", "*"));
                 foreach (string uuid in this.window.OpenedBlueprint.useduuids)
                 {
-                    if (this.window.getgameblocks()[uuid] != null)
+                    if (Database.blocks.ContainsKey(uuid))
                     {
-
-                        dynamic part = this.window.getgameblocks()[uuid];
-                        ItemList.Add(new Item(part.Name.ToString(), part.uuid.ToString()));
-
-
+                        ItemList.Add(new Item(Database.blocks[uuid].Name, uuid));
                     }
                 }
                 dynamic colorlist = new JObject();
@@ -111,13 +107,13 @@ namespace Advanced_Blueprint_Tools
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             window.openpaintpicker();
-            textBox_color1.Text = this.window.PaintColor;
+            textBox_color1.Text = PaintSelector.PaintColor;
         }
 
         private void button3_Copy_Click(object sender, RoutedEventArgs e)
         {
             window.openpaintpicker();
-            textBox_color2.Text = this.window.PaintColor;
+            textBox_color2.Text = PaintSelector.PaintColor;
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -166,7 +162,9 @@ namespace Advanced_Blueprint_Tools
             string message = "++ " + amountcolored + " " + oldcolor + " " + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
             if (textBox_color1.Text == "#" || textBox_color1.Text == "")
                 message = "++ " + amountcolored + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
-            MessageBox.Show(message);
+            
+            new System.Threading.Thread(new System.Threading.ThreadStart(() => { MessageBox.Show(message); })).Start();
+
             if (amountcolored > 0)
             {
                 window.OpenedBlueprint.setblueprint(window.OpenedBlueprint.blueprint);
@@ -181,9 +179,9 @@ namespace Advanced_Blueprint_Tools
         private void color_list_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.window.openpaintpicker();
-            this.window.PaintColor = "#" + ((string)((dynamic)color_list.SelectedItem).Background.ToString()).Substring(3,6);
+            PaintSelector.PaintColor = "#" + ((string)((dynamic)color_list.SelectedItem).Background.ToString()).Substring(3,6);
             if (this.window.paintSelector.IsLoaded)
-                this.window.paintSelector.textbox_color.Text = this.window.PaintColor;
+                this.window.paintSelector.textbox_color.Text = PaintSelector.PaintColor;
         }
     }
 

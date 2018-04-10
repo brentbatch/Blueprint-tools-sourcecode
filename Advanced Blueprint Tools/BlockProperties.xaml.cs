@@ -49,11 +49,9 @@ namespace Advanced_Blueprint_Tools
                 usedblocks.Add(new Item("any", "*"));
                 foreach (string uuid in this.mainwindow.OpenedBlueprint.useduuids)
                 {
-                    if (this.mainwindow.getgameblocks()[uuid] != null)
+                    if (Database.blocks.ContainsKey(uuid))
                     {
-
-                        dynamic part = this.mainwindow.getgameblocks()[uuid];
-                        usedblocks.Add(new Item(part.Name.ToString(), part.uuid.ToString())); // fill the combobox!   only runs once!
+                        usedblocks.Add(new Item(Database.blocks[uuid].Name.ToString(), uuid)); // fill the combobox!   only runs once!
                     }
                 }
                 filter_type.Items.Clear();
@@ -73,8 +71,7 @@ namespace Advanced_Blueprint_Tools
                         if (child.color.ToString().StartsWith("#"))
                             child.color = child.color.ToString().Substring(1);
                         child.blueprintIndex = i;
-                        dynamic blocks = this.mainwindow.getgameblocks();
-                        child.blockname = blocks[child.shapeId.ToString()].Name;
+                        child.blockname = Database.blocks[child.shapeId.ToString()].Name;
                         dynamic realpos = this.mainwindow.OpenedBlueprint.getposandbounds(child);
 
                         if (backuplist[realpos.pos.x.ToString()] == null) backuplist[realpos.pos.x.ToString()] = new JObject();
@@ -110,7 +107,7 @@ namespace Advanced_Blueprint_Tools
         private void filter_SET_Click(object sender, RoutedEventArgs e)
         {
             mainwindow.openpaintpicker();
-            filter_color.Text = this.mainwindow.PaintColor;
+            filter_color.Text = PaintSelector.PaintColor;
         }
         private void Filter_pos_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -425,18 +422,18 @@ namespace Advanced_Blueprint_Tools
         {
 
             mainwindow.openpaintpicker();
-            new_sensorcolor.Text = this.mainwindow.PaintColor;
+            new_sensorcolor.Text = PaintSelector.PaintColor;
 
         }
         private void SET_Copy1_Click(object sender, RoutedEventArgs e)
         {
             mainwindow.openpaintpicker();
-            new_lampcolor.Text = this.mainwindow.PaintColor;
+            new_lampcolor.Text = PaintSelector.PaintColor;
         }
         private void SET_Copy2_Click(object sender, RoutedEventArgs e)
         {
             mainwindow.openpaintpicker();
-            new_color.Text = this.mainwindow.PaintColor;
+            new_color.Text = PaintSelector.PaintColor;
         }
 
 

@@ -40,14 +40,12 @@ namespace Advanced_Blueprint_Tools
                 replacebyblocks = new JArray();
                 foreach (string uuid in this.window.OpenedBlueprint.useduuids)
                 {
-                    if (this.window.getgameblocks()[uuid] != null)
+                    if (Database.blocks.ContainsKey(uuid))
                     {
-
-                        dynamic part = this.window.getgameblocks()[uuid];
                         dynamic blok = new JObject();
-                        blok.name = part.Name;
-                        blok.bounds = getbounds(part);
-                        blok.uuid = part.uuid;
+                        blok.name = Database.blocks[uuid].Name;
+                        blok.bounds = (Database.blocks[uuid] is Part)? ((Part)Database.blocks[uuid]).GetBoundsDynamic() : null;
+                        blok.uuid = uuid;
                         blockstoreplace.Add(blok);
                     }
                 }
@@ -99,28 +97,34 @@ namespace Advanced_Blueprint_Tools
             {
 
                 dynamic selectedblok = blockstoreplace[comboBox_old.SelectedIndex];
-                dynamic blocklist = this.window.getgameblocks();
-                foreach (dynamic bindex in blocklist)
+
+                foreach(string uuid in Database.blocks.Keys)
                 {
-                    dynamic part = blocklist[bindex.Name];
-                    dynamic bounds = getbounds(part);
-                    if ((selectedblok.bounds != null && bounds != null && bounds.x == selectedblok.bounds.x && bounds.y == selectedblok.bounds.y && bounds.z == selectedblok.bounds.z) || bounds == null)
+                    dynamic bounds = null;
+                    if (Database.blocks[uuid] is Part)
                     {
-                        dynamic b = new JObject();
-                        b.name = part.Name;
-                        b.bounds = getbounds(part);
-                        b.uuid = part.uuid;
-                        replacebyblocks.Add(b);
-                        comboBox_new.Items.Add(part.Name);
+                        bounds = ((Part)Database.blocks[uuid]).GetBoundsDynamic();
                     }
+
+                    if(bounds == null||(selectedblok.bounds != null && bounds == selectedblok.bounds))
+                    {
+                        dynamic block = new JObject();
+                        block.name = Database.blocks[uuid].Name;
+                        block.bounds = bounds;
+                        block.uuid = uuid;
+                        replacebyblocks.Add(block);
+                        comboBox_new.Items.Add(block.name);
+                    }
+                    
                 }
+                
 
             }
         }
 
         private void button_set_Click(object sender, RoutedEventArgs e)
         {
-            textBox_color1.Text = this.window.PaintColor;
+            textBox_color1.Text = PaintSelector.PaintColor;
         }
 
         private void button_swap_Click(object sender, RoutedEventArgs e)
