@@ -29,17 +29,19 @@ namespace Advanced_Blueprint_Tools
         {
             this.window = window;
             InitializeComponent();
-            this.update();
+            this.Update();
         }
 
 
-        public void update()
+        public void Update()
         {
-            if (uuidsbackup != this.window.OpenedBlueprint.useduuids)
+            if (uuidsbackup != BP.Useduuids)
             {
-                ItemList = new List<Item>();
-                ItemList.Add(new Item("any", "*"));
-                foreach (string uuid in this.window.OpenedBlueprint.useduuids)
+                ItemList = new List<Item>
+                {
+                    new Item("any", "*")
+                };
+                foreach (string uuid in BP.Useduuids)
                 {
                     if (Database.blocks.ContainsKey(uuid))
                     {
@@ -47,7 +49,7 @@ namespace Advanced_Blueprint_Tools
                     }
                 }
                 dynamic colorlist = new JObject();
-                foreach (dynamic body in this.window.OpenedBlueprint.blueprint.bodies)
+                foreach (dynamic body in BP.Blueprint.bodies)
                     foreach(dynamic child in body.childs)
                     {
                         if (child.color.ToString().StartsWith("#")) child.color = child.color.ToString().Substring(1);
@@ -76,12 +78,12 @@ namespace Advanced_Blueprint_Tools
                     }));
                 }
             }
-            uuidsbackup = this.window.OpenedBlueprint.useduuids;
+            uuidsbackup = BP.Useduuids;
         }
 
 
 
-        private void textBox_color_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_color_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textbox_color = (TextBox)sender;
             if (textbox_color.Text.Length == 7)
@@ -104,24 +106,24 @@ namespace Advanced_Blueprint_Tools
             }
         }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
+        private void Button3_Click(object sender, RoutedEventArgs e)
         {
-            window.openpaintpicker();
+            MainWindow.openpaintpicker();
             textBox_color1.Text = PaintSelector.PaintColor;
         }
 
-        private void button3_Copy_Click(object sender, RoutedEventArgs e)
+        private void Button3_Copy_Click(object sender, RoutedEventArgs e)
         {
-            window.openpaintpicker();
+            MainWindow.openpaintpicker();
             textBox_color2.Text = PaintSelector.PaintColor;
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void Button1_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://youtu.be/glLgQemUS2I?t=677");
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             TextBox t1 = (TextBox)textBox_color1;
             Brush b = t1.Background;
@@ -132,7 +134,7 @@ namespace Advanced_Blueprint_Tools
             string newcolor = "#" + (b1 as SolidColorBrush).Color.ToString().Substring(3);
 
             int amountcolored = 0;
-            foreach (dynamic body in window.OpenedBlueprint.blueprint.bodies)
+            foreach (dynamic body in BP.Blueprint.bodies)
             {
                 foreach (dynamic child in body.childs)
                 {
@@ -146,8 +148,8 @@ namespace Advanced_Blueprint_Tools
                     }
                 }
             }
-            if(window.OpenedBlueprint.blueprint.joints != null)
-                foreach (dynamic child in window.OpenedBlueprint.blueprint.joints)
+            if(BP.Blueprint.joints != null)
+                foreach (dynamic child in BP.Blueprint.joints)
                 {
                     string token = "#";
                     string color = child.color.ToString();
@@ -167,21 +169,21 @@ namespace Advanced_Blueprint_Tools
 
             if (amountcolored > 0)
             {
-                window.OpenedBlueprint.setblueprint(window.OpenedBlueprint.blueprint);
+                BP.setblueprint(BP.Blueprint);
 
-                window.OpenedBlueprint.description.description = window.OpenedBlueprint.description.description + "\n" + message;
+                BP.Description.description = BP.Description.description + "\n" + message;
                 window.UpdateOpenedBlueprint();
             }
 
 
         }
 
-        private void color_list_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Color_list_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.window.openpaintpicker();
+            MainWindow.openpaintpicker();
             PaintSelector.PaintColor = "#" + ((string)((dynamic)color_list.SelectedItem).Background.ToString()).Substring(3,6);
-            if (this.window.paintSelector.IsLoaded)
-                this.window.paintSelector.textbox_color.Text = PaintSelector.PaintColor;
+            if (MainWindow.paintSelector.IsLoaded)
+                MainWindow.paintSelector.textbox_color.Text = PaintSelector.PaintColor;
         }
     }
 

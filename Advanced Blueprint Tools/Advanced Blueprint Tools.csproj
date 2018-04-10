@@ -31,7 +31,7 @@
     <ProductName>Advanced Blueprint Tools</ProductName>
     <PublisherName>Brent Batch</PublisherName>
     <SuiteName>BB corp.</SuiteName>
-    <ApplicationRevision>70</ApplicationRevision>
+    <ApplicationRevision>73</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -254,6 +254,7 @@
   <ItemGroup>
     <Content Include="Assimp32.dll" />
     <Content Include="Assimp64.dll" />
+    <Resource Include="Resources\missingicon.bmp" />
     <Resource Include="missingicon.bmp" />
     <Resource Include="Resources\ScrapMechanic.ico" />
     <Resource Include="ScrapMechanic.ico" />

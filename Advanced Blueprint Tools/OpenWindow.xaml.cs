@@ -22,11 +22,11 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class OpenWindow : Window
     {
-        MainWindow MainWindow;
+        MainWindow mainwindow;
         Thread loadbp;
         public OpenWindow(MainWindow mainWindow)
         {
-            this.MainWindow = mainWindow;
+            this.mainwindow = mainWindow;
             InitializeComponent();
 
             //load mainwindow.blueprints in list
@@ -74,14 +74,19 @@ namespace Advanced_Blueprint_Tools
                     catch { }
                     totalbps = Database.blueprints.Count();
                 }
-                this.Dispatcher.Invoke((Action)(() =>
+                try
                 {
-                    if(Database.bprefresh == true)
+
+                    this.Dispatcher.Invoke((Action)(() =>
                     {
-                        Database.bprefresh = false;
-                        button_refresh_Copy_Click(null, null);
-                    }
-                }));
+                        if (Database.bprefresh == true)
+                        {
+                            Database.bprefresh = false;
+                            button_refresh_Copy_Click(null, null);
+                        }
+                    }));
+                }
+                catch { }
                 Thread.Sleep(1000);
             }
 
@@ -116,37 +121,34 @@ namespace Advanced_Blueprint_Tools
 
         private void button_LOAD_Click(object sender, RoutedEventArgs e)
         {
-            load();
+            Load();
         }
 
-        public void load()
+        public void Load()
         {
-            BP bp = null;
             string bppath = "";
+            Loadwindow l = new Loadwindow();
             try
             {
                 bppath = ((Blueprint)listBox_blueprints.SelectedItem).blueprintpath.ToString();
 
-                bp = new BP(bppath);
+                l.Show();
+                new BP(bppath);
+
+
+                mainwindow.UpdateOpenedBlueprint();
+                if (mainwindow.advancedconnections != null && mainwindow.advancedconnections.IsLoaded) mainwindow.advancedconnections.Update();
+                if (mainwindow.advancedcolorwindow != null && mainwindow.advancedcolorwindow.IsLoaded) mainwindow.advancedcolorwindow.Update();
+                if (mainwindow.swapblockswindow != null && mainwindow.swapblockswindow.IsLoaded) mainwindow.swapblockswindow.Update();
+                if (mainwindow.blockProperties != null && mainwindow.blockProperties.IsLoaded) mainwindow.blockProperties.Close();
+
+                l.Close();
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
-            }
-            if (bp != null)
-            {
-                Loadwindow l = new Loadwindow();
-                l.Show();
-                MainWindow.OpenedBlueprint = bp;
-                MainWindow.UpdateOpenedBlueprint();
-                if (MainWindow.advancedconnections != null && MainWindow.advancedconnections.IsLoaded) MainWindow.advancedconnections.update();
-                if (MainWindow.advancedcolorwindow != null && MainWindow.advancedcolorwindow.IsLoaded) MainWindow.advancedcolorwindow.update();
-                if (MainWindow.swapblockswindow != null && MainWindow.swapblockswindow.IsLoaded) MainWindow.swapblockswindow.update();
-                if (MainWindow.blockProperties != null && MainWindow.blockProperties.IsLoaded) MainWindow.blockProperties.Close();
-
                 l.Close();
             }
-
         }
 
         private void button_DELETE_Click(object sender, RoutedEventArgs e)

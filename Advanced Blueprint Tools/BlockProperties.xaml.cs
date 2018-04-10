@@ -34,20 +34,22 @@ namespace Advanced_Blueprint_Tools
             Loadwindow w = new Loadwindow();
             w.Show();
 
-            update();
+            Update();
 
             w.Close();
 
         }
 
-        public void update()
+        public void Update()
         {
 
-            if (uuidsbackup != this.mainwindow.OpenedBlueprint.useduuids)
+            if (uuidsbackup != BP.Useduuids)
             {
-                usedblocks = new List<Item>();
-                usedblocks.Add(new Item("any", "*"));
-                foreach (string uuid in this.mainwindow.OpenedBlueprint.useduuids)
+                usedblocks = new List<Item>
+                {
+                    new Item("any", "*")
+                };
+                foreach (string uuid in BP.Useduuids)
                 {
                     if (Database.blocks.ContainsKey(uuid))
                     {
@@ -59,20 +61,20 @@ namespace Advanced_Blueprint_Tools
                         filter_type.Items.Add(useditem.Name);
 
             }
-            uuidsbackup = this.mainwindow.OpenedBlueprint.useduuids;
+            uuidsbackup = BP.Useduuids;
             filter_type.SelectedIndex = 0;
             int i = 0;
             {
                 backuplist = new JObject(); //fill 'backup'list with all childs!
 
-                foreach (dynamic body in this.mainwindow.OpenedBlueprint.blueprint.bodies)
+                foreach (dynamic body in BP.Blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
                         if (child.color.ToString().StartsWith("#"))
                             child.color = child.color.ToString().Substring(1);
                         child.blueprintIndex = i;
                         child.blockname = Database.blocks[child.shapeId.ToString()].Name;
-                        dynamic realpos = this.mainwindow.OpenedBlueprint.getposandbounds(child);
+                        dynamic realpos = BP.getposandbounds(child);
 
                         if (backuplist[realpos.pos.x.ToString()] == null) backuplist[realpos.pos.x.ToString()] = new JObject();
                         if (backuplist[realpos.pos.x.ToString()][realpos.pos.y.ToString()] == null) backuplist[realpos.pos.x.ToString()][realpos.pos.y.ToString()] = new JObject();
@@ -88,7 +90,7 @@ namespace Advanced_Blueprint_Tools
             }
 
             //fill xyz:
-            int x1 = this.mainwindow.OpenedBlueprint.minx, y1 = this.mainwindow.OpenedBlueprint.miny, z1 = this.mainwindow.OpenedBlueprint.minz, x2 = this.mainwindow.OpenedBlueprint.maxx, y2 = this.mainwindow.OpenedBlueprint.maxy, z2 = this.mainwindow.OpenedBlueprint.maxz;
+            int x1 = BP.minx, y1 = BP.miny, z1 = BP.minz, x2 = BP.maxx, y2 = BP.maxy, z2 = BP.maxz;
             filter_x1.Text = x1.ToString();
             filter_y1.Text = y1.ToString();
             filter_z1.Text = z1.ToString();
@@ -104,9 +106,9 @@ namespace Advanced_Blueprint_Tools
             MessageBox.Show("find help here: \nhttp://youtube.com/c/brentbatch");
         }
 
-        private void filter_SET_Click(object sender, RoutedEventArgs e)
+        private void Filter_SET_Click(object sender, RoutedEventArgs e)
         {
-            mainwindow.openpaintpicker();
+            MainWindow.openpaintpicker();
             filter_color.Text = PaintSelector.PaintColor;
         }
         private void Filter_pos_TextChanged(object sender, TextChangedEventArgs e)
@@ -200,7 +202,7 @@ namespace Advanced_Blueprint_Tools
         {
 
             { 
-                int x1 = this.mainwindow.OpenedBlueprint.minx-2, y1 = this.mainwindow.OpenedBlueprint.miny-2, z1 = this.mainwindow.OpenedBlueprint.minz-2, x2 = this.mainwindow.OpenedBlueprint.maxx+2, y2 = this.mainwindow.OpenedBlueprint.maxy+2, z2 = this.mainwindow.OpenedBlueprint.maxz+2;
+                int x1 = BP.minx-2, y1 = BP.miny-2, z1 = BP.minz-2, x2 = BP.maxx+2, y2 = BP.maxy+2, z2 = BP.maxz+2;
                 string type = "*";//nullable! = any
 
                 this.Dispatcher.Invoke((Action)(() =>
@@ -307,8 +309,8 @@ namespace Advanced_Blueprint_Tools
 
                 dynamic selectedblock = ((dynamic)filter_output.SelectedItem);
 
-                dynamic realpos = this.mainwindow.OpenedBlueprint.getposandbounds(selectedblock);
-                this.mainwindow.setMarker(Convert.ToInt32(realpos.pos.x) + (Convert.ToDouble(selectedblock.bounds.x)/2), Convert.ToInt32(realpos.pos.y) + (Convert.ToDouble(selectedblock.bounds.y) / 2), Convert.ToDouble(realpos.pos.z) + (Convert.ToDouble(selectedblock.bounds.z) / 2));
+                dynamic realpos = BP.getposandbounds(selectedblock);
+                this.mainwindow.setMarker(Convert.ToInt32(realpos.pos.x) + (Convert.ToDouble(realpos.bounds.x)/2), Convert.ToInt32(realpos.pos.y) + (Convert.ToDouble(realpos.bounds.y) / 2), Convert.ToDouble(realpos.pos.z) + (Convert.ToDouble(realpos.bounds.z) / 2));
 
                 selectedchildindex = selectedblock.blueprintIndex;
                 Edit_general.Visibility = Visibility.Visible;
@@ -421,18 +423,18 @@ namespace Advanced_Blueprint_Tools
         private void SET_Copy_Click(object sender, RoutedEventArgs e)
         {
 
-            mainwindow.openpaintpicker();
+            MainWindow.openpaintpicker();
             new_sensorcolor.Text = PaintSelector.PaintColor;
 
         }
         private void SET_Copy1_Click(object sender, RoutedEventArgs e)
         {
-            mainwindow.openpaintpicker();
+            MainWindow.openpaintpicker();
             new_lampcolor.Text = PaintSelector.PaintColor;
         }
         private void SET_Copy2_Click(object sender, RoutedEventArgs e)
         {
-            mainwindow.openpaintpicker();
+            MainWindow.openpaintpicker();
             new_color.Text = PaintSelector.PaintColor;
         }
 
@@ -464,7 +466,7 @@ namespace Advanced_Blueprint_Tools
         private void button_render_Click(object sender, RoutedEventArgs e)
         {
             //blueprintIndex
-            foreach(dynamic body in this.mainwindow.OpenedBlueprint.blueprint.bodies)
+            foreach(dynamic body in BP.Blueprint.bodies)
                 foreach(dynamic child in body.childs)
                     if (Convert.ToInt32(child.blueprintIndex) == selectedchildindex)
                     {
@@ -523,10 +525,10 @@ namespace Advanced_Blueprint_Tools
             Loadwindow w = new Loadwindow();
             w.Show();
 
-            this.mainwindow.OpenedBlueprint.description.description = this.mainwindow.OpenedBlueprint.description.description += "++ Applied some block property changes ";
-            this.mainwindow.OpenedBlueprint.setblueprint(this.mainwindow.OpenedBlueprint.blueprint);
+            BP.Description.description = BP.Description.description += "++ Applied some block property changes ";
+            BP.setblueprint(BP.Blueprint);
             this.mainwindow.UpdateOpenedBlueprint();
-            update();
+            Update();
             w.Close();
         }
 

@@ -22,5 +22,29 @@ namespace Advanced_Blueprint_Tools.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string steamapps {
+            get {
+                return ((string)(this["steamapps"]));
+            }
+            set {
+                this["steamapps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int times {
+            get {
+                return ((int)(this["times"]));
+            }
+            set {
+                this["times"] = value;
+            }
+        }
     }
 }

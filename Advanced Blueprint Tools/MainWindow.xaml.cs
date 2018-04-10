@@ -56,14 +56,14 @@ namespace Advanced_Blueprint_Tools
             InitializeComponent();
             //LOAD RESOURCES:
             Database.findPaths();
-            new Thread(new ThreadStart(() =>
+            new Task(() =>
             {
                 Database.LoadAllBlocks();
-            })).Start();
-            new Thread(new ThreadStart(() =>
+            }).Start();
+            new Task(() =>
             {
                 Database.LoadAllBlueprints();
-            })).Start();
+            }).Start();
 
            
             
@@ -72,23 +72,22 @@ namespace Advanced_Blueprint_Tools
         
         public void UpdateOpenedBlueprint()
         {
-            TextBox_Name.Text = OpenedBlueprint.description.name;
-            TextBox_Description.Text = OpenedBlueprint.description.description;
+            TextBox_Name.Text = BP.Description.name;
+            TextBox_Description.Text = BP.Description.description;
 
             //update 3D view
             var modelGroup = new Model3DGroup();
             var glass = new Model3DGroup();
             
-            int centerx = this.OpenedBlueprint.centerx;
-            int centery = this.OpenedBlueprint.centery;
-            int centerz = this.OpenedBlueprint.centerz;
-
-            bool missingmods = false;
+            int centerx = BP.centerx;
+            int centery = BP.centery;
+            int centerz = BP.centerz;
             
-            foreach (dynamic x in this.OpenedBlueprint.blocksxyz)
-                foreach (dynamic y in this.OpenedBlueprint.blocksxyz[x.Name])
-                    foreach (dynamic z in this.OpenedBlueprint.blocksxyz[x.Name][y.Name])
-                        foreach (dynamic child in this.OpenedBlueprint.blocksxyz[x.Name][y.Name][z.Name].blocks)
+            
+            foreach (dynamic x in BP.blocksxyz)
+                foreach (dynamic y in BP.blocksxyz[x.Name])
+                    foreach (dynamic z in BP.blocksxyz[x.Name][y.Name])
+                        foreach (dynamic child in BP.blocksxyz[x.Name][y.Name][z.Name].blocks)
                         {
                             int posx = Convert.ToInt32(x.Name.ToString());
                             int posy = Convert.ToInt32(y.Name.ToString());
@@ -116,8 +115,6 @@ namespace Advanced_Blueprint_Tools
                             }
                             else//not in database
                             {
-                                missingmods = true;
-
                                 dynamic bounds = new JObject();
                                 if (child.bounds == null)
                                 {
@@ -135,8 +132,6 @@ namespace Advanced_Blueprint_Tools
 
                             }
                         }
-            if (missingmods)
-                MessageBox.Show("Missing mods for this blueprint.\nReplaced missing blocks with cuboids");
 
 
             try
@@ -176,9 +171,9 @@ namespace Advanced_Blueprint_Tools
 
         public void setMarker(double x, double y, double z)
         {//cross marker
-            int centerx = this.OpenedBlueprint.centerx;
-            int centery = this.OpenedBlueprint.centery;
-            int centerz = this.OpenedBlueprint.centerz;
+            int centerx = BP.centerx;
+            int centery = BP.centery;
+            int centerz = BP.centerz;
             Model3DGroup marker = new Model3DGroup();
             Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(100, 51, 204, 51)));
             var meshBuilder = new MeshBuilder(false, false);
@@ -194,9 +189,9 @@ namespace Advanced_Blueprint_Tools
         }
         public void setMarker2(double x, double y, double z, double boundsx, double boundsy, double boundsz)
         {//cuboid marker
-            int centerx = this.OpenedBlueprint.centerx;
-            int centery = this.OpenedBlueprint.centery;
-            int centerz = this.OpenedBlueprint.centerz;
+            int centerx = BP.centerx;
+            int centery = BP.centery;
+            int centerz = BP.centerz;
             Model3DGroup marker = new Model3DGroup();
             Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(100, 20, 50, 50)));
             var meshBuilder = new MeshBuilder(false, false);
@@ -227,7 +222,7 @@ namespace Advanced_Blueprint_Tools
         private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)//possible to save/saveas?
         {
             e.CanExecute = false;
-            if (OpenedBlueprint != null) e.CanExecute = true;
+            if (BP.Blueprint != null) e.CanExecute = true;
         }
 
         private void SaveCommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -242,23 +237,23 @@ namespace Advanced_Blueprint_Tools
 
         private void button_overwrite_click(object sender, RoutedEventArgs e)//save/overwrite
         {
-            if (OpenedBlueprint != null)
+            if (BP.Blueprint != null)
             {
                 newtumbnail();
-                OpenedBlueprint.description.name = TextBox_Name.Text;
-                OpenedBlueprint.description.description = TextBox_Description.Text;
-                OpenedBlueprint.Save();
+                BP.Description.name = TextBox_Name.Text;
+                BP.Description.description = TextBox_Description.Text;
+                BP.Save();
             }
         }
         private void button_save_click(object sender, RoutedEventArgs e)//save as
         {
-            if (OpenedBlueprint != null)
+            if (BP.Blueprint != null)
             {
                 newtumbnail();
-                OpenedBlueprint.description.name = TextBox_Name.Text;
-                OpenedBlueprint.description.description = TextBox_Description.Text;
+                BP.Description.name = TextBox_Name.Text;
+                BP.Description.description = TextBox_Description.Text;
                 Random r = new Random(); //GENERATE NEW UUID AND CHANGE DESCRIPTION LOCALID --todo
-                OpenedBlueprint.SaveAs("Blueprint" + r.Next() + "-" + r.Next());
+                BP.SaveAs("Blueprint" + r.Next() + "-" + r.Next());
             }
         }
         
@@ -269,7 +264,7 @@ namespace Advanced_Blueprint_Tools
             Clipboard.SetImage(bmp);
             PngBitmapEncoder png = new PngBitmapEncoder();
             png.Frames.Add(BitmapFrame.Create(bmp));
-            OpenedBlueprint.icon = png;
+            BP.Icon = png;
         }
 
 
@@ -311,8 +306,8 @@ namespace Advanced_Blueprint_Tools
             blueprint.bodies.Add(new JObject());
             blueprint.bodies[0].childs = new JArray();
 
-            this.OpenedBlueprint.blueprint.joints = null;
-            foreach (dynamic body in this.OpenedBlueprint.blueprint.bodies)
+            BP.Blueprint.joints = null;
+            foreach (dynamic body in BP.Blueprint.bodies)
             {
                 //remove bearings/springs
                 foreach (dynamic child in body.childs)
@@ -325,8 +320,8 @@ namespace Advanced_Blueprint_Tools
                     blueprint.bodies[0].childs.Add(child);
                 }
             }
-            this.OpenedBlueprint.description.description = this.OpenedBlueprint.description.description + "\n++ removed joints & glitchwelded";
-            this.OpenedBlueprint.setblueprint(this.OpenedBlueprint.blueprint);
+            BP.Description.description = BP.Description.description + "\n++ removed joints & glitchwelded";
+            BP.setblueprint(BP.Blueprint);
             this.UpdateOpenedBlueprint();
         }
         
@@ -339,7 +334,7 @@ namespace Advanced_Blueprint_Tools
         }
 
 
-        public PaintSelector paintSelector;
+        public static PaintSelector paintSelector;
         private void Click_paintpicker(object sender, RoutedEventArgs e) //paint picker
         {
             if(paintSelector != null)
@@ -353,15 +348,16 @@ namespace Advanced_Blueprint_Tools
                 paintSelector = new PaintSelector();
                 paintSelector.Owner = this;
                 paintSelector.Show();
-                //openpainpicker();
+                //MainWindow.openpainpicker();
             }
         }
-        public void openpaintpicker()//opens the paintpicker if mainwindow doesn't have one open
+        public static void openpaintpicker()//opens the paintpicker if mainwindow doesn't have one open
         {
+            
             if (paintSelector == null || !paintSelector.IsLoaded)
             {
                 paintSelector = new PaintSelector();
-                paintSelector.Owner = this;
+                //paintSelector.Owner = this; //static function :(
                 paintSelector.Show();
             }
         }
@@ -369,7 +365,7 @@ namespace Advanced_Blueprint_Tools
 
         private void Click_mirrormode(object sender, RoutedEventArgs e)//needs work
           {
-            dynamic blueprint = this.OpenedBlueprint.blueprint;
+            dynamic blueprint = BP.Blueprint;
             if (blueprint.joints == null)
             {
                 foreach (dynamic body in blueprint.bodies)
@@ -385,7 +381,7 @@ namespace Advanced_Blueprint_Tools
 
 
                         {
-                            dynamic realpos = this.OpenedBlueprint.getposandbounds(block);
+                            dynamic realpos = BP.getposandbounds(block);
 
 
                             realpos.xaxis = -Convert.ToInt32(block.xaxis);
@@ -394,9 +390,9 @@ namespace Advanced_Blueprint_Tools
                             realpos.pos.x = -Convert.ToInt32(block.pos.x) - Convert.ToInt32(realpos.bounds.x);
                             //realpos.pos.y = Convert.ToInt32(block.pos.y) - Convert.ToInt32(block.bounds.y);
 
-                            block.pos = this.OpenedBlueprint.calcbppos(realpos).pos;
-                            block.xaxis = this.OpenedBlueprint.calcbppos(realpos).xaxis;
-                            block.zaxis = this.OpenedBlueprint.calcbppos(realpos).zaxis;
+                            block.pos = BP.calcbppos(realpos).pos;
+                            block.xaxis = BP.calcbppos(realpos).xaxis;
+                            block.zaxis = BP.calcbppos(realpos).zaxis;
 
                             //block.pos.x = -Convert.ToInt32(block.pos.x);
                             //works thus far for blocks, not parts tho
@@ -417,7 +413,7 @@ namespace Advanced_Blueprint_Tools
                                 block.zaxis = -Convert.ToInt32(block.zaxis);*/
                         }
                     }
-                this.OpenedBlueprint.setblueprint(blueprint);
+                BP.setblueprint(blueprint);
                 this.UpdateOpenedBlueprint();
             }
             else
@@ -445,7 +441,7 @@ namespace Advanced_Blueprint_Tools
 
         private void Click_requiredmods(object sender, RoutedEventArgs e)
         {
-            List<string> useduuids = this.OpenedBlueprint.useduuids;
+            List<string> useduuids = BP.Useduuids;
             
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://scrapmechanic.xesau.eu/uuidservice/get_mods");
             request.Method = "POST";
@@ -504,6 +500,11 @@ namespace Advanced_Blueprint_Tools
         }
         
         private void MenuItem_Click_Settings(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Notifications_Click(object sender, RoutedEventArgs e)
         {
 
         }
