@@ -40,6 +40,8 @@ namespace Advanced_Blueprint_Tools
         public Model3DGroup Marker2 { get; set; }
         public Model3DGroup Glass { get; set; }
 
+        public Model3DGroup Wires { get; set; }
+
         OpenWindow openwindow;
         //public cuz need to update(); when new creation loaded: 
         public AdvancedConnections advancedconnections;
@@ -49,6 +51,8 @@ namespace Advanced_Blueprint_Tools
         Ellipsoid_Generator ellpisoid_generator;
         Cuboid_Generator cuboid_Generator;
 
+        NotificationWindow notificationWindow;
+        Settings settings;
 
         public MainWindow()
         {
@@ -56,15 +60,42 @@ namespace Advanced_Blueprint_Tools
             InitializeComponent();
             //LOAD RESOURCES:
             Database.findPaths();
-            new Task(() =>
+            new Thread(() =>
             {
                 Database.LoadAllBlocks();
             }).Start();
-            new Task(() =>
+            new Thread(() =>
             {
                 Database.LoadAllBlueprints();
             }).Start();
+            new Task(() =>
+            {
+                new Updater().CheckForUpdates();
+            });
+            new Thread(() =>
+            {
+                while(true)
+                {
+                    if(Database.Notifications.Count>0)
+                    {
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            Notifications.Visibility = Visibility.Visible;
+                            Notifications.Content = Database.Notifications.Count;
+                        }));
+                    }
+                    else
+                    {
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            Notifications.Visibility = Visibility.Collapsed;
+                        }));
+                    }
 
+                    Thread.Sleep(1500);
+                }
+
+            });
            
             
             
@@ -167,6 +198,11 @@ namespace Advanced_Blueprint_Tools
             {
                 MessageBox.Show(e.Message, "Failed to import into rendering box!");
             }
+        }
+
+        public void Addwire(dynamic pos1, dynamic pos2, string color)
+        {
+
         }
 
         public void setMarker(double x, double y, double z)
@@ -498,13 +534,34 @@ namespace Advanced_Blueprint_Tools
             stream.Dispose();
             reader.Dispose();
         }
-        
-        private void MenuItem_Click_Settings(object sender, RoutedEventArgs e)
+
+        private void Notifications_Click(object sender, RoutedEventArgs e)
         {
+            if (notificationWindow != null) notificationWindow.Close();
+            notificationWindow = new NotificationWindow();
+            notificationWindow.Owner = this;
+            notificationWindow.Show();
+        }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            if (settings != null) settings.Close();
+            settings = new Settings();
+            settings.Owner = this;
+            settings.Show();
 
         }
 
-        private void Notifications_Click(object sender, RoutedEventArgs e)
+        private void Help_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Need help?","",MessageBoxButton.YesNo);   
+            if(result == MessageBoxResult.Yes)
+            {
+                System.Diagnostics.Process.Start("https://discord.gg/HXFqUqF");
+            }
+        }
+
+        private void About_Click(object sender, RoutedEventArgs e)
         {
 
         }
