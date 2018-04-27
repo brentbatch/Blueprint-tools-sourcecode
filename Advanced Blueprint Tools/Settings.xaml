@@ -1,0 +1,24 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.Settings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Background="#61737D"
+        Title="Settings" Height="720" Width="405" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid Background="#8093A0"  HorizontalAlignment="Center" VerticalAlignment="Center" Height="650"  Width="400">
+        <Button x:Name="Button_Branch" Content="Current Branch: &#x9;Public" HorizontalAlignment="Left" Margin="10,10,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Click="Button_Branch_Click"/>
+        <Button x:Name="Button_SafeMode" Content="Safe mode: &#x9;ON" HorizontalAlignment="Left" Margin="10,65,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Click="Button_SafeMode_Click"/>
+        <Button x:Name="Button_Debug" Content="Debug Mode: &#x9;Not Available" HorizontalAlignment="Left" Margin="10,120,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Click="Button_Debug_Click"/>
+        <Label Content="Path:" HorizontalAlignment="Left" Margin="10,175,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" BorderThickness="1" BorderBrush="#707070" />
+        <TextBox  x:Name="Text_Path" HorizontalAlignment="Left" Height="40" Margin="94,180,0,0" VerticalAlignment="Top" Width="290" VerticalContentAlignment="Center" TextWrapping="NoWrap" AcceptsReturn="False" AcceptsTab="False" FontSize="14" Foreground="#fff" Background="#61737C" BorderThickness="1" ScrollViewer.CanContentScroll="False" Text="Drive:\\SomeSpecialpath\Steam\SteamApps" ToolTip="steamapps path" TextChanged="Text_Path_TextChanged"/>
+        <Label  x:Name="Text_Version" Content="Version: &#x9;V82" HorizontalAlignment="Left" Margin="10,343,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" BorderThickness="1" BorderBrush="#707070" />
+        <Button x:Name="Save_settings" Content="Save" HorizontalAlignment="Right" Margin="0,580,10,0" VerticalAlignment="Top" Width="380" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7"  FontWeight="Bold" Click="Save_settings_Click" />
+        <Button x:Name="Button_update" Content="Check for updates" HorizontalAlignment="Left" Margin="10,398,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Click="Button_update_Click" />
+        <Button x:Name="Button_wires" Content="Wires:&#x9;&#x9;OFF" HorizontalAlignment="Left" Margin="10,230,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Click="Button_wires_Click" />
+        <Button x:Name="Button_colorwires" Content="ColorWires:&#x9;OFF" HorizontalAlignment="Left" Margin="10,285,0,0"  Width="380" Height="50" HorizontalContentAlignment="Left" Padding="20,0,0,0" VerticalContentAlignment="Center" FontSize="24" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Click="Button_colorwires_Click" ToolTip="Wires get color from source block"/>
+
+
+    </Grid>
+</Window>

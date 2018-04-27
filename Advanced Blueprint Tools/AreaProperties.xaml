@@ -1,0 +1,85 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.AreaProperties"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Title="AreaProperties" Height="742.333" Width="447" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Height="96"  Width="421" Background="#61737C">
+            <Label Content="Filter options:" HorizontalAlignment="Left" Margin="9,6,0,0" VerticalAlignment="Top"/>
+            <ComboBox Name="filter_type" HorizontalAlignment="Left" Margin="8,37,0,0" VerticalAlignment="Top" Width="203" SelectionChanged="filter_type_SelectionChanged" ItemsSource="{Binding Name}"/>
+            <TextBox Name="filter_color" HorizontalAlignment="Left" Height="22" Margin="66,64,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="92" TextChanged="color_TextChanged"/>
+            <Button Name="filter_SET" Content="&lt; SET" HorizontalAlignment="Left" Margin="163,64,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Filter_SET_Click"/>
+            <Label Content="&lt;  x  &lt;" HorizontalAlignment="Left" Margin="287,5,0,0" VerticalAlignment="Top" FontSize="15"/>
+            <Label Content="&lt;  y  &lt;" HorizontalAlignment="Left" Margin="287,32,0,0" VerticalAlignment="Top" FontSize="15"/>
+            <Label Content="&lt;  z  &lt;" HorizontalAlignment="Left" Margin="287,59,0,0" VerticalAlignment="Top" FontSize="15"/>
+            <TextBox Name="filter_x1" HorizontalAlignment="Left" Height="22" Margin="216,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_y1" HorizontalAlignment="Left" Height="22" Margin="216,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_z1" HorizontalAlignment="Left" Height="22" Margin="216,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_z2" HorizontalAlignment="Left" Height="22" Margin="341,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_y2" HorizontalAlignment="Left" Height="22" Margin="341,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="filter_x2" HorizontalAlignment="Left" Height="22" Margin="341,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="Filter_pos_TextChanged"/>
+
+
+
+        </Grid>
+
+        <Grid Name="Edit_general" HorizontalAlignment="Center" Margin="0,101,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="True">
+            <Label Content="x:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="124,6,0,0"/>
+            <TextBox Name="new_x" HorizontalAlignment="Left" Height="22" Margin="138,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34" Text="0" SelectionChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="new_y" HorizontalAlignment="Left" Height="22" Margin="186,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34" Text="0" SelectionChanged="Filter_pos_TextChanged"/>
+            <TextBox Name="new_z" HorizontalAlignment="Left" Height="22" Margin="232,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="36" Text="0" SelectionChanged="Filter_pos_TextChanged"/>
+            <Label Content="y:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="172,6,0,0"/>
+            <Label Content="z:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="218,6,0,0"/>
+            <TextBox x:Name="new_color" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="65" TextChanged="color_TextChanged"/>
+            <Button x:Name="SET_Copy2" Content="&lt; SET" HorizontalAlignment="Left" Margin="363,10,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="SET_Copy2_Click"/>
+            <Label Content="Relative Movement:" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
+        </Grid>
+
+        <Grid Name="Edit_sensor" HorizontalAlignment="Center" Margin="0,148,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="SensorRange:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.065,0.692"/>
+            <TextBox Name="new_sensorrange" HorizontalAlignment="Left" Height="22" Margin="97,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35"/>
+            <CheckBox Name="new_sensorcolormode" Content="ColorMode" HorizontalAlignment="Left" Margin="207,10,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="22" Width="86"/>
+            <TextBox Name="new_sensorcolor" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="65" TextChanged="color_TextChanged"/>
+            <Button x:Name="SET_Copy" Content="&lt; SET" HorizontalAlignment="Left" Margin="363,10,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="SET_Copy_Click"/>
+
+        </Grid>
+
+        <Grid Name="Edit_gate" HorizontalAlignment="Center" Margin="0,242,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="Type:" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
+            <ComboBox Name="new_gatemode" SelectedIndex="0" HorizontalAlignment="Left" Margin="97,10,0,0" VerticalAlignment="Top" Width="90">
+                <ComboBoxItem Name="Gate_NO">/</ComboBoxItem>
+                <ComboBoxItem Name="Gate_AND">AND</ComboBoxItem>
+                <ComboBoxItem Name="Gate_OR">OR</ComboBoxItem>
+                <ComboBoxItem Name="Gate_XOR">XOR</ComboBoxItem>
+                <ComboBoxItem Name="Gate_NAND">NAND</ComboBoxItem>
+                <ComboBoxItem Name="Gate_NOR">NOR</ComboBoxItem>
+                <ComboBoxItem Name="Gate_XNOR">XNOR</ComboBoxItem>
+            </ComboBox>
+        </Grid>
+
+        <Grid Name="Edit_Timer"  HorizontalAlignment="Center" Margin="0,289,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="seconds:" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_timerseconds" HorizontalAlignment="Left" Height="23" Margin="97,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+            <Label Content="ticks:" HorizontalAlignment="Left" Margin="136,8,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_timerticks" HorizontalAlignment="Left" Height="23" Margin="187,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="34"/>
+
+        </Grid>
+        <Grid HorizontalAlignment="Center" Margin="0,600,0,0" VerticalAlignment="Top" Height="84"  Width="421" Background="#61737C" IsEnabled="True">
+            <Button Name="button_render" Content="Apply&amp;Render" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="195" Height="64" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Margin="216,10,0,0" IsEnabled="False" Click="button_render_Click" />
+            <Button Name="button_help" Content="Help" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="195" Height="64" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Margin="10,10,0,0" Click="Button_Help_Click" />
+        </Grid>
+        <Grid Name="Edit_lamp" HorizontalAlignment="Center" Margin="0,195,0,0" VerticalAlignment="Top" Height="42"  Width="421" Background="#61737C" IsEnabled="true">
+            <Label Content="luminance:" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_luminance" HorizontalAlignment="Left" Height="22" Margin="97,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35" ToolTip="= distance"/>
+            <Label Content="ConeAngle:" HorizontalAlignment="Left" Margin="132,6,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_coneangle" HorizontalAlignment="Left" Height="22" Margin="203,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Width="35" RenderTransformOrigin="0.357,0.568"/>
+            <Label Content="Color2:" HorizontalAlignment="Left" Margin="245,6,0,0" VerticalAlignment="Top"/>
+            <TextBox Name="new_lampcolor" HorizontalAlignment="Left" Height="22" Margin="293,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="65" ToolTip="Available property in blueprint,\nNo official support by devs yet" TextChanged="color_TextChanged"/>
+            <Button x:Name="SET_Copy1" Content="&lt; SET" HorizontalAlignment="Left" Margin="363,10,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="SET_Copy1_Click"/>
+        </Grid>
+    </Grid>
+</Window>

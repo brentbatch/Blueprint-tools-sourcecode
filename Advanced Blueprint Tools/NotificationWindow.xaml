@@ -1,0 +1,27 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.NotificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Title="Notifications" Height="400" Width="350" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
+    <ListBox x:Name="listBox_notis" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="350" Width="330" VerticalAlignment="Center" Background="#8093A0" SelectionChanged="Notification_Click">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
+                    <Grid Width="317">
+                        <TextBlock Height="17" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding description}"/>
+                    </Grid>
+                    <!--<Image Height="50" Width="50" Margin="3" Source="{Binding image}" />-->
+                </StackPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+        <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+    </ListBox>
+</Window>

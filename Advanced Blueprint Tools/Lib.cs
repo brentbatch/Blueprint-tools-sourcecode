@@ -32,6 +32,7 @@ namespace Advanced_Blueprint_Tools
         public static Dictionary<string, Blockobject> blocks = new Dictionary<string, Blockobject>();//uuid, block
         public static Dictionary<string, string> usedmods = new Dictionary<string, string>();//id, name
         public static Dictionary<string, BitmapSource> blueprints = new Dictionary<string, BitmapSource>();//path, img
+        public static List<Notification> Notifications = new List<Notification>();
 
         public static bool bprefresh;
 
@@ -59,25 +60,20 @@ namespace Advanced_Blueprint_Tools
                 }
             }
             User_ = dir;
-
-            if (steamapps != null) return steamapps;
-
             
-            if(steamapps == "not a path")
+
+            steamapps = Properties.Settings.Default.steamapps;
+            /*
             {//not yet
-                steamapps = Properties.Settings.Default.steamapps;
                 if(Properties.Settings.Default.times == 3)
                     System.Diagnostics.Process.Start("http://www.youtube.com/c/brentbatch?sub_confirmation=1");
-                
-                Properties.Settings.Default.times += 1;
-            }
+            }*/
 
             if (File.Exists("steamapps") && !File.Exists("config"))
                 File.Copy("steamapps", "config");
+
             dynamic config = new JObject();
-            config.steamapps = "";
-            config.times = 0;
-            if (File.Exists("config"))
+            if (File.Exists("config") && !System.IO.Directory.Exists(steamapps + @"\common\Scrap Mechanic\Data\Objects\Database\ShapeSets"))
             {
                 try
                 {
@@ -85,12 +81,22 @@ namespace Advanced_Blueprint_Tools
                 }
                 catch { }
                 if (config.steamapps != null)
-                    steamapps = config.steamapps.ToString();
-                if (config.times != null && Convert.ToInt32(config.times) == 3)
                 {
-                    System.Diagnostics.Process.Start("http://www.youtube.com/c/brentbatch?sub_confirmation=1");
+                    steamapps = config.steamapps.ToString();
+                    Properties.Settings.Default.steamapps = steamapps;
                 }
+                if (config.times != null)
+                    Properties.Settings.Default.times = Convert.ToInt32(config.times.ToString());
+                if (config.safemode == true)
+                    Properties.Settings.Default.safemode = config.safemode == true ? true : false;
+                if (config.wires == true)
+                    Properties.Settings.Default.wires = config.wires == true ? true : false;
+                if (config.colorwires == true)
+                    Properties.Settings.Default.colorwires = config.colorwires == true ? true : false;
+
             }
+            Properties.Settings.Default.times++;
+
             if (steamapps == null)
             {
                 steamapps = "";
@@ -141,11 +147,6 @@ namespace Advanced_Blueprint_Tools
 
             if (steamapps != "")
                 ModDatabase = steamapps + @"\workshop\content\387990";
-
-            config.times = Convert.ToInt32(config.times) + 1;
-            config.steamapps = steamapps;
-            //Properties.Resources.steamapps = steamapps;
-            File.WriteAllText("config", config.ToString());
 
             Properties.Settings.Default.steamapps = steamapps;
 
