@@ -104,6 +104,16 @@ namespace Advanced_Blueprint_Tools
         public void Update()//new bp, items replaced, ... whatever
         {
             disableAll();
+            if (filter_x1.Text == "" || uuidsbackup != BP.Useduuids)
+            {
+                int x1 = BP.minx, y1 = BP.miny, z1 = BP.minz, x2 = BP.maxx, y2 = BP.maxy, z2 = BP.maxz;
+                filter_x1.Text = x1.ToString();
+                filter_y1.Text = y1.ToString();
+                filter_z1.Text = z1.ToString();
+                filter_x2.Text = x2.ToString();
+                filter_y2.Text = y2.ToString();
+                filter_z2.Text = z2.ToString();
+            }
             if (uuidsbackup != BP.Useduuids | true)//fill the combobox once
             {
                 filter_type.Items.Clear();
@@ -113,18 +123,9 @@ namespace Advanced_Blueprint_Tools
                     if (Database.blocks.ContainsKey(uuid))
                         filter_type.Items.Add(new Item(Database.blocks[uuid].Name.ToString(), uuid));
                 }
-                uuidsbackup = BP.Useduuids;
+                uuidsbackup.Clear();
+                uuidsbackup.InsertRange(0, BP.Useduuids);
                 filter_type.SelectedIndex = 0;
-            }
-            //if(filter_x1.Text=="")
-            {
-                int x1 = BP.minx, y1 = BP.miny, z1 = BP.minz, x2 = BP.maxx, y2 = BP.maxy, z2 = BP.maxz;
-                filter_x1.Text = x1.ToString();
-                filter_y1.Text = y1.ToString();
-                filter_z1.Text = z1.ToString();
-                filter_x2.Text = x2.ToString();
-                filter_y2.Text = y2.ToString();
-                filter_z2.Text = z2.ToString();
             }
             filterupdate();
         }

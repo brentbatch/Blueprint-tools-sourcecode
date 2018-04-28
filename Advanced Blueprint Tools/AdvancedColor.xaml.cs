@@ -198,5 +198,9 @@ namespace Advanced_Blueprint_Tools
             this.UUID = UUID;
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

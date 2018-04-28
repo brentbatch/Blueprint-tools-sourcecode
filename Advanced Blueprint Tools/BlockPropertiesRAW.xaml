@@ -9,7 +9,7 @@
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Height="203"  Width="421" Background="#61737C">
             <Label Content="Filter options:" HorizontalAlignment="Left" Margin="9,6,0,0" VerticalAlignment="Top"/>
-            <ComboBox Name="filter_type" HorizontalAlignment="Left" Margin="8,37,0,0" VerticalAlignment="Top" Width="203" SelectionChanged="filter_type_SelectionChanged"/>
+            <ComboBox Name="filter_type" HorizontalAlignment="Left" Margin="8,37,0,0" VerticalAlignment="Top" Width="203" SelectionChanged="filter_type_SelectionChanged" ItemsSource="{Binding Name}"/>
             <TextBox Name="filter_color" HorizontalAlignment="Left" Height="22" Margin="66,64,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalContentAlignment="Center"  Width="92" TextChanged="color_TextChanged"/>
             <Button Name="filter_SET" Content="&lt; SET" HorizontalAlignment="Left" Margin="163,64,0,0" VerticalAlignment="Top" Width="48" Height="22"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Filter_SET_Click"/>
 

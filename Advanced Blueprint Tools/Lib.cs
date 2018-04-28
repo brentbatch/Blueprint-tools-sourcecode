@@ -280,9 +280,17 @@ namespace Advanced_Blueprint_Tools
                         }
                         catch (Exception e)
                         {
-                            MessageBox.Show(e.Message, "error in vanilla files!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                            //noti + log!
-                            //blocks[part.uuid.ToString()].mesh = "";
+                            Notifications.Add(new Notification(
+                                "unloadable file",
+                                new Task(() =>
+                                {
+                                    System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show(e.Message+"\n\nopen file?", "error in vanilla files!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+                                    if (messageBoxResult == MessageBoxResult.Yes)
+                                    {
+                                        System.Diagnostics.Process.Start(file);
+                                    }
+                                })
+                            ));
                         }
                     }
                 }
@@ -310,6 +318,17 @@ namespace Advanced_Blueprint_Tools
                         {//not parseable
                             if (!workshoppages.Contains("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder)))
                                 workshoppages.Add("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder));
+                            Notifications.Add(new Notification(
+                                "unloadable file",
+                                new Task(() =>
+                                {
+                                    System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("item desc not parseable, open location?", "unparseable file!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+                                    if (messageBoxResult == MessageBoxResult.Yes)
+                                    {
+                                            System.Diagnostics.Process.Start(folder +@"\Gui\Language\");
+                                    }
+                                })
+                            ));
                         }
 
                         int conflictusemod = 0; //(1 use old, 2 use new
@@ -326,6 +345,18 @@ namespace Advanced_Blueprint_Tools
                                 {//not parseable, add to naughty list
                                     if (!workshoppages.Contains("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder)))
                                        workshoppages.Add("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder));
+
+                                    Notifications.Add(new Notification(
+                                        "unparseable file",
+                                        new Task(() =>
+                                        {
+                                            System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("unparseable file found:\n"+file, "unparseable file!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+                                            if (messageBoxResult == MessageBoxResult.Yes)
+                                            {
+                                                System.Diagnostics.Process.Start(file);
+                                            }
+                                        })
+                                    ));
                                 }
 
 
@@ -405,8 +436,16 @@ namespace Advanced_Blueprint_Tools
                                                 }
                                                 else
                                                 {
-                                                    MessageBox.Show("broken mod description!\nFile: " + folder);
-                                                }
+
+                                                    Notifications.Add(new Notification(
+                                                        "broken appdata mod",
+                                                        new Task(() =>
+                                                        {
+                                                            MessageBox.Show("broken mod description!\nfolder: " + folder);
+
+                                                        })
+                                                    ));
+                                                    }
 
                                             }
                                             catch
@@ -437,7 +476,18 @@ namespace Advanced_Blueprint_Tools
                             if (inventoryitemdesc == null)
                                 inventoryitemdesc = new JObject();
                         }
-                        catch { }
+                        catch (Exception e)
+                        {
+
+                            Notifications.Add(new Notification(
+                                "broken appdata mod",
+                                new Task(() =>
+                                {
+                                    MessageBox.Show(e.Message + "\n\n" + folder+ @"\Gui\Language\English\inventoryDescriptions.json", "broken appdata mod!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+
+                                })
+                            ));
+                        }
 
                         foreach (string file in System.IO.Directory.GetFiles(folder + @"\Objects\Database\ShapeSets"))
                             if (System.IO.Path.GetExtension(file).ToLower() == ".json")
@@ -449,7 +499,15 @@ namespace Advanced_Blueprint_Tools
                                 }
                                 catch (Exception e)
                                 {
-                                    MessageBox.Show(e.Message + "\n\n" + file, "broken appdata mod!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+
+                                    Notifications.Add(new Notification(
+                                        "broken appdata mod",
+                                        new Task(() =>
+                                        {
+                                            MessageBox.Show(e.Message + "\n\n" + file, "broken appdata mod!", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+
+                                        })
+                                    ));
                                 }
 
                                 if (parts != null)
@@ -525,18 +583,20 @@ namespace Advanced_Blueprint_Tools
 
             if (workshoppages.Count != 0)
             {
-                
-                new Task(() =>
-                {
-                    System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Mods: " + usedmods.Count() + "\nBlocks loaded: " + blocks.Count() + "\n\nFound mods that weren't able to be loaded\nEither broken or made by a lazy modder\n\npls Remove or Unsub\n\nOpen Workshop pages?", "Found unloadable mods!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
-                    if (messageBoxResult == MessageBoxResult.Yes)
+                Notifications.Add(new Notification(
+                    "unloadable mods --workshop pages",
+                    new Task(() =>
                     {
-                        foreach (string page in workshoppages)
+                        System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Mods: " + usedmods.Count() + "\nBlocks loaded: " + blocks.Count() + "\n\nFound mods that weren't able to be loaded\nEither broken or made by a lazy modder\n\npls Remove or Unsub\n\nOpen Workshop pages?", "Found unloadable mods!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+                        if (messageBoxResult == MessageBoxResult.Yes)
                         {
-                            System.Diagnostics.Process.Start(page);
+                            foreach (string page in workshoppages)
+                            {
+                                System.Diagnostics.Process.Start(page);
+                            }
                         }
-                    }
-                }).Start();
+                    })
+                ));
             }
         }
         

@@ -48,6 +48,8 @@ namespace Advanced_Blueprint_Tools
         public AdvancedColor advancedcolorwindow;
         public SwapBlocksWindow swapblockswindow;
         public BlockProperties blockProperties;
+        public AreaProperties areaProperties;
+        public BlockPropertiesRAW blockPropertiesRAW;
         Ellipsoid_Generator ellpisoid_generator;
         Cuboid_Generator cuboid_Generator;
 
@@ -71,36 +73,35 @@ namespace Advanced_Blueprint_Tools
             new Task(() =>
             {
                 new Updater().CheckForUpdates();
-            });
+            }).Start();
             new Thread(() =>
             {
-                while(true)
+                try
                 {
-                    if(Database.Notifications.Count>0)
+                    while (true)
                     {
                         this.Dispatcher.Invoke((Action)(() =>
                         {
-                            Notifications.Visibility = Visibility.Visible;
-                            Notifications.Content = Database.Notifications.Count;
+                            if (Database.Notifications.Count > 0)
+                            {
+                                Notifications.Visibility = Visibility.Visible;
+                                Notifications.Content = Database.Notifications.Count;
+                            }
+                            else
+                            {
+                                Notifications.Visibility = Visibility.Collapsed;
+                            }
                         }));
+                        Thread.Sleep(1500);
                     }
-                    else
-                    {
-                        this.Dispatcher.Invoke((Action)(() =>
-                        {
-                            Notifications.Visibility = Visibility.Collapsed;
-                        }));
-                    }
-
-                    Thread.Sleep(1500);
                 }
+                catch { }
 
-            });
-           
-            
-            
+            }).Start();
+
+
         }
-        
+
         public void UpdateOpenedBlueprint()
         {
             TextBox_Name.Text = BP.Description.name;
@@ -163,7 +164,19 @@ namespace Advanced_Blueprint_Tools
 
                             }
                         }
-
+            //helix_wires.Items.Clear();
+            this.Wires = new Model3DGroup();
+            if (Properties.Settings.Default.wires)
+                foreach (int id in BP.Wires.Keys)
+                {
+                    dynamic wire = BP.Wires[id];
+                    if(wire.connections != null)
+                        foreach(dynamic connid in wire.connections)
+                            if(BP.Wires.ContainsKey(Convert.ToInt32(connid.id.ToString())))
+                            {
+                                Addwire(wire.pos, BP.Wires[Convert.ToInt32(connid.id.ToString())].pos, wire.color.ToString());
+                            }
+                }
 
             try
             {
@@ -171,11 +184,13 @@ namespace Advanced_Blueprint_Tools
                 this.Glass = glass;
                 this.Marker = null;
                 this.Marker2 = null;
+                
 
                 //Image_blueprint.DataContext = new MainViewModel();//'refresh'
                 Image_blueprint.DataContext = null;
                 Image_blueprint.DataContext = this;
                 helix.ResetCamera();
+                helix_wires.Camera = helix.Camera;
                 //helix.SetView(new Point3D(0, 0, 0), new Vector3D(90, 0, 0), new Vector3D(10, 10, 10), 50);
                 //Model.Children[5].Transform = new ScaleTransform3D(2,2,2);
 
@@ -185,14 +200,17 @@ namespace Advanced_Blueprint_Tools
                     blockproperties.IsEnabled = true;
                     paint.IsEnabled = true;
                     fixcreation.IsEnabled = true;
-
+                    areaproperties.IsEnabled = true;
                     //areaproperties.IsEnabled = false;
                     swapblocks.IsEnabled = true;
                     paintpicker.IsEnabled = true;
                     mirrorcreation.IsEnabled = true;
                     requiredmods.IsEnabled = true;
-                    
                 }
+                if (!Properties.Settings.Default.safemode)
+                    blockpropertiesRAW.IsEnabled = true;
+                else
+                    blockpropertiesRAW.IsEnabled = false;
             }
             catch (Exception e)
             {
@@ -202,7 +220,31 @@ namespace Advanced_Blueprint_Tools
 
         public void Addwire(dynamic pos1, dynamic pos2, string color)
         {
+            int centerx = BP.centerx;
+            int centery = BP.centery;
+            int centerz = BP.centerz;
+            try
+            {
+                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180, 70, 70, 220)));
+                if (Properties.Settings.Default.colorwires)
+                    material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180,
+                        Convert.ToByte(color.Substring(0, 2),16), Convert.ToByte(color.Substring(2, 2),16), Convert.ToByte(color.Substring(4, 2),16))));
+                var meshBuilder = new MeshBuilder(false, false);
 
+                meshBuilder.AddArrow(new Point3D(Convert.ToDouble(pos1.x.ToString()) - centerx,
+                                                Convert.ToDouble(pos1.y.ToString()) - centery,
+                                                Convert.ToDouble(pos1.z.ToString()) - centerz),
+                                    new Point3D(Convert.ToDouble(pos2.x.ToString()) - centerx,
+                                                Convert.ToDouble(pos2.y.ToString()) - centery,
+                                                Convert.ToDouble(pos2.z.ToString()) - centerz),
+                                    0.15, 4);
+                var Mesh = meshBuilder.ToMesh(true);
+                this.Wires.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "wire render failed");
+            }
         }
 
         public void setMarker(double x, double y, double z)
@@ -220,6 +262,10 @@ namespace Advanced_Blueprint_Tools
             var Mesh = meshBuilder.ToMesh(true);
             marker.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
             this.Marker = marker;
+            //helix_wires.Camera.AnimateTo(new Point3D(x - centerx, y - centery, z - centerz), helix_wires.Camera.LookDirection, helix_wires.Camera.UpDirection, 1000);
+            helix_wires.Camera.LookAt(new Point3D(x - centerx, y - centery, z - centerz),1000);
+            
+            helix.Camera = helix_wires.Camera;
             Image_blueprint.DataContext = "";
             Image_blueprint.DataContext = this;
         }
@@ -322,7 +368,17 @@ namespace Advanced_Blueprint_Tools
 
         private void Click_areaproperties(object sender, RoutedEventArgs e)
         {
-            //
+            if (areaProperties != null) areaProperties.Close();
+            areaProperties = new AreaProperties(this);
+            areaProperties.Owner = this;
+            areaProperties.Show();
+        }
+        private void Click_blockpropertiesRAW(object sender, RoutedEventArgs e)
+        {
+            if (blockPropertiesRAW != null) blockPropertiesRAW.Close();
+            blockPropertiesRAW = new BlockPropertiesRAW(this);
+            blockPropertiesRAW.Owner = this;
+            blockPropertiesRAW.Show();
         }
 
         private void Click_advancedcolor(object sender, RoutedEventArgs e)
@@ -342,22 +398,26 @@ namespace Advanced_Blueprint_Tools
             blueprint.bodies.Add(new JObject());
             blueprint.bodies[0].childs = new JArray();
 
-            BP.Blueprint.joints = null;
+            //BP.Blueprint.joints = null;
             foreach (dynamic body in BP.Blueprint.bodies)
             {
-                //remove bearings/springs
+                //remove bearings/springs/pistons
                 foreach (dynamic child in body.childs)
                 {
                     if (child.joints != null)
                         child.joints = null;
                     if (child.controller != null)
+                    {
                         if (child.controller.joints != null)
                             child.controller.joints = null;
+                        if (child.controller.controllers != null)
+                            child.controller.controllers = null;
+                    }
                     blueprint.bodies[0].childs.Add(child);
                 }
             }
             BP.Description.description = BP.Description.description + "\n++ removed joints & glitchwelded";
-            BP.setblueprint(BP.Blueprint);
+            BP.setblueprint(blueprint);
             this.UpdateOpenedBlueprint();
         }
         
@@ -563,7 +623,11 @@ namespace Advanced_Blueprint_Tools
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("A tool that provides lots of awesome features for you to make blueprint editing fun and easy!\n" +
+                "\nMade by Brent Batch (youtube.com/c.brentbatch)\n'Required Mods'-feature: help by Xesau/Aaron\n\n" +
+                "And a BIG thanks to all the testers: @GamerGuy, @iceboundGlaceon, @lmaster, @the_killerbanana, @ThePiGuy24Gaming, @Remynem, @xXTBR and @zOmbie1919nl.\n\n" +
+                "Version: " + Properties.Settings.Default.version);
         }
+
     }
 }

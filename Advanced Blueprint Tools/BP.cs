@@ -20,6 +20,7 @@ namespace Advanced_Blueprint_Tools
 
         public static PngBitmapEncoder Icon { get; set; }
 
+        public static Dictionary<int, dynamic> Wires { get; set; }
 
         public static List<string> Useduuids { get; set; } = new List<string>();
 
@@ -76,6 +77,8 @@ namespace Advanced_Blueprint_Tools
             {
                 Useduuids.Clear();
                 blocksxyz = new JObject();
+                Wires = new Dictionary<int, dynamic>();
+                minx = 10000; maxx = -10000; miny = 10000; maxy = -10000; minz = 10000; maxz = -10000;
                 foreach (dynamic body in Blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
@@ -94,14 +97,28 @@ namespace Advanced_Blueprint_Tools
                         if (blocksxyz[x][y][z] == null) blocksxyz[x][y][z] = new JObject();
                         if (blocksxyz[x][y][z].blocks == null) blocksxyz[x][y][z].blocks = new JArray();
                         blocksxyz[x][y][z].blocks.Add(child);
+                        if(child.controller != null && child.controller.id != null)
+                        {
+                            dynamic wire =  new JObject();
+                            wire.pos = new JObject();
+                            wire.pos.x =Convert.ToInt32(correctedchild.pos.x.ToString())+Convert.ToInt32(correctedchild.bounds.x.ToString())/2.0;
+                            wire.pos.y =Convert.ToInt32(correctedchild.pos.y.ToString())+Convert.ToInt32(correctedchild.bounds.y.ToString())/2.0;
+                            wire.pos.z =Convert.ToInt32(correctedchild.pos.z.ToString())+Convert.ToInt32(correctedchild.bounds.z.ToString())/2.0;
+                            string color = child.color.ToString();
+                            if (color.StartsWith("#"))
+                                color = color.Substring(1, 6);
+                            wire.color = color;
+                            wire.connections = child.controller.controllers;
+                            Wires.Add(Convert.ToInt32(child.controller.id.ToString()), wire);
+                        }
 
                         //get whole creation bounds:
                         if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
-                        if (correctedchild.pos.x > maxx) maxx = correctedchild.pos.x;
+                        if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
                         if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
-                        if (correctedchild.pos.y > maxy) maxy = correctedchild.pos.y;
+                        if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
                         if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
-                        if (correctedchild.pos.z > maxz) maxz = correctedchild.pos.z;
+                        if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
                     }
                 if (Blueprint.joints != null)
                     for (int i = 0; i < Blueprint.joints.Count; i++)
@@ -135,6 +152,30 @@ namespace Advanced_Blueprint_Tools
                         if (blocksxyz[x][y][z].blocks == null) blocksxyz[x][y][z].blocks = new JArray();
 
                         blocksxyz[x][y][z].blocks.Add(Blueprint.joints[i]);
+
+                        if (Blueprint.joints[i].controller != null && Blueprint.joints[i].controller.id != null)
+                        {
+                            dynamic wire = new JObject();
+                            wire.pos = new JObject();
+                            wire.pos.x = Convert.ToInt32(correctedchild.pos.x.ToString()) + Convert.ToInt32(correctedchild.bounds.x.ToString())/2.0;
+                            wire.pos.y = Convert.ToInt32(correctedchild.pos.y.ToString()) + Convert.ToInt32(correctedchild.bounds.y.ToString())/2.0;
+                            wire.pos.z = Convert.ToInt32(correctedchild.pos.z.ToString()) + Convert.ToInt32(correctedchild.bounds.z.ToString())/2.0;
+                            string color = Blueprint.joints[i].color.ToString();
+                            if (color.StartsWith("#"))
+                                color = color.Substring(1, 6);
+                            wire.color = color;
+                            wire.connections = Blueprint.joints[i].controller.controllers;
+                            Wires.Add(Convert.ToInt32(Blueprint.joints[i].controller.id.ToString()), wire);
+                        }
+
+                        //get whole creation bounds:
+                        if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
+                        if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
+                        if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
+                        if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
+                        if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
+                        if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
+
                     }
                 centerx = (maxx + minx) / 2;
                 centery = (maxy + miny) / 2;
@@ -183,7 +224,7 @@ namespace Advanced_Blueprint_Tools
         }
         public static void SaveAs(string name)//in scrapdata dir
         {
-            string newbp = Database.ScrapData + @"\" + name;
+            string newbp = Database.User_ + @"\Blueprints\" + name;
             System.IO.Directory.CreateDirectory(newbp);
 
             string blueprinttext = Convert.ToString(Blueprint);
@@ -199,7 +240,7 @@ namespace Advanced_Blueprint_Tools
             Database.bprefresh = true;
             
             
-            new System.Threading.Thread(new System.Threading.ThreadStart(() => { MessageBox.Show("Saved as new blueprint!\nwill require game restart to be able to find it in-game!\n(blame axolot)"); })).Start();
+            new System.Threading.Thread(() => { MessageBox.Show("Saved as new blueprint!\nwill require game restart to be able to find it in-game!\n(blame axolot)"); }).Start();
 
         }
 
