@@ -22,7 +22,7 @@ namespace Advanced_Blueprint_Tools
     public partial class BlockPropertiesRAW : Window
     {
         MainWindow mainwindow;
-        List<string> uuidsbackup;
+        List<string> uuidsbackup = new List<string>();
         dynamic blueprint;
         public BlockPropertiesRAW(MainWindow mainwindow)
         {
@@ -103,19 +103,7 @@ namespace Advanced_Blueprint_Tools
         {
             disableAll();
             blueprint = BP.Blueprint;
-            if (uuidsbackup != BP.Useduuids | true)//fill the combobox once
-            {
-                filter_type.Items.Clear();
-                filter_type.Items.Add(new Item("any", "*"));
-                foreach (string uuid in BP.Useduuids)
-                {
-                    if (Database.blocks.ContainsKey(uuid))
-                        filter_type.Items.Add(new Item(Database.blocks[uuid].Name.ToString(), uuid));
-                }
-                uuidsbackup = BP.Useduuids;
-                filter_type.SelectedIndex = 0;
-            }
-            //if(filter_x1.Text=="")
+            if (filter_x1.Text == "" || uuidsbackup != BP.Useduuids)
             {
                 int x1 = BP.minx, y1 = BP.miny, z1 = BP.minz, x2 = BP.maxx, y2 = BP.maxy, z2 = BP.maxz;
                 filter_x1.Text = x1.ToString();
@@ -125,8 +113,22 @@ namespace Advanced_Blueprint_Tools
                 filter_y2.Text = y2.ToString();
                 filter_z2.Text = z2.ToString();
             }
+            if (uuidsbackup != BP.Useduuids)//fill the combobox once
+            {
+                filter_type.Items.Clear();
+                filter_type.Items.Add(new Item("any", "*"));
+                foreach (string uuid in BP.Useduuids)
+                {
+                    if (Database.blocks.ContainsKey(uuid))
+                        filter_type.Items.Add(new Item(Database.blocks[uuid].Name.ToString(), uuid));
+                }
+                uuidsbackup.Clear();
+                uuidsbackup.InsertRange(0, BP.Useduuids);
+                filter_type.SelectedIndex = 0;
+            }
             filterupdate();
         }
+        
         string filtercolor = null;
 
         Thread filter;
@@ -286,7 +288,7 @@ namespace Advanced_Blueprint_Tools
             try
             {
                 w.Show();
-                dynamic edited = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Edit_child.Text);
+                dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Edit_child.Text);
                 int i = 0;
                 int index = ((dynamic)filter_output.SelectedItem).index;
                 for (int j=0; j<blueprint.bodies.Count; j++)
@@ -294,13 +296,15 @@ namespace Advanced_Blueprint_Tools
                     {
                         if (index == i)
                         {
-                            blueprint.bodies[j].childs[k] = edited;
+                            blueprint.bodies[j].childs[k] = child;
                             BP.setblueprint(blueprint);
                             BP.Description.description = BP.Description.description + "\n++Applied RAW changes";
                             mainwindow.UpdateOpenedBlueprint();
-                            Update();
+                            //Update(); 
                             w.Close();
                             MessageBox.Show("edit successfull");
+                            Thread.Sleep(1000);
+                            Update();
                             return;
                         }
                         i++;
@@ -310,13 +314,15 @@ namespace Advanced_Blueprint_Tools
                 {
                     if (index == i)
                     {
-                        blueprint.joints[j] = edited;
+                        blueprint.joints[j] = child;
                         BP.setblueprint(blueprint);
                         BP.Description.description = BP.Description.description + "\n++Applied RAW changes";
                         mainwindow.UpdateOpenedBlueprint();
-                        Update();
+                        //Update();
                         w.Close();
                         MessageBox.Show("edit successfull");
+                        Thread.Sleep(1000);
+                        Update();
                         return;
                     }
                     i++;

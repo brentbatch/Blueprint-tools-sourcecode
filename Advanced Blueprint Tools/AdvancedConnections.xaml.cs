@@ -22,14 +22,14 @@ namespace Advanced_Blueprint_Tools
     public partial class AdvancedConnections : Window
     {
         
-        MainWindow window;
+        MainWindow mainwindow;
         private dynamic uuidsbackup;
 
         List<Connectable> connectable_UUIDS = new List<Connectable>();
         //List<Item> ItemList;
         public AdvancedConnections(MainWindow window)
         {
-            this.window = window;
+            this.mainwindow = window;
             InitializeComponent();
             this.Update();
         }
@@ -43,7 +43,7 @@ namespace Advanced_Blueprint_Tools
                 {
                     if (Database.blocks.ContainsKey(uuid) && Database.blocks[uuid] is Part && (Database.blocks[uuid] as Part).IsConnectable)
                     {
-                        connectable_UUIDS.Add(new Connectable(uuid.ToString(), ((Part)Database.blocks[uuid]).GetBounds(), Database.blocks[uuid].Name));
+                        connectable_UUIDS.Add(new Connectable(uuid.ToString(), ((Part)Database.blocks[uuid]).GetBoundsDynamic(), Database.blocks[uuid].Name));
 
                     }
                 }
@@ -107,7 +107,7 @@ namespace Advanced_Blueprint_Tools
             this.Update();
             PaintSelector p = new PaintSelector
             {
-                Owner = this.window
+                Owner = this.mainwindow
             };
             p.Show();
         }
@@ -244,7 +244,9 @@ namespace Advanced_Blueprint_Tools
                                     maxz = source.pos.z;
                                 }
 
-
+                                string color = child.color.ToString();
+                                if (color.StartsWith("#"))
+                                    color.Substring(1, 6);
                                 for (int i = minx; i <= maxx; i++)
                                     if (destids[i.ToString()] != null)
                                         for (int j = miny; j <= maxy; j++)
@@ -284,9 +286,16 @@ namespace Advanced_Blueprint_Tools
                                                             }
                                 */
 
+                                mainwindow.Image_blueprint.DataContext = null;
+                                mainwindow.Image_blueprint.DataContext = mainwindow;
                             }
 
-                    new System.Threading.Thread(new System.Threading.ThreadStart(() => { MessageBox.Show("Successfully made " + amountwired + " connections! :D");})).Start();
+                    new System.Threading.Thread(new System.Threading.ThreadStart(() => {
+                        if(Properties.Settings.Default.wires)
+                            MessageBox.Show("Successfully made " + amountwired + " connections! :D\n\n'Wires'-feature will render wires upon load from openwindow->needs work");
+                        else
+                            MessageBox.Show("Successfully made " + amountwired + " connections! :D");
+                    })).Start();
                     
                     //window.UpdateOpenedBlueprint();
                     if (amountwired>0)

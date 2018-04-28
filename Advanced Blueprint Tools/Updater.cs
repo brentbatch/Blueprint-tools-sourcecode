@@ -148,7 +148,7 @@ namespace Advanced_Blueprint_Tools
 
                             object shDesktop = (object)"Desktop";
                             IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
-                            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\Advanced Blueprint Tools.lnk";
+                            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\Advanced Blueprint Tools "+ gotoversion+".lnk";
                             IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(shortcutAddress);
                             shortcut.Description = "Shortcut for blueprint tool";
                             shortcut.TargetPath = findlastversionname + "\\Advanced Blueprint Tools.exe";

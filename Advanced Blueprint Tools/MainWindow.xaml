@@ -34,7 +34,8 @@
                 <MenuItem Name="connections" Header="Advanced Connections" Click="Click_advancedwiring" IsEnabled="False"/>
                 <MenuItem Name="paint" Header="Advanced Paint" Click="Click_advancedcolor" IsEnabled="False" />
                 <MenuItem Name="blockproperties" Header="Block Properties" Click="Click_blockproperties" IsEnabled="False" />
-                <MenuItem Name="areaproperties" Header="Joint Properties" Click="Click_areaproperties" IsEnabled="False" Visibility="Collapsed"/>
+                <MenuItem Name="blockpropertiesRAW" Header="blockpropertiesRAW" Click="Click_blockpropertiesRAW" IsEnabled="False"/>
+                <MenuItem Name="areaproperties" Header="areaproperties" Click="Click_areaproperties" IsEnabled="False"/>
                 <MenuItem Name="fixcreation" Header="fix invalid json (Removes joints)" Click="Click_fixcreation" IsEnabled="False" />
                 <MenuItem Name="requiredmods" Header="Check Required mods" Click="Click_requiredmods" IsEnabled="False" />
                 <MenuItem Name="swapblocks" Header="Swap Blocks" Click="Click_swapblocks" IsEnabled="False" />
@@ -45,15 +46,15 @@
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="help" Click="Help_Click"/>
+                <MenuItem Header="Mods"/>
                 <MenuItem Header="settings" Click="Settings_Click"/>
-                <MenuItem Header="enabled Mods"/>
                 <MenuItem Header="about" Click="About_Click"/>
             </MenuItem>
         </Menu>
         <Grid Background="#8093A0"  HorizontalAlignment="Center" VerticalAlignment="Center" Height="650"  Width="1275" Margin="0,0,0,20" >
 
             <Grid x:Name="Image_blueprint" HorizontalAlignment="Left" Height="500" Width="500" Margin="34,30,0,0" VerticalAlignment="Top" >
-                
+
 
                 <HelixToolkit:HelixViewport3D Name="helix" ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" CameraRotationMode="Turntable" ShowViewCube="false">
                     <HelixToolkit:HelixViewport3D.Background>
@@ -71,6 +72,17 @@
                     <ModelVisual3D Content="{Binding Marker}"/>
                     <ModelVisual3D Content="{Binding Marker2}"/>
                     <ModelVisual3D Content="{Binding Glass}"/>
+
+                    <!-- You can also add elements here in the xaml -->
+                </HelixToolkit:HelixViewport3D>
+                <HelixToolkit:HelixViewport3D Name="helix_wires" ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" CameraRotationMode="Turntable" ShowViewCube="false" >
+
+
+                    <!-- Remember to add light to the scene -->
+                    <HelixToolkit:SunLight/>
+
+                    <!-- The content of this visual is defined in MainViewModel.cs -->
+                    <ModelVisual3D Content="{Binding Wires}"/>
 
                     <!-- You can also add elements here in the xaml -->
                 </HelixToolkit:HelixViewport3D>

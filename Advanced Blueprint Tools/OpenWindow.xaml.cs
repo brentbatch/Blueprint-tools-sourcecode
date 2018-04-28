@@ -86,7 +86,10 @@ namespace Advanced_Blueprint_Tools
                         }
                     }));
                 }
-                catch { }
+                catch
+                {
+                    break;
+                }
                 Thread.Sleep(1000);
             }
 
@@ -141,6 +144,8 @@ namespace Advanced_Blueprint_Tools
                 if (mainwindow.advancedcolorwindow != null && mainwindow.advancedcolorwindow.IsLoaded) mainwindow.advancedcolorwindow.Update();
                 if (mainwindow.swapblockswindow != null && mainwindow.swapblockswindow.IsLoaded) mainwindow.swapblockswindow.Update();
                 if (mainwindow.blockProperties != null && mainwindow.blockProperties.IsLoaded) mainwindow.blockProperties.Close();
+                if (mainwindow.areaProperties != null && mainwindow.areaProperties.IsLoaded) mainwindow.areaProperties.Update();
+                if (mainwindow.blockPropertiesRAW != null && mainwindow.blockPropertiesRAW.IsLoaded) mainwindow.blockPropertiesRAW.Update();
 
                 l.Close();
             }
