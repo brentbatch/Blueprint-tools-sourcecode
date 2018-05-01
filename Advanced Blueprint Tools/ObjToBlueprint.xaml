@@ -1,0 +1,17 @@
+﻿<Window x:Class="Advanced_Blueprint_Tools.ObjToBlueprint"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
+        mc:Ignorable="d"
+        Title="ObjToBlueprint" Height="154.761" Width="495.381" Background="#8093A0"  HorizontalAlignment="Center" VerticalAlignment="Center" >
+    <Grid>
+        <TextBox Name="objPath" HorizontalAlignment="Left" Height="47" Margin="76,10,0,0" TextWrapping="NoWrap" Text="C://" VerticalAlignment="Top" Width="398" VerticalContentAlignment="Center" MouseDoubleClick="objPath_MouseDoubleClick" ToolTip="Double Click me!" HorizontalScrollBarVisibility="Auto" TextChanged="objPath_TextChanged"/>
+        <Label Content=".Obj Path:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="47" />
+        <Button Content="Generate Blueprint" HorizontalAlignment="Left" Margin="219,62,0,0" VerticalAlignment="Top" Width="131" Height="46" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button_Click"/>
+        <Label Content="Scale:" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="10,62,0,0" VerticalAlignment="Top" Height="46"/>
+        <TextBox Name="Textbox_Scale" HorizontalAlignment="Left" Height="46" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="76,62,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="138" TextChanged="TextBox_TextChanged"/>
+
+    </Grid>
+</Window>

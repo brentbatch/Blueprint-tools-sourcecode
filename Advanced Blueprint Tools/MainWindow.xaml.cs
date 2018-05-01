@@ -58,7 +58,8 @@ namespace Advanced_Blueprint_Tools
 
         public MainWindow()
         {
-
+            
+            //BlueprintOptimizer.CreateBlueprintFromPoints(null);
             InitializeComponent();
             //LOAD RESOURCES:
             Database.findPaths();
@@ -98,7 +99,7 @@ namespace Advanced_Blueprint_Tools
                 catch { }
 
             }).Start();
-
+            helix.Camera = helix_wires.Camera;
 
         }
 
@@ -170,6 +171,7 @@ namespace Advanced_Blueprint_Tools
                 foreach (int id in BP.Wires.Keys)
                 {
                     dynamic wire = BP.Wires[id];
+                    Addblob(wire.pos, wire.color.ToString());
                     if(wire.connections != null)
                         foreach(dynamic connid in wire.connections)
                             if(BP.Wires.ContainsKey(Convert.ToInt32(connid.id.ToString())))
@@ -183,15 +185,13 @@ namespace Advanced_Blueprint_Tools
                 this.Model = modelGroup;
                 this.Glass = glass;
                 this.Marker = null;
-                this.Marker2 = null;
+                this.Marker2 = new Model3DGroup();
                 
-
-                //Image_blueprint.DataContext = new MainViewModel();//'refresh'
+                
                 Image_blueprint.DataContext = null;
                 Image_blueprint.DataContext = this;
                 helix.ResetCamera();
                 helix_wires.Camera = helix.Camera;
-                //helix.SetView(new Point3D(0, 0, 0), new Vector3D(90, 0, 0), new Vector3D(10, 10, 10), 50);
                 //Model.Children[5].Transform = new ScaleTransform3D(2,2,2);
 
                 if (connections.IsEnabled == false)
@@ -217,6 +217,31 @@ namespace Advanced_Blueprint_Tools
                 MessageBox.Show(e.Message, "Failed to import into rendering box!");
             }
         }
+        public void Addblob(dynamic pos, string color)
+        {
+            int centerx = BP.centerx;
+            int centery = BP.centery;
+            int centerz = BP.centerz;
+            try
+            {
+                if (!Properties.Settings.Default.colorwires)
+                    color = Properties.Settings.Default.blobcolor.Substring(1,6);
+
+                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180,
+                            Convert.ToByte(color.Substring(0, 2), 16), Convert.ToByte(color.Substring(2, 2), 16), Convert.ToByte(color.Substring(4, 2), 16))));
+                var meshBuilder = new MeshBuilder(false, false);
+
+                meshBuilder.AddSphere(new Point3D(Convert.ToDouble(pos.x.ToString()) - centerx,
+                                                Convert.ToDouble(pos.y.ToString()) - centery,
+                                                Convert.ToDouble(pos.z.ToString()) - centerz), 0.3);
+                var Mesh = meshBuilder.ToMesh(true);
+                this.Wires.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "wire render failed");
+            }
+        }
 
         public void Addwire(dynamic pos1, dynamic pos2, string color)
         {
@@ -225,10 +250,11 @@ namespace Advanced_Blueprint_Tools
             int centerz = BP.centerz;
             try
             {
-                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180, 70, 70, 220)));
-                if (Properties.Settings.Default.colorwires)
-                    material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180,
-                        Convert.ToByte(color.Substring(0, 2),16), Convert.ToByte(color.Substring(2, 2),16), Convert.ToByte(color.Substring(4, 2),16))));
+                if (!Properties.Settings.Default.colorwires)
+                    color = Properties.Settings.Default.wirecolor.Substring(1, 6);
+                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180,
+                        Convert.ToByte(color.Substring(0, 2), 16), Convert.ToByte(color.Substring(2, 2), 16), Convert.ToByte(color.Substring(4, 2), 16))));
+
                 var meshBuilder = new MeshBuilder(false, false);
 
                 meshBuilder.AddArrow(new Point3D(Convert.ToDouble(pos1.x.ToString()) - centerx,
@@ -255,19 +281,18 @@ namespace Advanced_Blueprint_Tools
             Model3DGroup marker = new Model3DGroup();
             Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(100, 51, 204, 51)));
             var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 0.3, 0.3, 100);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 0.3, 100, 0.3);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 100, 0.3, 0.3);
+            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 0.2, 0.2, 1000);
+            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 0.2, 1000, 0.2);
+            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 1000, 0.2, 0.2);
             // Create a mesh from the builder (and freeze it)
             var Mesh = meshBuilder.ToMesh(true);
             marker.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
             this.Marker = marker;
             //helix_wires.Camera.AnimateTo(new Point3D(x - centerx, y - centery, z - centerz), helix_wires.Camera.LookDirection, helix_wires.Camera.UpDirection, 1000);
-            helix_wires.Camera.LookAt(new Point3D(x - centerx, y - centery, z - centerz),1000);
-            
-            helix.Camera = helix_wires.Camera;
             Image_blueprint.DataContext = "";
             Image_blueprint.DataContext = this;
+            helix_wires.Camera.LookAt(new Point3D(x - centerx, y - centery, z - centerz), 1000);
+            //helix.Camera = helix_wires.Camera;
         }
         public void setMarker2(double x, double y, double z, double boundsx, double boundsy, double boundsz)
         {//cuboid marker
@@ -467,15 +492,6 @@ namespace Advanced_Blueprint_Tools
                 foreach (dynamic body in blueprint.bodies)
                     foreach (dynamic block in body.childs)
                     {
-
-                        if (block.bounds == null)
-                        {
-                            //block.xaxis = -block.xaxis;
-                            block.pos.x = -block.pos.x; 
-                            throw new Exception(); //every block should have gotten bounds
-                        }
-
-
                         {
                             dynamic realpos = BP.getposandbounds(block);
 
@@ -626,8 +642,38 @@ namespace Advanced_Blueprint_Tools
             MessageBox.Show("A tool that provides lots of awesome features for you to make blueprint editing fun and easy!\n" +
                 "\nMade by Brent Batch (youtube.com/c.brentbatch)\n'Required Mods'-feature: help by Xesau/Aaron\n\n" +
                 "And a BIG thanks to all the testers: @GamerGuy, @iceboundGlaceon, @lmaster, @the_killerbanana, @ThePiGuy24Gaming, @Remynem, @xXTBR and @zOmbie1919nl.\n\n" +
-                "Version: " + Properties.Settings.Default.version);
+                "Version: " + Properties.Settings.Default.version,"About");
         }
 
+        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if(TextBox_Description.Text == "Easter Egg")
+            MessageBox.Show(@"                 /  \" + "\n" +
+@"               / _ ^\" + "\n" +
+@"              |  /  \  |" + "\n" +
+@"              ||      ||  _______" + "\n" +
+@"              ||      ||  |\          \" + "\n" +
+@"              ||      ||  ||\          \" + "\n" +
+@"              ||      ||  ||  \        |" + "\n" +
+@"              ||      ||  ||    \__/" + "\n" +
+@"              ||      ||  ||      ||" + "\n" +
+@"                \\_/  \_/  \_//" + "\n" +
+@"              /     _         _     \" + "\n" +
+@"            /                           \" + "\n" +
+@"            |       O         O      |" + "\n" +
+@"            |      \    ___    /      |" + "\n" +
+@"          /          \  \_/  /         \" + "\n" +
+@"        /      -----    |    --\        \" + "\n" +
+@"        |           \__/|\__/  \       |" + "\n" +
+@"        \              |_|_|              /" + "\n" +
+@"          \_____              _____/" + "\n" +
+@"                      \          /" + "\n" +
+@"                      |          |","Easter Egg!");
+        }
+
+        private void ObjToBlueprint_Click(object sender, RoutedEventArgs e)
+        {
+            new ObjToBlueprint(this) { Owner = this }.Show();
+        }
     }
 }

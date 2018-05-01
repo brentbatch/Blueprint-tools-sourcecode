@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,6 +112,83 @@ namespace Advanced_Blueprint_Tools
             };
             p.Show();
         }
+        
+
+        private dynamic WireIt(dynamic blueprint, string sourcecolor, string destinationcolor, string sourcetype, string destinationtype, int offsetx, int offsety, int offsetz, string offsetcolor )
+        {
+
+            //dynamic block = new JObject { [x] = new JObject { [y] = new JObject { [z] = new JObject { [child.color.ToString()] = new JObject { [child.shapeId.ToString()] = new JObject { [child.color] = "test" } } } } } };
+            //merge
+            using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.scrapshitConnectionString))
+            {
+                //conn.ConnectionString = "MyDB";c
+                int i = 0;
+                conn.Open();
+                foreach (dynamic body in blueprint.bodies)
+                    foreach (dynamic child in body.childs)
+                    {
+                        if(child.controller != null)
+                        {
+                            dynamic rpos = BP.getposandbounds(child);
+                            string x = rpos.pos.x.ToString();
+                            string y = rpos.pos.y.ToString();
+                            string z = rpos.pos.z.ToString();
+                            string color = child.color.ToString();
+                            if (color.StartsWith("#"))
+                                color = color.Substring(1, 6);
+
+                            using (SqlCommand insertCommand = new SqlCommand("INSERT INTO Connections (Controller_Id, posx, posy, posz, color, uuid) VALUES (@controllerid, @x, @y, @z, @color, @uuid)", conn))
+                            {
+                                insertCommand.Parameters.AddWithValue("@controllerid", Convert.ToInt32(child.controller.id.ToString()));
+                                insertCommand.Parameters.AddWithValue("@x", x);
+                                insertCommand.Parameters.AddWithValue("@y", y);
+                                insertCommand.Parameters.AddWithValue("@z", z);
+                                insertCommand.Parameters.AddWithValue("@color", color);
+                                insertCommand.Parameters.AddWithValue("@uuid", child.shapeId.ToString());
+                                try
+                                {
+                                    i+= insertCommand.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    MessageBox.Show(e.Message);
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+                //SqlCommand cmd = new SqlCommand("SELECT * FROM Description WHERE login = @login", conn);
+
+
+                //all with uuid x / other / all other (match offset block color)
+                //all with color / all other  / all other (match offset block color)
+                //all with x + offsetx / other(all in this dir) /x
+                //all with y + offsety / other / y
+                //all with z + offsetz /other / z
+                //exclude self wire?
+                //if match offset block color search offset from  x y z found blocks (from all, check all current found + offset with color x and type x)
+
+
+            }
+
+
+
+            //<x, y, z, color, shapeId>, controllerid
+            Dictionary<Tuple<int, int, int, string, string>, int> dict = new Dictionary<Tuple<int, int, int, string, string>, int>();
+
+            Dictionary<int, Dictionary<int, Dictionary<int, int>>> testdict = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
+            //testdict[5][2][3] = 5;
+            
+
+
+
+            return blueprint;
+        }
+
+
 
         //Wire it!
         private void Button1_Click(object sender, RoutedEventArgs e)
@@ -122,15 +200,16 @@ namespace Advanced_Blueprint_Tools
                 Connectable sourceblock = connectable_UUIDS[comboBox_items1.SelectedIndex];
                 Connectable destinationblock = connectable_UUIDS[comboBox_items2.SelectedIndex];
 
+                int offsetx = Convert.ToInt32(textBox_X.Text);
+                int offsety = Convert.ToInt32(textBox_Y.Text);
+                int offsetz = Convert.ToInt32(textBox_Z.Text);
+                
+                dynamic result = WireIt(BP.Blueprint, sourcecolor, destinationcolor, sourceblock.UUID, destinationblock.UUID, offsetx, offsety, offsetz, destinationcolor);
+
+
                 dynamic backupbp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(BP.Blueprint.ToString());
                 //list all destionationblocks and their ID's
                 dynamic destids = new JObject();
-                /*
-                destids["-1"] = new JObject();
-                destids["-1"]["1"] = new JObject();
-                destids["-1"]["1"]["5"] = new JObject();
-                destids["-1"]["1"]["5"].id = 5;
-                */
                 int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000, minz = 10000, maxz = -10000;
                 //loop over all blocks:
                 foreach (dynamic body in BP.Blueprint.bodies)
@@ -139,7 +218,7 @@ namespace Advanced_Blueprint_Tools
                     {
                         if(child.shapeId.Value.ToLower() == destinationblock.UUID.ToLower() /*&& (child.color.Value.ToLower() == destinationcolor.ToLower() || "#"+child.color.Value.ToLower() == destinationcolor.ToLower() || destinationcolor == "" || destinationcolor == "#")*/)
                         {
-                            dynamic dest = Getposandbounds(child);//outputs corrected child (default rotation, correct position)
+                            dynamic dest = BP.getposandbounds(child);//outputs corrected child (default rotation, correct position)
 
                             string x = dest.pos.x.ToString();
                             string y = dest.pos.y.ToString();
@@ -222,7 +301,7 @@ namespace Advanced_Blueprint_Tools
                         foreach(dynamic child in body.childs)
                             if (child.shapeId.Value.ToLower() == sourceblock.UUID.ToLower() && (child.color.Value.ToLower() == sourcecolor.ToLower() || "#" + child.color.Value.ToLower() == sourcecolor.ToLower() || sourcecolor == "" || sourcecolor == "#"))
                             {//COLOR AND UUID CORRECT, FURTHER WIRING PROCESS:
-                                dynamic source = Getposandbounds(child);//outputs corrected child (default rotation, correct position)
+                                dynamic source = BP.getposandbounds(child);//outputs corrected child (default rotation, correct position)
 
                                 string x = source.pos.x.ToString();
                                 string y = source.pos.y.ToString();
@@ -318,152 +397,7 @@ namespace Advanced_Blueprint_Tools
 
         }
 
-
-
-        //get bounds from 
-        private dynamic Getbounds(dynamic part)
-        {
-            dynamic bounds = new Newtonsoft.Json.Linq.JObject();
-            if (part.box != null)
-            {
-                return part.box;
-            }
-            if (part.hull != null)
-            {
-                bounds.x = part.hull.x;
-                bounds.y = part.hull.y;
-                bounds.z = part.hull.z;
-                return bounds;
-            }
-            if (part.cylinder != null)
-            {
-                if (part.cylinder.axis.ToString().ToLower() == "x")
-                {
-                    bounds.x = part.cylinder.depth;
-                    bounds.y = part.cylinder.diameter * 2;
-                    bounds.z = part.cylinder.diameter * 2;
-                    return bounds;
-
-                }
-                else
-                if (part.cylinder.axis.ToString().ToLower() == "y")
-                {
-                    bounds.x = part.cylinder.diameter * 2;
-                    bounds.y = part.cylinder.depth;
-                    bounds.z = part.cylinder.diameter * 2;
-                    return bounds;
-
-                }
-                else
-                if (part.cylinder.axis.ToString().ToLower() == "z")
-                {
-                    bounds.x = part.cylinder.diameter * 2;
-                    bounds.y = part.cylinder.diameter * 2;
-                    bounds.z = part.cylinder.depth;
-                    return bounds;
-
-                }
-            }
-            bounds.X = 1;
-            bounds.Y = 1;
-            bounds.Z = 1;
-            MessageBox.Show("no bounds\n\nImpossible senario. please report");
-            return bounds;
-        }
-        //Reorganize bounds according to rotation:
-        private dynamic Flip(dynamic child, string neworder)
-        {
-            int x = child.bounds.x;
-            int y = child.bounds.y;
-            int z = child.bounds.z;
-            if (neworder == "zxy") //shift
-            {
-                child.bounds.x = z;
-                child.bounds.y = x;
-                child.bounds.z = y;
-            }
-            if (neworder == "yzx") //"
-            {
-                child.bounds.x = y;
-                child.bounds.y = z;
-                child.bounds.z = x;
-            }
-            if (neworder == "xzy") //switch
-            {
-                child.bounds.x = x;
-                child.bounds.y = z;
-                child.bounds.z = y;
-            }
-            if (neworder == "zyx")
-            {
-                child.bounds.x = z;
-                child.bounds.y = y;
-                child.bounds.z = x;
-            }
-            if (neworder == "yxz")
-            {
-                child.bounds.x = y;
-                child.bounds.y = x;
-                child.bounds.z = z;
-            }
-            return child;
-        }
-        //get new pos and correct ingame bounds for child
-        private dynamic Getposandbounds(dynamic whatever)
-        {
-            dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));
-            string uuid = child.shapeId;
-
-            if (child.bounds == null) //add bounds to parts (blocks do not get affected)
-            {
-
-                foreach(Connectable c in connectable_UUIDS)
-                {
-                    if (c.UUID.ToLower() == child.shapeId.Value)
-                    {
-                        child.bounds = c.bounds;
-                    }
-                }
-                //switch bounds here
-                if (Math.Abs(Convert.ToInt32(child.xaxis)) == 3)
-                {
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 2)
-                    {
-                        Flip(child, "yzx");
-                    }
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 1)
-                    {
-                        Flip(child, "zyx");
-                    }
-                }
-                if (Math.Abs(Convert.ToInt32(child.xaxis)) == 2)
-                {
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 3)
-                    {
-                        Flip(child, "yxz");
-                    }
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 1)
-                    {
-                        Flip(child, "zxy");
-                    }
-                }
-                if (Math.Abs(Convert.ToInt32(child.xaxis)) == 1)
-                {
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 2)
-                    {
-                        Flip(child, "xzy");
-                    }
-                }
-            }
-            //this updating pos only applies to parts, blocks do not get affected as they always have xaxis 1 zaxis 3
-            if (child.xaxis == -1 | child.zaxis == -1 | (child.xaxis == 2 && child.zaxis == 3) | (child.xaxis == 3 && child.zaxis == -2) | (child.xaxis == -2 && child.zaxis == -3) | (child.xaxis == -3 && child.zaxis == 2))
-                child.pos.x -= child.bounds.x;
-            if (child.xaxis == -2 | child.zaxis == -2 | (child.xaxis == -1 && child.zaxis == 3) | (child.xaxis == -3 && child.zaxis == -1) | (child.xaxis == 1 && child.zaxis == -3) | (child.xaxis == 3 && child.zaxis == 1))
-                child.pos.y -= child.bounds.y;
-            if (child.xaxis == -3 | child.zaxis == -3 | (child.xaxis == -2 && child.zaxis == 1) | (child.xaxis == -1 && child.zaxis == -2) | (child.xaxis == 1 && child.zaxis == 2) | (child.xaxis == 2 && child.zaxis == -1))
-                child.pos.z -= child.bounds.z;
-            return child;
-        }
+        
 
         private void Button2_Click(object sender, RoutedEventArgs e)
         {

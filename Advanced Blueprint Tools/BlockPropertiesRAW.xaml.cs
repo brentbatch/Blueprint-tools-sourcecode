@@ -302,7 +302,7 @@ namespace Advanced_Blueprint_Tools
                             mainwindow.UpdateOpenedBlueprint();
                             //Update(); 
                             w.Close();
-                            MessageBox.Show("edit successfull");
+                            MessageBox.Show("edit successful");
                             Thread.Sleep(1000);
                             Update();
                             return;
@@ -320,7 +320,7 @@ namespace Advanced_Blueprint_Tools
                         mainwindow.UpdateOpenedBlueprint();
                         //Update();
                         w.Close();
-                        MessageBox.Show("edit successfull");
+                        MessageBox.Show("edit successful");
                         Thread.Sleep(1000);
                         Update();
                         return;

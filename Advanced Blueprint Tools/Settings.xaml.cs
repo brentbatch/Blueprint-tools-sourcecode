@@ -23,7 +23,10 @@ namespace Advanced_Blueprint_Tools
         public Settings()
         {
             InitializeComponent();
+            color_wire.Text = Properties.Settings.Default.wirecolor;
+            color_blob.Text = Properties.Settings.Default.blobcolor;
             Update();
+            
         }
         void Update()
         {
@@ -113,6 +116,47 @@ namespace Advanced_Blueprint_Tools
         {
             Properties.Settings.Default.colorwires = !Properties.Settings.Default.colorwires;
             Update();
+        }
+
+        private void color_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textbox_color = (TextBox)sender;
+            if (textbox_color.Text.Length == 7)
+            {
+                try
+                {
+                    var bc = new BrushConverter();
+                    string color = "#FF" + textbox_color.Text.Substring(1);
+                    textbox_color.Background = (Brush)bc.ConvertFrom(color);
+                }
+                catch
+                {
+                    //MessageBox.Show("Please use the right format\n \"#123abc\" where 1-9,a-f (hex)");
+                    textbox_color.Text = "";
+                }
+            }
+            else
+            {
+                var bc = new BrushConverter();
+                textbox_color.Text = "#2CE6E6";
+                textbox_color.Background = (Brush)bc.ConvertFrom("#2CE6E6");
+            }
+        }
+
+        private void color_SET_Click(object sender, RoutedEventArgs e)
+        {
+
+            MainWindow.openpaintpicker();
+            color_wire.Text = PaintSelector.PaintColor;
+            Properties.Settings.Default.wirecolor = color_wire.Text;
+        }
+
+        private void color_SET2_Click(object sender, RoutedEventArgs e)
+        {
+
+            MainWindow.openpaintpicker();
+            color_blob.Text = PaintSelector.PaintColor;
+            Properties.Settings.Default.blobcolor = color_blob.Text;
         }
     }
 }

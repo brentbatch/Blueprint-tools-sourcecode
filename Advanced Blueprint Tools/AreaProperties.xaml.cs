@@ -21,8 +21,8 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class AreaProperties : Window
     {
-        MainWindow mainwindow;
-        List<string> uuidsbackup;
+        MainWindow mainwindow; 
+        List<string> uuidsbackup = new List<string>();
         public AreaProperties(MainWindow mainwindow)
         {
             this.mainwindow = mainwindow;

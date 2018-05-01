@@ -42,6 +42,7 @@
                 <MenuItem Name="mirrorcreation" Header="Mirror Creation!" Click="Click_mirrormode" IsEnabled="False" />
                 <MenuItem Name="spheregenerator" Header="Sphere Generator" Click="Click_ellipsoidgenerator"/>
                 <MenuItem Name="cuboidgenerator" Header="Cuboid Generator" Click="Click_cuboidgenerator"/>
+                <MenuItem Name="ObjToBlueprint" Header=".Obj To Blueprint" Click="ObjToBlueprint_Click"/>
                 <MenuItem Name="paintpicker" Header="Paint Selector" Click="Click_paintpicker" Background="#dddddd"/>
             </MenuItem>
             <MenuItem Header="Help">
@@ -94,8 +95,8 @@
             <Button x:Name="button_overwrite" Content="SAVE/OVERWRITE" HorizontalAlignment="Right" Margin="0,540,395,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7"  FontWeight="Bold" Click="button_overwrite_click" />
             <Button x:Name="button_save" Content="SAVE AS NEW" HorizontalAlignment="Right" Margin="0,540,44,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Click="button_save_click"  />
             <TextBox x:Name="TextBox_Name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" TextWrapping="Wrap" Text="NAME" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="34,540,735,30" Width="500" Height="60" BorderThickness="0"/>
-            <Button x:Name="Notifications" Content="0" HorizontalAlignment="Right" Padding="10,0,10,0" VerticalContentAlignment="Center" Margin="0,30,44,0" VerticalAlignment="Top" Height="42"  FontSize="24" Foreground="#fff" Background="#FF954444" FontWeight="Bold" Visibility="Visible" Click="Notifications_Click"/>
-
+            <Label Margin="714,0,0,557" MouseDoubleClick="Label_MouseDoubleClick"/>
+            <Button x:Name="Notifications" Content="0" HorizontalAlignment="Right" Padding="10,0,10,0" VerticalContentAlignment="Center" Margin="0,30,44,0" VerticalAlignment="Top" Height="42"  FontSize="24" Foreground="#fff" Background="#FF954444" FontWeight="Bold" Visibility="Collapsed" Click="Notifications_Click"/>
         </Grid>
     </DockPanel>
 </Window>

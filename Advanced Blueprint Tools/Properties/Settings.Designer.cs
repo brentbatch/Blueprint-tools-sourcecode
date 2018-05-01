@@ -73,7 +73,7 @@ namespace Advanced_Blueprint_Tools.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("85")]
+        [global::System.Configuration.DefaultSettingValueAttribute("93")]
         public int version {
             get {
                 return ((int)(this["version"]));
@@ -101,6 +101,41 @@ namespace Advanced_Blueprint_Tools.Properties {
             }
             set {
                 this["colorwires"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#2C6DE6")]
+        public string wirecolor {
+            get {
+                return ((string)(this["wirecolor"]));
+            }
+            set {
+                this["wirecolor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#2CE6E6")]
+        public string blobcolor {
+            get {
+                return ((string)(this["blobcolor"]));
+            }
+            set {
+                this["blobcolor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\scrapshit.mdf" +
+            ";Integrated Security=True;Connect Timeout=30")]
+        public string scrapshitConnectionString {
+            get {
+                return ((string)(this["scrapshitConnectionString"]));
             }
         }
     }

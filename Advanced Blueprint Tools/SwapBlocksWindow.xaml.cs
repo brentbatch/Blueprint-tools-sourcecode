@@ -98,32 +98,37 @@ namespace Advanced_Blueprint_Tools
 
                 dynamic selectedblok = blockstoreplace[comboBox_old.SelectedIndex];
 
-                foreach(string uuid in Database.blocks.Keys)
+                var keys = Database.blocks.Keys;
+                try
                 {
-                    dynamic bounds = null;
-                    if (Database.blocks[uuid] is Part)
+                    foreach (string uuid in keys)
                     {
-                        bounds = ((Part)Database.blocks[uuid]).GetBoundsDynamic();
-                    }
+                        dynamic bounds = null;
+                        if (Database.blocks[uuid] is Part)
+                        {
+                            bounds = ((Part)Database.blocks[uuid]).GetBoundsDynamic();
+                        }
 
-                    if(bounds == null||(selectedblok.bounds != null && bounds == selectedblok.bounds))
-                    {
-                        dynamic block = new JObject();
-                        block.name = Database.blocks[uuid].Name;
-                        block.bounds = bounds;
-                        block.uuid = uuid;
-                        replacebyblocks.Add(block);
-                        comboBox_new.Items.Add(block.name);
+                        if (bounds == null || (selectedblok.bounds != null && bounds == selectedblok.bounds))
+                        {
+                            dynamic block = new JObject();
+                            block.name = Database.blocks[uuid].Name;
+                            block.bounds = bounds;
+                            block.uuid = uuid;
+                            replacebyblocks.Add(block);
+                            comboBox_new.Items.Add(block.name);
+                        }
+
                     }
-                    
                 }
-                
+                catch { }
 
             }
         }
 
         private void button_set_Click(object sender, RoutedEventArgs e)
         {
+            MainWindow.openpaintpicker();
             textBox_color1.Text = PaintSelector.PaintColor;
         }
 

@@ -93,6 +93,10 @@ namespace Advanced_Blueprint_Tools
                     Properties.Settings.Default.wires = config.wires == true ? true : false;
                 if (config.colorwires == true)
                     Properties.Settings.Default.colorwires = config.colorwires == true ? true : false;
+                if (config.wirecolor != null)
+                    Properties.Settings.Default.wirecolor = config.wirecolor;
+                if (config.blobcolor != null)
+                    Properties.Settings.Default.blobcolor = config.blobcolor;
 
             }
             Properties.Settings.Default.times++;
@@ -975,12 +979,14 @@ namespace Advanced_Blueprint_Tools
 
 
                 Scene a = new AssimpImporter().ImportFile(location);
+                
 
                 Mesh m = a.Meshes[0];
-                IList<Point3D> vertices = new List<Point3D>();
                 var meshBuilder = new MeshBuilder(false, false);
                 foreach (Face face in m.Faces)
                 {
+                    
+                    IList<Point3D> vertices = new List<Point3D>();
                     foreach (uint i in face.Indices)
                     {
                         vertices.Add(new Point3D(m.Vertices[i].X, m.Vertices[i].Y, m.Vertices[i].Z));
@@ -988,6 +994,7 @@ namespace Advanced_Blueprint_Tools
                     meshBuilder.AddPolygon(vertices);
                     vertices = new List<Point3D>();
                 }
+                
                 //meshBuilder.Normals = m.Normals;
                 //meshBuilder.Tangents = m.Tangents;
                 //meshBuilder.BiTangents = m.BiTangents;
