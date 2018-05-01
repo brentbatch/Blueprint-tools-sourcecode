@@ -79,6 +79,7 @@ namespace Advanced_Blueprint_Tools
                 blocksxyz = new JObject();
                 Wires = new Dictionary<int, dynamic>();
                 minx = 10000; maxx = -10000; miny = 10000; maxy = -10000; minz = 10000; maxz = -10000;
+                if(Blueprint.bodies != null)
                 foreach (dynamic body in Blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
@@ -296,108 +297,88 @@ namespace Advanced_Blueprint_Tools
             MessageBox.Show("no bounds\n\nImpossible senario. please report");
             return bounds;
         }
-        //Reorganize bounds according to rotation:
-        private static dynamic flip(dynamic child, string neworder)
-        {
-            int x = child.bounds.x;
-            int y = child.bounds.y;
-            int z = child.bounds.z;
-            if (neworder == "zxy") //shift
-            {
-                child.bounds.x = z;
-                child.bounds.y = x;
-                child.bounds.z = y;
-            }
-            if (neworder == "yzx") //"
-            {
-                child.bounds.x = y;
-                child.bounds.y = z;
-                child.bounds.z = x;
-            }
-            if (neworder == "xzy") //switch
-            {
-                child.bounds.x = x;
-                child.bounds.y = z;
-                child.bounds.z = y;
-            }
-            if (neworder == "zyx")
-            {
-                child.bounds.x = z;
-                child.bounds.y = y;
-                child.bounds.z = x;
-            }
-            if (neworder == "yxz")
-            {
-                child.bounds.x = y;
-                child.bounds.y = x;
-                child.bounds.z = z;
-            }
-            return child;
-        }
+
         //get new pos and correct ingame bounds for child
         public static dynamic getposandbounds(dynamic whatever)
         {
             dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));
             string uuid = child.shapeId;
 
-            if (child.bounds == null) //add bounds to parts (blocks do not get affected)
+            //if (child.bounds == null) //add bounds to parts (blocks do not get affected)
             {
                 if (Database.blocks.ContainsKey(child.shapeId.Value.ToLower()))
                 {
-                    xyzpair bounds = ((Part)Database.blocks[child.shapeId.Value.ToLower()]).GetBounds();
-                    child.bounds = new JObject();
-                    child.bounds.x = bounds.x;
-                    child.bounds.y = bounds.y;
-                    child.bounds.z = bounds.z;
+                    Blockobject b = Database.blocks[child.shapeId.Value.ToLower()];
+                    if(b is Part)
+                    {
+                        child.bounds = ((Part)b).GetBoundsDynamic();
+                    }
+                    else
+                    {
+                        child.bounds = new JObject { ["x"] = 1, ["y"] = 1, ["z"] = 1 };
+                    }
                     //child.bounds = getbounds(gameblocks[child.shapeId.Value.ToLower()]);
                 }
                 else
                 {
                     missingmod = true;
-                    child.bounds = new JObject();
-                    child.bounds.x = 1;
-                    child.bounds.y = 1;
-                    child.bounds.z = 1;
+                    //child.bounds.x = 1;
+                    //child.bounds.y = 1;
+                    //child.bounds.z = 1;
                 }
 
-                //switch bounds here
-                if (Math.Abs(Convert.ToInt32(child.xaxis)) == 3)
+            }
+            int xaxis = Math.Abs(Convert.ToInt32(child.xaxis));
+            int zaxis = Math.Abs(Convert.ToInt32(child.zaxis));
+            //if(xaxis != 1 && zaxis != 3)
+            {
+
+                if (xaxis == 3)
                 {
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 2)
+                    if (zaxis == 2)
                     {
-                        flip(child, "yzx");
+                        child.bounds = new JObject { ["x"] = child.bounds.y, ["y"] = child.bounds.z, ["z"] = child.bounds.x };
                     }
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 1)
+                    else
+                    if (zaxis == 1)
                     {
-                        flip(child, "zyx");
+                        child.bounds = new JObject { ["x"] = child.bounds.z, ["y"] = child.bounds.y, ["z"] = child.bounds.x };
                     }
                 }
-                if (Math.Abs(Convert.ToInt32(child.xaxis)) == 2)
+                else if (xaxis == 2)
                 {
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 3)
+                    if (zaxis == 3)
                     {
-                        flip(child, "yxz");
+                        child.bounds = new JObject { ["x"] = child.bounds.y, ["y"] = child.bounds.x, ["z"] = child.bounds.z };
                     }
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 1)
+                    else
+                    if (zaxis == 1)
                     {
-                        flip(child, "zxy");
+                        child.bounds = new JObject { ["x"] = child.bounds.z, ["y"] = child.bounds.x, ["z"] = child.bounds.y };
                     }
                 }
-                if (Math.Abs(Convert.ToInt32(child.xaxis)) == 1)
+                else if (xaxis == 1)
                 {
-                    if (Math.Abs(Convert.ToInt32(child.zaxis)) == 2)
+                    if (zaxis == 2)
                     {
-                        flip(child, "xzy");
+                        child.bounds = new JObject { ["x"] = child.bounds.x, ["y"] = child.bounds.z, ["z"] = child.bounds.y };
                     }
                 }
             }
             //this updating pos only applies to parts, blocks do not get affected as they always have xaxis 1 zaxis 3
-            if (child.xaxis == -1 | child.zaxis == -1 | (child.xaxis == 2 && child.zaxis == 3) | (child.xaxis == 3 && child.zaxis == -2) | (child.xaxis == -2 && child.zaxis == -3) | (child.xaxis == -3 && child.zaxis == 2))
-                child.pos.x -= child.bounds.x;
-            if (child.xaxis == -2 | child.zaxis == -2 | (child.xaxis == -1 && child.zaxis == 3) | (child.xaxis == -3 && child.zaxis == -1) | (child.xaxis == 1 && child.zaxis == -3) | (child.xaxis == 3 && child.zaxis == 1))
-                child.pos.y -= child.bounds.y;
-            if (child.xaxis == -3 | child.zaxis == -3 | (child.xaxis == -2 && child.zaxis == 1) | (child.xaxis == -1 && child.zaxis == -2) | (child.xaxis == 1 && child.zaxis == 2) | (child.xaxis == 2 && child.zaxis == -1))
-                child.pos.z -= child.bounds.z;
+            try
+            {
+                if (child.xaxis == -1 | child.zaxis == -1 | (child.xaxis == 2 && child.zaxis == 3) | (child.xaxis == 3 && child.zaxis == -2) | (child.xaxis == -2 && child.zaxis == -3) | (child.xaxis == -3 && child.zaxis == 2))
+                    child.pos.x -= child.bounds.x;
+                if (child.xaxis == -2 | child.zaxis == -2 | (child.xaxis == -1 && child.zaxis == 3) | (child.xaxis == -3 && child.zaxis == -1) | (child.xaxis == 1 && child.zaxis == -3) | (child.xaxis == 3 && child.zaxis == 1))
+                    child.pos.y -= child.bounds.y;
+                if (child.xaxis == -3 | child.zaxis == -3 | (child.xaxis == -2 && child.zaxis == 1) | (child.xaxis == -1 && child.zaxis == -2) | (child.xaxis == 1 && child.zaxis == 2) | (child.xaxis == 2 && child.zaxis == -1))
+                    child.pos.z -= child.bounds.z;
+            }
+            catch
+            {
+
+            }
             return child;
         }
 

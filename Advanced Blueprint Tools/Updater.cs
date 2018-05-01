@@ -128,6 +128,8 @@ namespace Advanced_Blueprint_Tools
                             config.wires = Properties.Settings.Default.wires;
                             config.safemode = Properties.Settings.Default.safemode;
                             config.colorwires = Properties.Settings.Default.colorwires;
+                            config.wirecolor = Properties.Settings.Default.wirecolor;
+                            config.blobcolor = Properties.Settings.Default.blobcolor;
 
                             DateTime lasthigh = new DateTime(1900, 1, 1);
                             string findlastversionname = "";
@@ -148,9 +150,9 @@ namespace Advanced_Blueprint_Tools
 
                             object shDesktop = (object)"Desktop";
                             IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
-                            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\Advanced Blueprint Tools "+ gotoversion+".lnk";
+                            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\Advanced Blueprint Tools.lnk";
                             IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(shortcutAddress);
-                            shortcut.Description = "Shortcut for blueprint tool";
+                            shortcut.Description = "Shortcut for blueprint tool "+gotoversion;
                             shortcut.TargetPath = findlastversionname + "\\Advanced Blueprint Tools.exe";
                             shortcut.WorkingDirectory = findlastversionname;
                             shortcut.Save();

@@ -537,6 +537,7 @@ namespace Advanced_Blueprint_Tools
             base.OnClosing(e);
             this.mainwindow.Marker = null;
             this.mainwindow.setMarker2(0, 0, 0, 0, 0, 0);
+            this.mainwindow.Marker2 = new System.Windows.Media.Media3D.Model3DGroup();
         }
 
     }
