@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Threading;
+using System.Diagnostics;
+
 
 namespace Advanced_Blueprint_Tools
 {
@@ -156,8 +158,8 @@ namespace Advanced_Blueprint_Tools
                             shortcut.TargetPath = findlastversionname + "\\Advanced Blueprint Tools.exe";
                             shortcut.WorkingDirectory = findlastversionname;
                             shortcut.Save();
-                            MessageBox.Show("new version installed, close current application and open shortcut on desktop.");
-                            
+                            Process.Start(shortcutAddress);
+                            Environment.Exit(0);
                         }
                     })
                     ));

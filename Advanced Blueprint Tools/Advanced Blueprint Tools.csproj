@@ -31,7 +31,7 @@
     <ProductName>Advanced Blueprint Tools</ProductName>
     <PublisherName>Brent Batch</PublisherName>
     <SuiteName>BB corp.</SuiteName>
-    <ApplicationRevision>94</ApplicationRevision>
+    <ApplicationRevision>95</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -80,7 +80,7 @@
     <TargetZone>Custom</TargetZone>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Advanced Blueprint Tools_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
@@ -150,11 +150,6 @@
     <Compile Include="required mods.xaml.cs">
       <DependentUpon>required mods.xaml</DependentUpon>
     </Compile>
-    <Compile Include="scrapshitDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>scrapshitDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
@@ -207,7 +202,6 @@
     <Compile Include="Loadwindow.xaml.cs">
       <DependentUpon>Loadwindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -279,23 +273,45 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Advanced Blueprint Tools_TemporaryKey.pfx" />
+    <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna01.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna02.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antennatower.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_satellite01.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_satellite03.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass01.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass02.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass03.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_bathtub.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_button_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_engineelectric_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_gasengine_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_horn01_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_logicgate_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_piston_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_radio_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_raftshark_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotbasshead01_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotbliphead01_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotdrumhead01_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotsynthhead01_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_sensor_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_suspensionoffroad_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_suspensionsport_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_switch_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_thruster_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_timer_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_beamframelight_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_headlight_off.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\spaceship\obj_spaceship_shipdoor.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\vehicle\tire.obj" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="scrapshitDataSet.xsc">
-      <DependentUpon>scrapshitDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="scrapshitDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>scrapshitDataSet.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="scrapshitDataSet.xss">
-      <DependentUpon>scrapshitDataSet.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -315,15 +331,11 @@
   <ItemGroup>
     <Content Include="Assimp32.dll" />
     <Content Include="Assimp64.dll" />
-    <Content Include="scrapshit.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="scrapshit_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>scrapshit.mdf</DependentUpon>
-    </Content>
+    <Content Include="missingicon.bmp" />
     <Resource Include="Resources\missingicon.bmp" />
-    <Resource Include="missingicon.bmp" />
+    <Resource Include="missingicon.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\ScrapMechanic.ico" />
     <Resource Include="ScrapMechanic.ico" />
   </ItemGroup>
@@ -338,6 +350,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

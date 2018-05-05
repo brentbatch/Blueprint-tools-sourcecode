@@ -17,6 +17,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Threading;
+using System.IO;
 
 namespace Advanced_Blueprint_Tools
 {
@@ -32,6 +33,9 @@ namespace Advanced_Blueprint_Tools
         BackgroundWorker backgroundWorker = new BackgroundWorker();
         ProgressWindow progressWindow;
         HashSet<Point3D> pointlist = new HashSet<Point3D>();
+        bool flipyz = false;
+        bool flipxz = false;
+        int flipz = 1;
         public ObjToBlueprint(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
@@ -89,7 +93,9 @@ namespace Advanced_Blueprint_Tools
                 if(result == MessageBoxResult.Yes)*/
                 {
                     backgroundWorker = new BackgroundWorker();
-
+                    flipyz = flipYZ.IsChecked == true;
+                    flipxz = flipXZ.IsChecked == true;
+                    flipz = flipZ.IsChecked == true ? -1 : 1;
                     backgroundWorker.WorkerSupportsCancellation = true;
                     progressWindow = new ProgressWindow(backgroundWorker);
                     progressWindow.Show();
@@ -116,55 +122,73 @@ namespace Advanced_Blueprint_Tools
         private void convertobj(object sender, DoWorkEventArgs e)
         {
 
-                Scene scene = new AssimpImporter().ImportFile(file, PostProcessSteps.Triangulate);
+            Scene scene = new AssimpImporter().ImportFile(file, PostProcessSteps.Triangulate);
 
-                //List<Triangle> splittriangles = new List<Triangle>();
-                pointlist = new HashSet<Point3D>();
-                //pointlist.ToDictionary<>
-                int progress = 0;
-                int total = 0;
-                try
+            //List<Triangle> splittriangles = new List<Triangle>();
+            pointlist = new HashSet<Point3D>();
+            //pointlist.ToDictionary<>
+            int progress = 0;
+            int total = 0;
+            try
+            {
+                
+
+                foreach (Mesh m in scene.Meshes)
+                    foreach (Face face in m.Faces)
+                        total++;
+                foreach (Mesh m in scene.Meshes)
                 {
-                    foreach (Mesh m in scene.Meshes)
-                        foreach (Face face in m.Faces)
-                            total++;
-                    foreach (Mesh m in scene.Meshes)
+
+                    foreach (Face face in m.Faces)
                     {
-
-                        foreach (Face face in m.Faces)
+                            
+                        IList<Point3D> vertices = new List<Point3D>();
+                        foreach (uint i in face.Indices)
                         {
-                            //minx = int.MaxValue; maxx = int.MinValue; miny = int.MaxValue; maxy = int.MinValue; minz = int.MaxValue; maxz = int.MinValue;
-
-                            IList<Point3D> vertices = new List<Point3D>();
-                            foreach (uint i in face.Indices)
+                            double x = m.Vertices[i].X * scale;
+                            double y = m.Vertices[i].Y * scale;
+                            double z = m.Vertices[i].Z * scale;
+                            Point3D point;
+                            if (flipyz)
                             {
-                                double x = m.Vertices[i].X * scale;
-                                double y = m.Vertices[i].Y * scale;
-                                double z = m.Vertices[i].Z * scale;
-                                vertices.Add(new Point3D(x, y, z));
-                                pointlist.Add(new Point3D((int)Math.Floor(x), (int)Math.Floor(y), (int)Math.Floor(z)));
+                                if(flipxz)
+                                {
+                                    point = new Point3D((int)Math.Floor(y), (int)Math.Floor(z), flipz * (int)Math.Floor(x));
+                                }
+                                else
+                                {
+                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(z), flipz * (int)Math.Floor(y));
+                                }
                             }
-                            //splittriangles.AddRange(Splittriangles(new Triangle(vertices)));
-                            Triangle triangle = new Triangle(vertices);
-                        /*if (triangle.BoundsSmallerThan(bounds))
-                            splittriangles.Add(triangle);
-                        else
-                            splittriangles.AddRange(Splittriangles(triangle));*/
-                            if (!triangle.BoundsSmallerThan(bounds))
-                                Splittriangles(triangle);
-                            progress++;
-                            backgroundWorker.ReportProgress((progress * 100) / total);
+                            else
+                            {
+                                if (flipxz)
+                                {
+                                    point = new Point3D((int)Math.Floor(z), (int)Math.Floor(y), flipz * (int)Math.Floor(x));
+                                }
+                                else
+                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(y), flipz * (int)Math.Floor(z));
+                            }
+                            vertices.Add(point);
+                            pointlist.Add(point);
                         }
+                        Triangle triangle = new Triangle(vertices);
 
-                        if (backgroundWorker.CancellationPending)
-                            throw new OperationCanceledException();
+                        if (!triangle.BoundsSmallerThan(bounds))
+                            Splittriangles(triangle);
+                        progress++;
+                        backgroundWorker.ReportProgress((progress * 100) / total);
                     }
+
+                    if (backgroundWorker.CancellationPending)
+                        throw new OperationCanceledException();
                 }
-                catch(Exception ex)
-                {
-                    if(!(ex is OperationCanceledException))
-                        System.Windows.MessageBox.Show(ex.Message, "Something went wrong converting the obj");
-                }
+            }
+            catch(Exception ex)
+            {
+                if(!(ex is OperationCanceledException))
+                    System.Windows.MessageBox.Show(ex.Message, "Something went wrong converting the obj");
+            }
 
             try
             {
@@ -184,9 +208,10 @@ namespace Advanced_Blueprint_Tools
                     }
                 }*/
                 dynamic blueprint = new JObject();
-                int amountgenerated = 0;
                 try
                 {
+                    blueprint = BlueprintOptimizer.CreateBlueprintFromPoints(pointlist);
+                    /*
                     blueprint.version = 1;
                     blueprint.bodies = new JArray();
                     blueprint.bodies.Add(new JObject());
@@ -197,8 +222,8 @@ namespace Advanced_Blueprint_Tools
                         child.color = "5DB7E7";
                         child.pos = new JObject();
                         child.pos.x = -(int)Math.Floor(point.X);
-                        child.pos.y = (int)Math.Floor(point.Y);
-                        child.pos.z = (int)Math.Floor(point.Z);
+                        child.pos.z = (int)Math.Floor(point.Y);
+                        child.pos.y = (int)Math.Floor(point.Z);
                         child.bounds = new JObject();
                         child.bounds.x = 1;
                         child.bounds.y = 1;
@@ -208,12 +233,13 @@ namespace Advanced_Blueprint_Tools
                         child.zaxis = 3;
                         blueprint.bodies[0].childs.Add(child);
                         amountgenerated++;
-                    }
+                    }*/
                 }
                 catch(Exception bpex)
                 {
                     System.Windows.MessageBox.Show(bpex.Message, "Something went wrong building the blueprint");
                 }
+                int amountgenerated = blueprint.bodies[0].childs.Count;
                 string message = "converted obj to blueprint with " + amountgenerated + " blocks !";
                 //MessageBox.Show(message+"\n\nOptimized to: "+count+" shapes");
                 Random r = new Random();
@@ -241,31 +267,36 @@ namespace Advanced_Blueprint_Tools
 
         }
 
-        private List<Triangle> Splittriangles(Triangle triangle)
+        private void Splittriangles(Triangle triangle)
         {
-            List<Triangle> triangles = new List<Triangle>();
             //split triangle in 4 triangles:
             Point3D mid1 = Average(triangle.vertices[0], triangle.vertices[1]); 
             Point3D mid2 = Average(triangle.vertices[1], triangle.vertices[2]);
             Point3D mid3 = Average(triangle.vertices[0], triangle.vertices[2]);
-            triangles.Add(new Triangle(new List<Point3D> { mid1, mid2, mid3 }));
-            triangles.Add(new Triangle(new List<Point3D> { mid1, mid3, triangle.vertices[0] }));
-            triangles.Add(new Triangle(new List<Point3D> { mid1, mid2, triangle.vertices[1] }));
-            triangles.Add(new Triangle(new List<Point3D> { mid2, mid3, triangle.vertices[2] }));
-
-            //check for each triangle if bounds are smaller than 1x1x1, if not, split each again:
-            List<Triangle> splittriangles = new List<Triangle>();
-            foreach(Triangle splittriangle in triangles)
+            List<Triangle> triangles = new List<Triangle>
             {
-                foreach(Point3D point in splittriangle.vertices)
-                    pointlist.Add(new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z)));
+                new Triangle(new List<Point3D> { mid1, mid2, mid3 }),
+                new Triangle(new List<Point3D> { mid1, mid3, triangle.vertices[0] }),
+                new Triangle(new List<Point3D> { mid1, mid2, triangle.vertices[1] }),
+                new Triangle(new List<Point3D> { mid2, mid3, triangle.vertices[2] })
+            };
+            pointlist.Add(new Point3D((int)Math.Floor(mid1.X), (int)Math.Floor(mid1.Y), (int)Math.Floor(mid1.Z)));
+            pointlist.Add(new Point3D((int)Math.Floor(mid2.X), (int)Math.Floor(mid2.Y), (int)Math.Floor(mid2.Z)));
+            pointlist.Add(new Point3D((int)Math.Floor(mid3.X), (int)Math.Floor(mid3.Y), (int)Math.Floor(mid3.Z)));
+            //triangles.Add(new Triangle(new List<Point3D> { mid1, mid2, mid3 }));
+            //triangles.Add(new Triangle(new List<Point3D> { mid1, mid3, triangle.vertices[0] }));
+            //triangles.Add(new Triangle(new List<Point3D> { mid1, mid2, triangle.vertices[1] }));
+            //triangles.Add(new Triangle(new List<Point3D> { mid2, mid3, triangle.vertices[2] }));
+            //check for each triangle if bounds are smaller than 1x1x1, if not, split each again:
+            foreach (Triangle splittriangle in triangles)
+            {
+               // foreach(Point3D point in splittriangle.vertices)
+                 //   pointlist.Add(new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z)));
 
-                if (splittriangle.BoundsSmallerThan(bounds))
-                    splittriangles.Add(splittriangle);
-                else
-                    splittriangles.AddRange(Splittriangles(splittriangle));
+                if (!splittriangle.BoundsSmallerThan(bounds))
+                    Splittriangles(splittriangle);
             }
-            return splittriangles;
+            //return splittriangles;
         }
         private Point3D Average(Point3D point1, Point3D point2)
         {
@@ -275,7 +306,7 @@ namespace Advanced_Blueprint_Tools
         {
             pointlist.Clear();
             progressWindow.Close();
-            mainWindow.UpdateOpenedBlueprint();
+            mainWindow.RenderBlueprint();
             backgroundWorker.Dispose(); 
         }
 
@@ -306,10 +337,23 @@ namespace Advanced_Blueprint_Tools
         private void objPath_TextChanged(object sender, TextChangedEventArgs e)
         {
             string file = objPath.Text;
-            if (file != null && file != "")
+            if (file != null && file != ""&& File.Exists(file))
             {
                 this.file = file;
                 objPath.Text = file;
+
+                int minx = 1000000, maxx = -1000000, miny = 1000000, maxy = -1000000, minz = 1000000, maxz = -1000000;
+                Scene scene = new AssimpImporter().ImportFile(file);
+                foreach (Assimp.Vector3D m in scene.Meshes[0].Vertices)
+                {
+                    if (m.X < minx) minx = (int)m.X;
+                    else if (m.X > maxx) maxx = (int)m.X;
+                    if (m.Y < miny) miny = (int)m.Y;
+                    else if (m.Y > maxy) maxy = (int)m.Y;
+                    if (m.Z < minz) minz = (int)m.Z;
+                    else if (m.Z > maxz) maxz = (int)m.Z;
+                }
+                BoundsBox.Content = @"(" +(maxx - minx) +"x"+(maxy-miny) + "x"+ (maxz-minz) + ")";
             }
         }
     }

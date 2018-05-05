@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Windows;
 using System.IO;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 
 namespace Advanced_Blueprint_Tools
 {
@@ -20,23 +21,18 @@ namespace Advanced_Blueprint_Tools
 
         public static PngBitmapEncoder Icon { get; set; }
 
-        public static Dictionary<int, dynamic> Wires { get; set; }
+        private static Dictionary<int, dynamic> Wires { get; set; }
 
-        public static List<string> Useduuids { get; set; } = new List<string>();
-
-
-        public static dynamic blocksxyz = new JObject();//for render, contains correct pos for blocks
-
-
-        public static int minx = 10000,maxx = -10000, miny = 10000, maxy = -10000, minz = 10000, maxz = -10000;
-        public static int centerx, centery, centerz;
-
+        private static HashSet<string> Useduuids = new HashSet<string>();
+        
         public static bool missingmod = false;
 
         public static void setblueprint(dynamic bp)
         {
             Blueprint = bp;
-            calcrender();
+            missingmod = false;
+            Useduuids.Clear(); GetUsedUuids();
+            Wires = new Dictionary<int, dynamic>();
         }
 
         public BP(string bppath, dynamic bp, dynamic desc)
@@ -44,7 +40,6 @@ namespace Advanced_Blueprint_Tools
             Blueprintpath = bppath;
             Blueprint = bp;
             Description = desc;
-            blocksxyz = new JObject();
             setblueprint(bp);
         }
 
@@ -54,14 +49,13 @@ namespace Advanced_Blueprint_Tools
             Description = null;
 
             Blueprintpath = bppath;
-            blocksxyz = new JObject();
             //load directory of blueprints
             try
             {
                 Blueprint = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(Blueprintpath + @"\blueprint.json"));
                 Description = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(Blueprintpath + @"\description.json"));
 
-                calcrender();
+                setblueprint(Blueprint);
             }
             catch (Exception e)
             {
@@ -70,121 +64,202 @@ namespace Advanced_Blueprint_Tools
             }
         }
 
-        private static void calcrender()
+        public static HashSet<string> GetUsedUuids()
         {
-            missingmod = false;
-            //if(false)
-            {
-                Useduuids.Clear();
-                blocksxyz = new JObject();
-                Wires = new Dictionary<int, dynamic>();
-                minx = 10000; maxx = -10000; miny = 10000; maxy = -10000; minz = 10000; maxz = -10000;
-                if(Blueprint.bodies != null)
+            if (Useduuids.Count > 0) return Useduuids;
+
+            Useduuids = new HashSet<string>();
+
+            if (Blueprint.bodies != null)
                 foreach (dynamic body in Blueprint.bodies)
                     foreach (dynamic child in body.childs)
-                    {
-
-                        if (!Useduuids.Contains(child.shapeId.ToString()))
                             Useduuids.Add(child.shapeId.ToString());
+            if (Blueprint.joints != null)
+                foreach(dynamic joint in Blueprint.joints)
+                        Useduuids.Add(joint.shapeId.ToString());
+            return Useduuids;
+        }
 
-                        dynamic correctedchild = getposandbounds(child);//outputs corrected child (default rotation, correct position)
+        public static Dictionary<int, dynamic> GetWires()
+        {
+            Wires = new Dictionary<int, dynamic>();
 
-                        string x = correctedchild.pos.x.ToString();
-                        string y = correctedchild.pos.y.ToString();
-                        string z = correctedchild.pos.z.ToString();
-                        //if (child.bounds == null) child.bounds = correctedchild.bounds;
-                        if (blocksxyz[x] == null) blocksxyz[x] = new JObject();
-                        if (blocksxyz[x][y] == null) blocksxyz[x][y] = new JObject();
-                        if (blocksxyz[x][y][z] == null) blocksxyz[x][y][z] = new JObject();
-                        if (blocksxyz[x][y][z].blocks == null) blocksxyz[x][y][z].blocks = new JArray();
-                        blocksxyz[x][y][z].blocks.Add(child);
-                        if(child.controller != null && child.controller.id != null)
+            if (Blueprint.bodies != null)
+                foreach (dynamic body in Blueprint.bodies)
+                    foreach (dynamic child in body.childs)
+                        if (child.controller != null && child.controller.id != null)
                         {
-                            dynamic wire =  new JObject();
-                            wire.pos = new JObject();
-                            wire.pos.x =Convert.ToInt32(correctedchild.pos.x.ToString())+Convert.ToInt32(correctedchild.bounds.x.ToString())/2.0;
-                            wire.pos.y =Convert.ToInt32(correctedchild.pos.y.ToString())+Convert.ToInt32(correctedchild.bounds.y.ToString())/2.0;
-                            wire.pos.z =Convert.ToInt32(correctedchild.pos.z.ToString())+Convert.ToInt32(correctedchild.bounds.z.ToString())/2.0;
+                            dynamic correctedchild = getposandbounds(child);
+                            dynamic wire = new JObject();
+                            wire.pos = new JObject()
+                            {
+                                ["x"]= Convert.ToInt32(correctedchild.pos.x.ToString()) + Convert.ToInt32(correctedchild.bounds.x.ToString()) / 2.0,
+                                ["y"]= Convert.ToInt32(correctedchild.pos.y.ToString()) + Convert.ToInt32(correctedchild.bounds.y.ToString()) / 2.0,
+                                ["z"]= Convert.ToInt32(correctedchild.pos.z.ToString()) + Convert.ToInt32(correctedchild.bounds.z.ToString()) / 2.0
+                            };
                             string color = child.color.ToString();
                             if (color.StartsWith("#"))
-                                color = color.Substring(1, 6);
+                                color = color.Substring(1);
                             wire.color = color;
                             wire.connections = child.controller.controllers;
                             Wires.Add(Convert.ToInt32(child.controller.id.ToString()), wire);
                         }
 
-                        //get whole creation bounds:
-                        if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
-                        if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
-                        if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
-                        if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
-                        if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
-                        if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
-                    }
-                if (Blueprint.joints != null)
-                    for (int i = 0; i < Blueprint.joints.Count; i++)
+            if (Blueprint.joints != null)
+                foreach (dynamic joint in Blueprint.joints)
+                    if (joint.controller != null && joint.controller.id != null)
                     {
-                        if (!Useduuids.Contains(Blueprint.joints[i].shapeId.ToString()))
-                            Useduuids.Add(Blueprint.joints[i].shapeId.ToString());
-                        Blueprint.joints[i].xaxis = Blueprint.joints[i].xaxisA;
-                        Blueprint.joints[i].zaxis = Blueprint.joints[i].zaxisA;
-                        Blueprint.joints[i].pos = Blueprint.joints[i].posA;
-                        dynamic correctedchild = getposandbounds(Blueprint.joints[i]);//outputs corrected child (default rotation, correct position)
-                        correctedchild.pos = Blueprint.joints[i].posA;
-                        if (!(Convert.ToInt32(Blueprint.joints[i].zaxis.ToString()) > 0 || !(correctedchild.bounds.x != 1 || correctedchild.bounds.y != 1 || correctedchild.bounds.z != 1)))
+                        dynamic correctedchild = getposandbounds(joint);
+                        dynamic wire = new JObject();
+                        wire.pos = new JObject()
                         {
-                            //correctedchild.pos = Blueprint.joints[i].posB;
+                            ["x"] = Convert.ToInt32(correctedchild.pos.x.ToString()) + Convert.ToInt32(correctedchild.bounds.x.ToString()) / 2.0,
+                            ["y"] = Convert.ToInt32(correctedchild.pos.y.ToString()) + Convert.ToInt32(correctedchild.bounds.y.ToString()) / 2.0,
+                            ["z"] = Convert.ToInt32(correctedchild.pos.z.ToString()) + Convert.ToInt32(correctedchild.bounds.z.ToString()) / 2.0
+                        };
+                        string color = joint.color.ToString();
+                        if (color.StartsWith("#"))
+                            color = color.Substring(1);
+                        wire.color = color;
+                        wire.connections = joint.controller.controllers;
+                        Wires.Add(Convert.ToInt32(joint.controller.id.ToString()), wire);
+                    }
 
-                            int zaxis = Convert.ToInt32(Blueprint.joints[i].zaxis.ToString());
-                            if (zaxis == -1)
-                                correctedchild.pos.x -= correctedchild.bounds.x - 1;
-                            if (zaxis == -2)
-                                correctedchild.pos.y -= correctedchild.bounds.y - 1;
-                            if (zaxis == -3)
-                                correctedchild.pos.z -= correctedchild.bounds.z - 1;
-                        }
-                        string x = correctedchild.pos.x.ToString();
-                        string y = correctedchild.pos.y.ToString();
-                        string z = correctedchild.pos.z.ToString();
-                        //if (Blueprint.joints[i].bounds == null) Blueprint.joints[i].bounds = correctedchild.bounds;
-                        if (blocksxyz[x] == null) blocksxyz[x] = new JObject();
-                        if (blocksxyz[x][y] == null) blocksxyz[x][y] = new JObject();
-                        if (blocksxyz[x][y][z] == null) blocksxyz[x][y][z] = new JObject();
-                        if (blocksxyz[x][y][z].blocks == null) blocksxyz[x][y][z].blocks = new JArray();
+            return Wires;
+        }
 
-                        blocksxyz[x][y][z].blocks.Add(Blueprint.joints[i]);
+        public static dynamic GetBounds()
+        {
+            int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000, minz = 10000, maxz = -10000;
+            foreach(dynamic body in Blueprint.bodies)
+                foreach(dynamic child in body.childs)
+                {
+                    dynamic correctedchild = getposandbounds(child);
+                    if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
+                    else
+                    if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
+                    if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
+                    else
+                    if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
+                    if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
+                    else
+                    if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
+                }
+            if (Blueprint.joints != null)
+                foreach (dynamic joint in Blueprint.joints)
+                {
+                    dynamic correctedchild = getposandbounds(joint);
+                    if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
+                    else
+                    if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
+                    if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
+                    else
+                    if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
+                    if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
+                    else
+                    if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
+                }
+            return new JObject() { ["minx"] = minx, ["maxx"] = maxx, ["miny"] = miny, ["maxy"] = maxy, ["minz"] = minz, ["maxz"] = maxz };
+        }
 
-                        if (Blueprint.joints[i].controller != null && Blueprint.joints[i].controller.id != null)
+        public static Tuple<Model3DGroup, Model3DGroup> RenderBlocks()
+        {
+            Model3DGroup blocks = new Model3DGroup();
+            Model3DGroup glass = new Model3DGroup();
+
+            Block block = new Block(null, "unknown", "unknown", null, null);
+
+            if (Blueprint.bodies != null)
+                foreach (dynamic body in Blueprint.bodies)
+                    foreach (dynamic child in body.childs)
+                    {
+                        dynamic realpos = getposandbounds(child);
+                        int x = realpos.pos.x;
+                        int y = realpos.pos.y;
+                        int z = realpos.pos.z;
+
+                        if (Database.blocks.ContainsKey(child.shapeId.ToString()))
                         {
-                            dynamic wire = new JObject();
-                            wire.pos = new JObject();
-                            wire.pos.x = Convert.ToInt32(correctedchild.pos.x.ToString()) + Convert.ToInt32(correctedchild.bounds.x.ToString())/2.0;
-                            wire.pos.y = Convert.ToInt32(correctedchild.pos.y.ToString()) + Convert.ToInt32(correctedchild.bounds.y.ToString())/2.0;
-                            wire.pos.z = Convert.ToInt32(correctedchild.pos.z.ToString()) + Convert.ToInt32(correctedchild.bounds.z.ToString())/2.0;
-                            string color = Blueprint.joints[i].color.ToString();
-                            if (color.StartsWith("#"))
-                                color = color.Substring(1, 6);
-                            wire.color = color;
-                            wire.connections = Blueprint.joints[i].controller.controllers;
-                            Wires.Add(Convert.ToInt32(Blueprint.joints[i].controller.id.ToString()), wire);
+                            Blockobject blockobject = Database.blocks[child.shapeId.ToString()];
+                            if (blockobject is Block)
+                            {
+                                Model3D model = (blockobject as Block).Render(x, y, z, realpos.bounds, child.color.ToString(), Convert.ToInt32(realpos.xaxis), Convert.ToInt32(realpos.zaxis));
+                                if (!blockobject.glass)
+                                    blocks.Children.Add(model);
+                                else
+                                    glass.Children.Add(model);
+                            }
+                            else//part
+                            {
+                                Model3D model = (blockobject as Part).Render(x , y, z, child.color.ToString(), Convert.ToInt32(realpos.xaxis), Convert.ToInt32(realpos.zaxis));
+                                if (!blockobject.glass)
+                                    blocks.Children.Add(model);
+                                else
+                                    glass.Children.Add(model);
+                                
+                            }
                         }
+                        else//not in database
+                        {
+                            dynamic bounds = new JObject() { ["x"] = 1, ["y"] = 1, ["z"] = 1 };
+                            if (realpos.bounds != null)
+                                bounds = realpos.bounds;
 
-                        //get whole creation bounds:
-                        if (correctedchild.pos.x < minx) minx = correctedchild.pos.x;
-                        if (correctedchild.pos.x + correctedchild.bounds.x > maxx) maxx = correctedchild.pos.x + correctedchild.bounds.x;
-                        if (correctedchild.pos.y < miny) miny = correctedchild.pos.y;
-                        if (correctedchild.pos.y + correctedchild.bounds.y > maxy) maxy = correctedchild.pos.y + correctedchild.bounds.y;
-                        if (correctedchild.pos.z < minz) minz = correctedchild.pos.z;
-                        if (correctedchild.pos.z + correctedchild.bounds.z > maxz) maxz = correctedchild.pos.z + correctedchild.bounds.z;
+                            Model3D model = block.Render(x, y, z, bounds, child.color.ToString(), Convert.ToInt32(realpos.xaxis), Convert.ToInt32(realpos.zaxis));
+
+                            blocks.Children.Add(model);
+
+                        }
+                    }
+            if(Blueprint.joints != null)
+                foreach(dynamic joint in Blueprint.joints)
+                {
+                    dynamic realpos = getposandbounds(joint);
+                    int x = realpos.pos.x;
+                    int y = realpos.pos.y;
+                    int z = realpos.pos.z;
+
+                    if (Database.blocks.ContainsKey(joint.shapeId.ToString()))
+                    {
+                        Blockobject blockobject = Database.blocks[joint.shapeId.ToString()];
+                        if (blockobject is Block)
+                        {
+                            Model3D model = (blockobject as Block).Render(x, y, z, realpos.bounds, joint.color.ToString(), Convert.ToInt32(realpos.xaxis), Convert.ToInt32(realpos.zaxis));
+                            if (!blockobject.glass)
+                                blocks.Children.Add(model);
+                            else
+                                glass.Children.Add(model);
+                        }
+                        else//part
+                        {
+                            Model3D model = (blockobject as Part).Render(x, y, z, joint.color.ToString(), Convert.ToInt32(realpos.xaxis), Convert.ToInt32(realpos.zaxis));
+                            if (!blockobject.glass)
+                                blocks.Children.Add(model);
+                            else
+                                glass.Children.Add(model);
+                        }
+                    }
+                    else//not in database
+                    {
+                        dynamic bounds = new JObject() { ["x"] = 1, ["y"] = 1, ["z"] = 1 };
+                        if (realpos.bounds != null)
+                            bounds = realpos.bounds;
+
+                        Model3D model = block.Render(x, y, z, bounds, joint.color.ToString(), Convert.ToInt32(realpos.xaxis), Convert.ToInt32(realpos.zaxis));
+
+                        blocks.Children.Add(model);
 
                     }
-                centerx = (maxx + minx) / 2;
-                centery = (maxy + miny) / 2;
-                centerz = (maxz + minz) / 2;
-            }
-            if (missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!");
 
+                }
+            new Task(() =>
+            {
+                if (BP.missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!");
+            }).Start();
+            return new Tuple<Model3DGroup, Model3DGroup>(blocks,glass);
         }
+
+        
 
         public static void Save()
         {
@@ -298,82 +373,107 @@ namespace Advanced_Blueprint_Tools
             return bounds;
         }
 
+
         //get new pos and correct ingame bounds for child
         public static dynamic getposandbounds(dynamic whatever)
         {
-            dynamic child = Newtonsoft.Json.JsonConvert.DeserializeObject(Convert.ToString(whatever));
+
+            dynamic child = whatever.DeepClone();
             string uuid = child.shapeId;
 
             //if (child.bounds == null) //add bounds to parts (blocks do not get affected)
             {
-                if (Database.blocks.ContainsKey(child.shapeId.Value.ToLower()))
+                if (Database.blocks.ContainsKey(uuid))
                 {
-                    Blockobject b = Database.blocks[child.shapeId.Value.ToLower()];
+                    Blockobject b = Database.blocks[uuid];
                     if(b is Part)
                     {
                         child.bounds = ((Part)b).GetBoundsDynamic();
                     }
-                    else
-                    {
-                        child.bounds = new JObject { ["x"] = 1, ["y"] = 1, ["z"] = 1 };
-                    }
-                    //child.bounds = getbounds(gameblocks[child.shapeId.Value.ToLower()]);
                 }
                 else
                 {
                     missingmod = true;
-                    //child.bounds.x = 1;
-                    //child.bounds.y = 1;
-                    //child.bounds.z = 1;
+                }
+
+                if (child.bounds == null)
+                {
+                    child.bounds = new JObject { ["x"] = 1, ["y"] = 1, ["z"] = 1 };
                 }
 
             }
-            int xaxis = Math.Abs(Convert.ToInt32(child.xaxis));
-            int zaxis = Math.Abs(Convert.ToInt32(child.zaxis));
-            //if(xaxis != 1 && zaxis != 3)
+            bool IsJoint = false;
+            if(child.posA != null)
             {
+                IsJoint = true;
+                child.pos = child.posA;
+                child.xaxis = child.xaxisA;
+                child.zaxis = child.zaxisB;
+            }
 
-                if (xaxis == 3)
+            try
+            {
+                int xaxis = Convert.ToInt32(child.xaxis);
+                int zaxis = Convert.ToInt32(child.zaxis);
+                int xaxisabs = Math.Abs(xaxis);
+                int zaxisabs = Math.Abs(zaxis);
+
+                if (xaxisabs == 3)
                 {
-                    if (zaxis == 2)
+                    if (zaxisabs == 2)
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.y, ["y"] = child.bounds.z, ["z"] = child.bounds.x };
                     }
                     else
-                    if (zaxis == 1)
+                    if (zaxisabs == 1)
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.z, ["y"] = child.bounds.y, ["z"] = child.bounds.x };
                     }
                 }
-                else if (xaxis == 2)
+                else if (xaxisabs == 2)
                 {
-                    if (zaxis == 3)
+                    if (zaxisabs == 3)
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.y, ["y"] = child.bounds.x, ["z"] = child.bounds.z };
                     }
                     else
-                    if (zaxis == 1)
+                    if (zaxisabs == 1)
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.z, ["y"] = child.bounds.x, ["z"] = child.bounds.y };
                     }
                 }
-                else if (xaxis == 1)
+                else if (xaxisabs == 1)
                 {
-                    if (zaxis == 2)
+                    if (zaxisabs == 2)
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.x, ["y"] = child.bounds.z, ["z"] = child.bounds.y };
                     }
                 }
-            }
-            //this updating pos only applies to parts, blocks do not get affected as they always have xaxis 1 zaxis 3
-            try
-            {
-                if (child.xaxis == -1 | child.zaxis == -1 | (child.xaxis == 2 && child.zaxis == 3) | (child.xaxis == 3 && child.zaxis == -2) | (child.xaxis == -2 && child.zaxis == -3) | (child.xaxis == -3 && child.zaxis == 2))
-                    child.pos.x -= child.bounds.x;
-                if (child.xaxis == -2 | child.zaxis == -2 | (child.xaxis == -1 && child.zaxis == 3) | (child.xaxis == -3 && child.zaxis == -1) | (child.xaxis == 1 && child.zaxis == -3) | (child.xaxis == 3 && child.zaxis == 1))
-                    child.pos.y -= child.bounds.y;
-                if (child.xaxis == -3 | child.zaxis == -3 | (child.xaxis == -2 && child.zaxis == 1) | (child.xaxis == -1 && child.zaxis == -2) | (child.xaxis == 1 && child.zaxis == 2) | (child.xaxis == 2 && child.zaxis == -1))
-                    child.pos.z -= child.bounds.z;
+            
+                //this updating pos only applies to parts, blocks do not get affected as they always have xaxis 1 zaxis 3
+                if(!IsJoint)
+                {
+                    if (xaxis == -1 | zaxis == -1 | (xaxis == 2 && zaxis == 3) | (xaxis == 3 && zaxis == -2) | (xaxis == -2 && zaxis == -3) | (xaxis == -3 && zaxis == 2))
+                        child.pos.x -= child.bounds.x;
+                    if (xaxis == -2 | zaxis == -2 | (xaxis == -1 && zaxis == 3) | (xaxis == -3 && zaxis == -1) | (xaxis == 1 && zaxis == -3) | (xaxis == 3 && zaxis == 1))
+                        child.pos.y -= child.bounds.y;
+                    if (xaxis == -3 | zaxis == -3 | (xaxis == -2 && zaxis == 1) | (xaxis == -1 && zaxis == -2) | (xaxis == 1 && zaxis == 2) | (xaxis == 2 && zaxis == -1))
+                        child.pos.z -= child.bounds.z;
+                }
+                else
+                {
+                    if (!(zaxis > 0 || !(child.bounds.x != 1 || child.bounds.y != 1 || child.bounds.z != 1)))
+                    {
+                        //correctedchild.pos = Blueprint.joints[i].posB;
+                        if (zaxis == -1)
+                            child.pos.x -= child.bounds.x - 1;
+                        if (zaxis == -2)
+                            child.pos.y -= child.bounds.y - 1;
+                        if (zaxis == -3)
+                            child.pos.z -= child.bounds.z - 1;
+                    }
+
+                }
             }
             catch
             {

@@ -164,7 +164,7 @@ namespace Advanced_Blueprint_Tools
                     BP.setblueprint(Sphere);
                     BP.Description.description += message;
                 }
-                mainwindow.UpdateOpenedBlueprint();
+                mainwindow.RenderBlueprint();
             }
             else
             {

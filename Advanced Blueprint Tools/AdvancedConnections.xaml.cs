@@ -26,7 +26,7 @@ namespace Advanced_Blueprint_Tools
         MainWindow mainwindow;
         private dynamic uuidsbackup;
 
-        List<Connectable> connectable_UUIDS = new List<Connectable>();
+        HashSet<Connectable> connectable_UUIDS = new HashSet<Connectable>();
         //List<Item> ItemList;
         public AdvancedConnections(MainWindow window)
         {
@@ -37,10 +37,10 @@ namespace Advanced_Blueprint_Tools
 
         public void Update()
         {
-            if(uuidsbackup != BP.Useduuids)
+            if(uuidsbackup != BP.GetUsedUuids())
             {
                 connectable_UUIDS.Clear();
-                foreach (string uuid in BP.Useduuids)
+                foreach (string uuid in BP.GetUsedUuids())
                 {
                     if (Database.blocks.ContainsKey(uuid) && Database.blocks[uuid] is Part && (Database.blocks[uuid] as Part).IsConnectable)
                     {
@@ -57,12 +57,12 @@ namespace Advanced_Blueprint_Tools
                 {
                     this.Dispatcher.Invoke((Action)(() =>
                     {//this refer to form in WPF application 
-                        comboBox_items1.Items.Add(i.name);
-                        comboBox_items2.Items.Add(i.name);
+                        comboBox_items1.Items.Add(i);
+                        comboBox_items2.Items.Add(i);
                     }));
                 }
             }
-            uuidsbackup = BP.Useduuids;
+            uuidsbackup = BP.GetUsedUuids(); 
         }
 
         
@@ -113,17 +113,213 @@ namespace Advanced_Blueprint_Tools
             p.Show();
         }
         
-
-        private dynamic WireIt(dynamic blueprint, string sourcecolor, string destinationcolor, string sourcetype, string destinationtype, int offsetx, int offsety, int offsetz, string offsetcolor )
+        public struct Controller
         {
+            public int id;
+            public int x;
+            public int y;
+            public int z;
+            public string color;
+            public string uuid;
+            public List<int> connections;
+        }
 
-            //dynamic block = new JObject { [x] = new JObject { [y] = new JObject { [z] = new JObject { [child.color.ToString()] = new JObject { [child.shapeId.ToString()] = new JObject { [child.color] = "test" } } } } } };
-            //merge
+        private void WireIt(dynamic a, string sourcecolor, string destinationcolor, string sourcetype, string destinationtype, int offsetx, int offsety, int offsetz, string offsetcolor )
+        {
+            
+            Dictionary<int,Controller> controllers = new Dictionary<int, Controller>();
+            bool dirx = checkBox_X.IsChecked == true;
+            bool diry = checkBox_Y.IsChecked == true;
+            bool dirz = checkBox_Z.IsChecked == true;
+            bool self = checkBox_0.IsChecked == true;
+            bool matchoffset = MatchOffset.IsChecked == true; //safemode enable?
+
+            Dictionary<string, List<int>> filtercrap = new Dictionary<string, List<int>>();//can be glitchwelded
+            //x.y.z = int
+
+            foreach (dynamic body in BP.Blueprint.bodies)
+                foreach (dynamic child in body.childs)
+                    if (child.controller != null)
+                    {
+                        dynamic rpos = BP.getposandbounds(child);
+                        int x = Convert.ToInt32(rpos.pos.x.ToString());
+                        int y = Convert.ToInt32(rpos.pos.y.ToString());
+                        int z = Convert.ToInt32(rpos.pos.z.ToString());
+                        string color = child.color.ToString().ToLower();
+                        if (color.StartsWith("#"))
+                            color = color.Substring(1, 6);
+                        int id = Convert.ToInt32(child.controller.id.ToString());
+                        controllers.Add(id,new Controller {id= id, x = x, y = y, z = z, color = color, uuid = child.shapeId.ToString(), connections = new List<int>() });
+
+                        string key = x.ToString() + "." + y.ToString() + "." + z.ToString();
+                        if (!filtercrap.ContainsKey(key))
+                            filtercrap.Add(key, new List<int> { id });
+                        else
+                            filtercrap[key].Add(id);
+                    }
+
+            if(matchoffset)
+            {//filter only the block with color,type,offset from source
+                foreach (Controller source in controllers.Values)
+                    if ((sourcecolor == null || sourcecolor == source.color) && (sourcetype == source.uuid))
+                        foreach (Controller destination in controllers.Values)
+                            if((destinationcolor == null || destinationcolor == destination.color) && ( destinationtype == null || destinationtype == destination.uuid) && 
+                                (self || !source.Equals(destination)) &&
+                                (dirx || source.x+offsetx == destination.x) && (diry || source.y + offsety == destination.y) && (dirz || source.z + offsetz == destination.z))
+                            {
+                                source.connections.Add(destination.id);
+                            }
+            }
+            else//filter all blocks no offset with col&type, then get the ones offset from them (any color, any type)
+                foreach (Controller source in controllers.Values)
+                    if ((sourcecolor == null || sourcecolor == source.color) && (sourcetype == source.uuid))
+                        foreach (Controller destination in controllers.Values)
+                            if ((destinationcolor == null || destinationcolor == destination.color) && (destinationtype == null || destinationtype == destination.uuid) &&
+                                (self || !source.Equals(destination)) &&
+                                (dirx || source.x == destination.x) && (diry || source.y == destination.y) && (dirz || source.z == destination.z))
+                            {
+                                string key = (offsetx+ destination.x).ToString() + "." + (offsety + destination.y).ToString() + "." + (offsetz + destination.z).ToString();
+                                //get block offset from destination 
+                                if (filtercrap.ContainsKey(key))
+                                    source.connections.AddRange(filtercrap[key]);
+                                //source.connections.Add(destination.id);
+                            }
+
+            //apply controllers to bp:
+
+            int amountwired = 0;
+            foreach (dynamic body in BP.Blueprint.bodies)
+                foreach (dynamic child in body.childs)
+                    if (child.controller != null && controllers.ContainsKey(Convert.ToInt32(child.controller.id.ToString())))
+                    {
+                        int id = Convert.ToInt32(child.controller.id.ToString());
+                        if (child.controller.controllers == null)
+                            child.controller.controllers = new JArray();
+                        if(controllers[id].connections != null)
+                            foreach (int destid in controllers[id].connections)
+                            {
+                                child.controller.controllers.Add(new JObject { ["id"] = destid });
+                                amountwired++;
+                            }
+                    }
+
+            new System.Threading.Thread(new System.Threading.ThreadStart(() => {
+                    MessageBox.Show("Successfully made " + amountwired + " connections! :D");
+            })).Start();
+
+            if (amountwired > 0)
+            {
+                mainwindow.TextBox_Description.Text += "\n--> " + amountwired + " connections made\n";
+                BP.Description.description = BP.Description.description + "\n--> " + amountwired + " connections made\n";
+            }
+
+            mainwindow.RenderWires();
+            #region somecode
+            /*
+            dynamic controllersold = new JObject();
+
+            dynamic sources = new JObject();
+
+            foreach (dynamic body in blueprint.bodies)
+                foreach (dynamic child in body.childs)
+                {
+                    if (child.controller != null)
+                    {
+                        dynamic rpos = BP.getposandbounds(child);
+                        string x = rpos.pos.x.ToString();
+                        string y = rpos.pos.y.ToString();
+                        string z = rpos.pos.z.ToString();
+                        string color = child.color.ToString();
+                        if (color.StartsWith("#"))
+                            color = color.Substring(1, 6);
+                        //child.shapeId.ToString()
+                        // Convert.ToInt32(child.controller.id.ToString())
+                        dynamic controller = new JObject { [x] = new JObject { [y] = new JObject { [z] = new JObject { [child.color.ToString()] = new JObject { [child.shapeId.ToString()] = new JObject { [color] = Convert.ToInt32(child.controller.id.ToString()) } } } } } };
+                        controllersold.Merge(controller);
+                        if ((sourcecolor == null || sourcecolor == color) && (sourcetype == null || sourcetype == child.shapeId.ToString()))
+                            sources.Merge(controller);
+                    }
+                }
+
+
+            dynamic result = new JObject();//result.DeepClone();
+            //Newtonsoft.Json.Linq.JProperty // keypair
+
+            if (matchoffset) //ON
+            {//filter only the block with color,type,offset from source
+                dynamic searchfrom = controllersold.DeepClone();
+                if (dirx)
+                {
+                    result = searchfrom;
+                }
+                else
+                {
+                    foreach(JProperty Jprop in sources) //Jprop.Name = "X"
+                    {
+                        string coord = (Convert.ToInt32(Jprop.Name) + offsetx).ToString();
+                        if (searchfrom[coord] != null)
+                        {
+                            result.Merge(new JObject { [coord] = searchfrom[coord] });
+                        }
+                    }
+                }
+
+                searchfrom = result.DeepClone();
+                result = new JObject();
+                if (diry)
+                {
+                    result = searchfrom;
+                }
+                else
+                {
+                    foreach (JProperty JpropSource in sources) 
+                    {
+                        string coord = (Convert.ToInt32(JpropSource.Name) + offsetx).ToString();
+                        if (searchfrom[coord] != null)
+                        {
+                            result.Merge(new JObject { [coord] = searchfrom[coord] });
+                        }
+                    }
+                }
+            }
+            else
+            {//filter all blocks no offset with col&type, then get the ones offset from them (any color, any type)
+
+            }
+
+
+            foreach (dynamic body in blueprint.bodies)
+                foreach(dynamic child in body.childs)
+                {
+                    if(child.controller != null && (sourcetype == null || sourcetype == child.shapeId.ToString()))
+                    {
+                        string color = child.color.ToString(); if (color.StartsWith("#")) color = color.Substring(1, 6);
+                        if(sourcecolor == null || color == sourcecolor)
+                        {
+                            dynamic rpos = BP.getposandbounds(child);
+                            int x = Convert.ToInt32(rpos.pos.x.ToString());
+                            int y = Convert.ToInt32(rpos.pos.y.ToString());
+                            int z = Convert.ToInt32(rpos.pos.z.ToString());
+
+
+
+                        }
+                    }
+                }
+
+
+
+
+            if (blueprint == "")//false
             using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.scrapshitConnectionString))
             {
                 //conn.ConnectionString = "MyDB";c
                 int i = 0;
                 conn.Open();
+                using (SqlCommand insertCommand = new SqlCommand("DELETE FROM Connections", conn))
+                {
+                    insertCommand.ExecuteNonQuery();
+                }
                 foreach (dynamic body in blueprint.bodies)
                     foreach (dynamic child in body.childs)
                     {
@@ -160,8 +356,15 @@ namespace Advanced_Blueprint_Tools
 
 
 
-                //SqlCommand cmd = new SqlCommand("SELECT * FROM Description WHERE login = @login", conn);
+                //SqlCommand cmd = new SqlCommand("SELECT * FROM Connections WHERE login = @login", conn);
 
+                //find all sources  "SELECT * AS 'Sources' FROM Connections" + "WHERE color = @sourcecolor AND uuid = @sourceuuid"
+                //find all dests?
+
+
+                //string cmd = "SELECT * FROM Description"
+                //cmd+= "Where uuid = @uuid"
+                //cmd+= @"AND color = @color"
 
                 //all with uuid x / other / all other (match offset block color)
                 //all with color / all other  / all other (match offset block color)
@@ -170,7 +373,6 @@ namespace Advanced_Blueprint_Tools
                 //all with z + offsetz /other / z
                 //exclude self wire?
                 //if match offset block color search offset from  x y z found blocks (from all, check all current found + offset with color x and type x)
-
 
             }
 
@@ -181,11 +383,9 @@ namespace Advanced_Blueprint_Tools
 
             Dictionary<int, Dictionary<int, Dictionary<int, int>>> testdict = new Dictionary<int, Dictionary<int, Dictionary<int, int>>>();
             //testdict[5][2][3] = 5;
-            
 
-
-
-            return blueprint;
+            */
+            #endregion
         }
 
 
@@ -195,19 +395,38 @@ namespace Advanced_Blueprint_Tools
         {//WIRE IT!
             if(comboBox_items1.SelectedIndex!=-1 && comboBox_items2.SelectedIndex != -1 && BP.Blueprint != null)
             {
-                string sourcecolor = textBox_color1.Text;
-                string destinationcolor = textBox_color2.Text;
-                Connectable sourceblock = connectable_UUIDS[comboBox_items1.SelectedIndex];
-                Connectable destinationblock = connectable_UUIDS[comboBox_items2.SelectedIndex];
+                dynamic backupbp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(BP.Blueprint.ToString());
+                string sourcecolor = textBox_color1.Text.ToLower();
+                string destinationcolor = textBox_color2.Text.ToLower();
+                Connectable sourceblock = (Connectable) comboBox_items1.SelectedItem;
+                Connectable destinationblock = (Connectable) comboBox_items2.SelectedItem;
 
                 int offsetx = Convert.ToInt32(textBox_X.Text);
                 int offsety = Convert.ToInt32(textBox_Y.Text);
                 int offsetz = Convert.ToInt32(textBox_Z.Text);
+
+                if (sourcecolor.Length == 7)
+                    sourcecolor = sourcecolor.Substring(1, 6);
+                else
+                    sourcecolor = null;
+                if (destinationcolor.Length == 7)
+                    destinationcolor = destinationcolor.Substring(1, 6);
+                else
+                    destinationcolor = null;
+                //try
+                {
+                    WireIt(null, sourcecolor, destinationcolor, sourceblock.UUID, destinationblock.UUID, offsetx, offsety, offsetz, destinationcolor);
+                }
+                //catch (Exception ex)
+                {
+                  //  MessageBox.Show(ex.Message + "\n\n Blueprint connections abrupted\nrestoring blueprint", "ERROR");
+                    //BP.setblueprint(backupbp);
+                }
                 
-                dynamic result = WireIt(BP.Blueprint, sourcecolor, destinationcolor, sourceblock.UUID, destinationblock.UUID, offsetx, offsety, offsetz, destinationcolor);
+                if(false)
+                {
 
-
-                dynamic backupbp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(BP.Blueprint.ToString());
+                #region oldcode
                 //list all destionationblocks and their ID's
                 dynamic destids = new JObject();
                 int minx = 10000, maxx = -10000, miny = 10000, maxy = -10000, minz = 10000, maxz = -10000;
@@ -386,6 +605,9 @@ namespace Advanced_Blueprint_Tools
                     MessageBox.Show(exception.Message+"\n\n Blueprint connections abrupted\nrestoring blueprint","ERROR");
                     BP.setblueprint(backupbp);
                 }
+                    #endregion
+
+                }
             }
             else
             {
@@ -409,11 +631,20 @@ namespace Advanced_Blueprint_Tools
             TextBox t = (TextBox)sender;
             try
             {
-                if (Convert.ToInt32(t.Text) >= 0 || Convert.ToInt32(t.Text) <= 0) { }
+                if (Convert.ToInt32(t.Text) >= 0) { }
             }
             catch
             {
-                t.Text = "0";
+                if (t.Text == "-")
+                {
+                    t.Text = "-0";
+                    t.Select(1, 1);
+                }
+                else
+                {
+                    t.Text = "0";
+                    t.Select(0, 1);
+                }
             }
         }
 
@@ -436,6 +667,11 @@ namespace Advanced_Blueprint_Tools
             this.UUID = UUID;
             this.bounds = bounds;
             this.name = name;
+        }
+
+        public override string ToString()
+        {
+            return name;
         }
     }
     

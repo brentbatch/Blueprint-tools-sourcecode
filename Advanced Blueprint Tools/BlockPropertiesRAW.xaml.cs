@@ -22,7 +22,7 @@ namespace Advanced_Blueprint_Tools
     public partial class BlockPropertiesRAW : Window
     {
         MainWindow mainwindow;
-        List<string> uuidsbackup = new List<string>();
+        HashSet<string> uuidsbackup = new HashSet<string>();
         dynamic blueprint;
         public BlockPropertiesRAW(MainWindow mainwindow)
         {
@@ -103,27 +103,27 @@ namespace Advanced_Blueprint_Tools
         {
             disableAll();
             blueprint = BP.Blueprint;
-            if (filter_x1.Text == "" || uuidsbackup != BP.Useduuids)
+            if (filter_x1.Text == "" || uuidsbackup != BP.GetUsedUuids())
             {
-                int x1 = BP.minx, y1 = BP.miny, z1 = BP.minz, x2 = BP.maxx, y2 = BP.maxy, z2 = BP.maxz;
-                filter_x1.Text = x1.ToString();
-                filter_y1.Text = y1.ToString();
-                filter_z1.Text = z1.ToString();
-                filter_x2.Text = x2.ToString();
-                filter_y2.Text = y2.ToString();
-                filter_z2.Text = z2.ToString();
+                dynamic bounds = BP.GetBounds();
+                filter_x1.Text = bounds.minx.ToString();
+                filter_y1.Text = bounds.miny.ToString();
+                filter_z1.Text = bounds.minz.ToString();
+                filter_x2.Text = bounds.maxx.ToString();
+                filter_y2.Text = bounds.maxy.ToString();
+                filter_z2.Text = bounds.maxz.ToString();
             }
-            if (uuidsbackup != BP.Useduuids)//fill the combobox once
+            if (uuidsbackup != BP.GetUsedUuids())//fill the combobox once
             {
                 filter_type.Items.Clear();
                 filter_type.Items.Add(new Item("any", "*"));
-                foreach (string uuid in BP.Useduuids)
+                foreach (string uuid in BP.GetUsedUuids())
                 {
                     if (Database.blocks.ContainsKey(uuid))
                         filter_type.Items.Add(new Item(Database.blocks[uuid].Name.ToString(), uuid));
                 }
                 uuidsbackup.Clear();
-                uuidsbackup.InsertRange(0, BP.Useduuids);
+                uuidsbackup.UnionWith(BP.GetUsedUuids());
                 filter_type.SelectedIndex = 0;
             }
             filterupdate();
@@ -299,7 +299,7 @@ namespace Advanced_Blueprint_Tools
                             blueprint.bodies[j].childs[k] = child;
                             BP.setblueprint(blueprint);
                             BP.Description.description = BP.Description.description + "\n++Applied RAW changes";
-                            mainwindow.UpdateOpenedBlueprint();
+                            mainwindow.RenderBlueprint();
                             //Update(); 
                             w.Close();
                             MessageBox.Show("edit successful");
@@ -317,7 +317,7 @@ namespace Advanced_Blueprint_Tools
                         blueprint.joints[j] = child;
                         BP.setblueprint(blueprint);
                         BP.Description.description = BP.Description.description + "\n++Applied RAW changes";
-                        mainwindow.UpdateOpenedBlueprint();
+                        mainwindow.RenderBlueprint();
                         //Update();
                         w.Close();
                         MessageBox.Show("edit successful");

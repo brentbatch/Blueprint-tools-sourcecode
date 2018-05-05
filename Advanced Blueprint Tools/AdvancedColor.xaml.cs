@@ -35,13 +35,13 @@ namespace Advanced_Blueprint_Tools
 
         public void Update()
         {
-            if (uuidsbackup != BP.Useduuids)
+            if (uuidsbackup != BP.GetUsedUuids())
             {
                 ItemList = new List<Item>
                 {
                     new Item("any", "*")
                 };
-                foreach (string uuid in BP.Useduuids)
+                foreach (string uuid in BP.GetUsedUuids())
                 {
                     if (Database.blocks.ContainsKey(uuid))
                     {
@@ -74,11 +74,11 @@ namespace Advanced_Blueprint_Tools
                 {
                     this.Dispatcher.Invoke((Action)(() =>
                     {//this refer to form in WPF application 
-                        comboBox_old.Items.Add(item.Name);
+                        comboBox_old.Items.Add(item);
                     }));
                 }
             }
-            uuidsbackup = BP.Useduuids;
+            uuidsbackup = BP.GetUsedUuids(); 
         }
 
 
@@ -141,7 +141,7 @@ namespace Advanced_Blueprint_Tools
                     string token = "#";
                     string color = child.color.ToString();
                     if (color[0] == '#') token = "";
-                    if ((token + child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#" || textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString().ToLower() == ItemList[comboBox_old.SelectedIndex].UUID.ToLower()))
+                    if ((token + child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#" || textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString() == ((Item)comboBox_old.SelectedItem).UUID.ToLower()))
                     {
                         amountcolored++;
                         child.color = newcolor;
@@ -154,16 +154,16 @@ namespace Advanced_Blueprint_Tools
                     string token = "#";
                     string color = child.color.ToString();
                     if (color[0] == '#') token = "";
-                    if ((token + child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#" || textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString().ToLower() == ItemList[comboBox_old.SelectedIndex].UUID.ToLower()))
+                    if ((token + child.color.ToString().ToLower() == oldcolor.ToLower() || textBox_color1.Text == "#" || textBox_color1.Text == "") && ((comboBox_old.SelectedIndex <= 0) || child.shapeId.ToString() == ((Item)comboBox_old.SelectedItem).UUID.ToLower()))
                     {
                         amountcolored++;
-                        child.color = newcolor.Substring(1);
+                        child.color = newcolor.Substring(1); 
                     }
                 }
             if (comboBox_old.SelectedIndex < 0) comboBox_old.SelectedIndex = 0;
-            string message = "++ " + amountcolored + " " + oldcolor + " " + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
+            string message = "++ " + amountcolored + " " + oldcolor + " " + ((Item)comboBox_old.SelectedItem).Name + " are now painted " + newcolor + " color";
             if (textBox_color1.Text == "#" || textBox_color1.Text == "")
-                message = "++ " + amountcolored + ItemList[comboBox_old.SelectedIndex].Name + " are now painted " + newcolor + " color";
+                message = "++ " + amountcolored + ((Item)comboBox_old.SelectedItem).Name + " are now painted " + newcolor + " color";
             
             new System.Threading.Thread(new System.Threading.ThreadStart(() => { MessageBox.Show(message); })).Start();
 
@@ -172,7 +172,7 @@ namespace Advanced_Blueprint_Tools
                 BP.setblueprint(BP.Blueprint);
 
                 BP.Description.description = BP.Description.description + "\n" + message;
-                window.UpdateOpenedBlueprint();
+                window.RenderBlueprint();
             }
 
 

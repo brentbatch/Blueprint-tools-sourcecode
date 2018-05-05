@@ -61,11 +61,22 @@ namespace Advanced_Blueprint_Tools.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static string steamapps {
+        internal static System.Drawing.Bitmap missingicon {
             get {
-                return ResourceManager.GetString("steamapps", resourceCulture);
+                object obj = ResourceManager.GetObject("missingicon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] obj_fittings_ac {
+            get {
+                object obj = ResourceManager.GetObject("obj_fittings_ac", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

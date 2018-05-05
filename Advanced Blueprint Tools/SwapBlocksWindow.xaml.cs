@@ -34,11 +34,11 @@ namespace Advanced_Blueprint_Tools
 
         public void Update()
         {
-            if (uuidsbackup != BP.Useduuids)
+            if (uuidsbackup != BP.GetUsedUuids())
             {
                 blockstoreplace = new JArray();
                 replacebyblocks = new JArray();
-                foreach (string uuid in BP.Useduuids)
+                foreach (string uuid in BP.GetUsedUuids())
                 {
                     if (Database.blocks.ContainsKey(uuid))
                     {
@@ -62,7 +62,7 @@ namespace Advanced_Blueprint_Tools
                     }));
                 }
             }
-            uuidsbackup = BP.Useduuids;
+            uuidsbackup = BP.GetUsedUuids();
 
         }
 
@@ -161,7 +161,7 @@ namespace Advanced_Blueprint_Tools
                 {
                     BP.setblueprint(blueprint);
                     BP.Description.description = BP.Description.description + "\n" + message;
-                    window.UpdateOpenedBlueprint();
+                    window.RenderBlueprint();
                 }
 
             }

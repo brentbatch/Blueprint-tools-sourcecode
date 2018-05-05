@@ -70,7 +70,7 @@ namespace Advanced_Blueprint_Tools
                 BP.setblueprint(Cuboid);
                 BP.Description.description += message;
             }
-            mainWindow.UpdateOpenedBlueprint();
+            mainWindow.RenderBlueprint();
         }
 
         private dynamic block(int x, int y, int z, int bx, int by, int bz)

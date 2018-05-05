@@ -131,15 +131,15 @@ namespace Advanced_Blueprint_Tools
         {
             string bppath = "";
             Loadwindow l = new Loadwindow();
+            bppath = ((Blueprint)listBox_blueprints.SelectedItem).blueprintpath.ToString();
+
+            l.Show();
+            new BP(bppath);
+            mainwindow.RenderBlueprint();
             try
             {
-                bppath = ((Blueprint)listBox_blueprints.SelectedItem).blueprintpath.ToString();
-
-                l.Show();
-                new BP(bppath);
 
 
-                mainwindow.UpdateOpenedBlueprint();
                 if (mainwindow.advancedconnections != null && mainwindow.advancedconnections.IsLoaded) mainwindow.advancedconnections.Update();
                 if (mainwindow.advancedcolorwindow != null && mainwindow.advancedcolorwindow.IsLoaded) mainwindow.advancedcolorwindow.Update();
                 if (mainwindow.swapblockswindow != null && mainwindow.swapblockswindow.IsLoaded) mainwindow.swapblockswindow.Update();
