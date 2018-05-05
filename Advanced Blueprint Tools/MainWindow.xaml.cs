@@ -58,8 +58,6 @@ namespace Advanced_Blueprint_Tools
 
         public MainWindow()
         {
-            
-            //BlueprintOptimizer.CreateBlueprintFromPoints(null);
             InitializeComponent();
             //LOAD RESOURCES:
             Database.findPaths();
@@ -103,91 +101,21 @@ namespace Advanced_Blueprint_Tools
 
         }
 
-        public void UpdateOpenedBlueprint()
+        public void RenderBlueprint()
         {
             TextBox_Name.Text = BP.Description.name;
             TextBox_Description.Text = BP.Description.description;
-
-            //update 3D view
-            var modelGroup = new Model3DGroup();
-            var glass = new Model3DGroup();
             
-            int centerx = BP.centerx;
-            int centery = BP.centery;
-            int centerz = BP.centerz;
-            
-            
-            foreach (dynamic x in BP.blocksxyz)
-                foreach (dynamic y in BP.blocksxyz[x.Name])
-                    foreach (dynamic z in BP.blocksxyz[x.Name][y.Name])
-                        foreach (dynamic child in BP.blocksxyz[x.Name][y.Name][z.Name].blocks)
-                        {
-                            int posx = Convert.ToInt32(x.Name.ToString());
-                            int posy = Convert.ToInt32(y.Name.ToString());
-                            int posz = Convert.ToInt32(z.Name.ToString());
-
-                            if (Database.blocks.ContainsKey(child.shapeId.ToString()))
-                            {
-                                Blockobject blockobject = Database.blocks[child.shapeId.ToString()];
-                                if(blockobject is Block)
-                                {
-                                    Model3D model = (blockobject as Block).Render(posx - centerx, posy - centery, posz - centerz, child.bounds, child.color.ToString(), Convert.ToInt32(child.xaxis), Convert.ToInt32(child.zaxis));
-                                    if(blockobject.glass==true)
-                                        glass.Children.Add(model);
-                                    else
-                                        modelGroup.Children.Add(model);
-                                }
-                                else//part
-                                {
-                                    Model3D model = (blockobject as Part).Render(posx - centerx, posy - centery, posz - centerz, child.color.ToString(), Convert.ToInt32(child.xaxis), Convert.ToInt32(child.zaxis));
-                                    if (blockobject.glass == true)
-                                        glass.Children.Add(model);
-                                    else
-                                        modelGroup.Children.Add(model);
-                                }
-                            }
-                            else//not in database
-                            {
-                                dynamic bounds = new JObject();
-                                if (child.bounds == null)
-                                {
-                                    bounds.x = 1;
-                                    bounds.y = 1;
-                                    bounds.z = 1;
-                                }
-                                else
-                                    bounds = child.bounds;
-                        
-                                Block block = new Block(null, "unknown", "unknown", null, null);
-                                Model3D model = block.Render(posx - centerx, posy - centery, posz - centerz, bounds, child.color.ToString(), Convert.ToInt32(child.xaxis), Convert.ToInt32(child.zaxis));
-
-                                modelGroup.Children.Add(model);
-
-                            }
-                        }
-            //helix_wires.Items.Clear();
-            this.Wires = new Model3DGroup();
-            if (Properties.Settings.Default.wires)
-                foreach (int id in BP.Wires.Keys)
-                {
-                    dynamic wire = BP.Wires[id];
-                    Addblob(wire.pos, wire.color.ToString());
-                    if(wire.connections != null)
-                        foreach(dynamic connid in wire.connections)
-                            if(BP.Wires.ContainsKey(Convert.ToInt32(connid.id.ToString())))
-                            {
-                                Addwire(wire.pos, BP.Wires[Convert.ToInt32(connid.id.ToString())].pos, wire.color.ToString());
-                            }
-                }
-
             try
             {
-                this.Model = modelGroup;
-                this.Glass = glass;
+            
+                Tuple<Model3DGroup, Model3DGroup> renders = BP.RenderBlocks();//backgroundtask ?
+                this.Model = renders.Item1;
+                this.Glass = renders.Item2;
                 this.Marker = null;
                 this.Marker2 = new Model3DGroup();
-                
-                
+
+                RenderWires();
                 Image_blueprint.DataContext = null;
                 Image_blueprint.DataContext = this;
                 helix.ResetCamera();
@@ -217,11 +145,47 @@ namespace Advanced_Blueprint_Tools
                 MessageBox.Show(e.Message, "Failed to import into rendering box!");
             }
         }
+
+        public void RenderWires()
+        {
+            this.Wires = new Model3DGroup();
+            if (Properties.Settings.Default.wires)
+            {
+                var wires = BP.GetWires();
+                foreach (dynamic wire in wires.Values)
+                {
+                    Addblob(wire.pos, wire.color.ToString());
+                    if (wire.connections != null)
+                        foreach (dynamic connid in wire.connections)
+                            if (wires.ContainsKey(Convert.ToInt32(connid.id.ToString())))
+                            {
+                                Addwire(wire.pos, wires[Convert.ToInt32(connid.id.ToString())].pos, wire.color.ToString());
+                            }
+                }
+                Image_blueprint.DataContext = null;
+                Image_blueprint.DataContext = this;
+            }
+        }
+        private void ToggleWires_Click(object sender, RoutedEventArgs e)
+        {
+            if (BP.Blueprint != null)
+            {
+                Properties.Settings.Default.wires = !Properties.Settings.Default.wires;
+                if (Properties.Settings.Default.wires)
+                    RenderWires();
+                else
+                {
+                    this.Wires = null;
+                    Image_blueprint.DataContext = null;
+                    Image_blueprint.DataContext = this;
+                }
+
+            }
+
+        }
+
         public void Addblob(dynamic pos, string color)
         {
-            int centerx = BP.centerx;
-            int centery = BP.centery;
-            int centerz = BP.centerz;
             try
             {
                 if (!Properties.Settings.Default.colorwires)
@@ -231,9 +195,9 @@ namespace Advanced_Blueprint_Tools
                             Convert.ToByte(color.Substring(0, 2), 16), Convert.ToByte(color.Substring(2, 2), 16), Convert.ToByte(color.Substring(4, 2), 16))));
                 var meshBuilder = new MeshBuilder(false, false);
 
-                meshBuilder.AddSphere(new Point3D(Convert.ToDouble(pos.x.ToString()) - centerx,
-                                                Convert.ToDouble(pos.y.ToString()) - centery,
-                                                Convert.ToDouble(pos.z.ToString()) - centerz), 0.3);
+                meshBuilder.AddSphere(new Point3D(Convert.ToDouble(pos.x.ToString()) ,
+                                                Convert.ToDouble(pos.y.ToString()) ,
+                                                Convert.ToDouble(pos.z.ToString()) ), 0.25);
                 var Mesh = meshBuilder.ToMesh(true);
                 this.Wires.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
             }
@@ -245,9 +209,6 @@ namespace Advanced_Blueprint_Tools
 
         public void Addwire(dynamic pos1, dynamic pos2, string color)
         {
-            int centerx = BP.centerx;
-            int centery = BP.centery;
-            int centerz = BP.centerz;
             try
             {
                 if (!Properties.Settings.Default.colorwires)
@@ -257,12 +218,12 @@ namespace Advanced_Blueprint_Tools
 
                 var meshBuilder = new MeshBuilder(false, false);
 
-                meshBuilder.AddArrow(new Point3D(Convert.ToDouble(pos1.x.ToString()) - centerx,
-                                                Convert.ToDouble(pos1.y.ToString()) - centery,
-                                                Convert.ToDouble(pos1.z.ToString()) - centerz),
-                                    new Point3D(Convert.ToDouble(pos2.x.ToString()) - centerx,
-                                                Convert.ToDouble(pos2.y.ToString()) - centery,
-                                                Convert.ToDouble(pos2.z.ToString()) - centerz),
+                meshBuilder.AddArrow(new Point3D(Convert.ToDouble(pos1.x.ToString()),
+                                                Convert.ToDouble(pos1.y.ToString()) ,
+                                                Convert.ToDouble(pos1.z.ToString()) ),
+                                    new Point3D(Convert.ToDouble(pos2.x.ToString()) ,
+                                                Convert.ToDouble(pos2.y.ToString()) ,
+                                                Convert.ToDouble(pos2.z.ToString()) ),
                                     0.15, 4);
                 var Mesh = meshBuilder.ToMesh(true);
                 this.Wires.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
@@ -275,15 +236,12 @@ namespace Advanced_Blueprint_Tools
 
         public void setMarker(double x, double y, double z)
         {//cross marker
-            int centerx = BP.centerx;
-            int centery = BP.centery;
-            int centerz = BP.centerz;
             Model3DGroup marker = new Model3DGroup();
             Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(100, 51, 204, 51)));
             var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 0.2, 0.2, 1000);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 0.2, 1000, 0.2);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), 1000, 0.2, 0.2);
+            meshBuilder.AddBox(new Point3D(x, y, z), 0.2, 0.2, 1000);
+            meshBuilder.AddBox(new Point3D(x, y, z), 0.2, 1000, 0.2);
+            meshBuilder.AddBox(new Point3D(x, y, z), 1000, 0.2, 0.2);
             // Create a mesh from the builder (and freeze it)
             var Mesh = meshBuilder.ToMesh(true);
             marker.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
@@ -291,18 +249,15 @@ namespace Advanced_Blueprint_Tools
             //helix_wires.Camera.AnimateTo(new Point3D(x - centerx, y - centery, z - centerz), helix_wires.Camera.LookDirection, helix_wires.Camera.UpDirection, 1000);
             Image_blueprint.DataContext = "";
             Image_blueprint.DataContext = this;
-            helix_wires.Camera.LookAt(new Point3D(x - centerx, y - centery, z - centerz), 1000);
+            helix_wires.Camera.LookAt(new Point3D(x, y, z), 1000);
             //helix.Camera = helix_wires.Camera;
         }
         public void setMarker2(double x, double y, double z, double boundsx, double boundsy, double boundsz)
         {//cuboid marker
-            int centerx = BP.centerx;
-            int centery = BP.centery;
-            int centerz = BP.centerz;
             Model3DGroup marker = new Model3DGroup();
-            Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(100, 20, 50, 50)));
+            Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(50, 20, 50, 50)));
             var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(x - centerx, y - centery, z - centerz), boundsx+0.1, boundsy+0.1, boundsz+0.1);
+            meshBuilder.AddBox(new Point3D(x, y, z), boundsx+0.1, boundsy+0.1, boundsz+0.1);
             // Create a mesh from the builder (and freeze it)
             var Mesh = meshBuilder.ToMesh(true);
             marker.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
@@ -443,7 +398,7 @@ namespace Advanced_Blueprint_Tools
             }
             BP.Description.description = BP.Description.description + "\n++ removed joints & glitchwelded";
             BP.setblueprint(blueprint);
-            this.UpdateOpenedBlueprint();
+            this.RenderBlueprint();
         }
         
         private void Click_swapblocks(object sender, RoutedEventArgs e)
@@ -526,7 +481,7 @@ namespace Advanced_Blueprint_Tools
                         }
                     }
                 BP.setblueprint(blueprint);
-                this.UpdateOpenedBlueprint();
+                this.RenderBlueprint();
             }
             else
                 MessageBox.Show("Mirror mode can't mirror blueprints with joints inside yet!");
@@ -553,14 +508,16 @@ namespace Advanced_Blueprint_Tools
 
         private void Click_requiredmods(object sender, RoutedEventArgs e)
         {
-            List<string> useduuids = BP.Useduuids;
             
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://scrapmechanic.xesau.eu/uuidservice/get_mods");
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
-            string postData = "uuid[]=" + useduuids[0].ToString();
-            for (int i = 1; i < useduuids.Count(); i++)
-                postData += "&uuid[]=" + useduuids[i].ToString();
+            string postData = "";
+            foreach(string uuid in BP.GetUsedUuids())
+            {
+                postData+="&uuid[]=" + uuid;
+            }
+            postData = postData.Substring(1);
 
             byte[] bytes = Encoding.UTF8.GetBytes(postData);
             request.ContentLength = bytes.Length;
@@ -675,5 +632,6 @@ namespace Advanced_Blueprint_Tools
         {
             new ObjToBlueprint(this) { Owner = this }.Show();
         }
+
     }
 }

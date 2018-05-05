@@ -213,6 +213,7 @@ namespace Advanced_Blueprint_Tools
                             }
                         }
                         image.Dispose();
+                        
                     }
                     else
                     {
@@ -229,6 +230,28 @@ namespace Advanced_Blueprint_Tools
                             }
                         }
                         image.Dispose();
+                    }
+                }
+                else if(File.Exists(blueprint + @"\icon.png"))
+                {
+                    //go over all files, if no .txt files or directories, remove folder
+
+                    bool dirs = false;
+                    foreach (string subdir in Directory.GetDirectories(blueprint))
+                    {
+                        if (Directory.Exists(subdir)) dirs = true;
+                    }
+                    if(!dirs)
+                    {
+                        bool hasTxtFile = false;
+                        foreach (string subfile in Directory.GetFiles(blueprint))
+                        {
+                            string ext = Path.GetExtension(subfile);
+                            if (ext == ".txt")
+                                hasTxtFile = true;
+                        }
+                        if (!hasTxtFile)
+                            Directory.Delete(blueprint, true);
                     }
                 }
             }
@@ -676,7 +699,7 @@ namespace Advanced_Blueprint_Tools
 
             //for textures: prob need to switch to: https://www.nuget.org/packages/HelixToolkit.Wpf.SharpDX/
             //https://github.com/helix-toolkit/helix-toolkit/issues/471
-
+            
 
             Model3D renderedblock = new GeometryModel3D { Geometry = geometry3D, Material = material };
 
@@ -762,7 +785,9 @@ namespace Advanced_Blueprint_Tools
     public class Block : Blockobject
     {
         private dynamic block;
-        //no geometry, no mesh
+        //private static Dictionary<dynamic,Geometry3D> previousGeometries;
+
+
         public Block(string path, string Name, string Modname, JObject block, JObject desc) :base( path,  Name,  Modname, desc)
         {
             this.block = block;
@@ -979,13 +1004,15 @@ namespace Advanced_Blueprint_Tools
 
 
                 Scene a = new AssimpImporter().ImportFile(location);
-                
+
 
                 Mesh m = a.Meshes[0];
+                //a.Materials[0]
+
                 var meshBuilder = new MeshBuilder(false, false);
                 foreach (Face face in m.Faces)
                 {
-                    
+
                     IList<Point3D> vertices = new List<Point3D>();
                     foreach (uint i in face.Indices)
                     {
@@ -994,7 +1021,16 @@ namespace Advanced_Blueprint_Tools
                     meshBuilder.AddPolygon(vertices);
                     vertices = new List<Point3D>();
                 }
-                
+                if (false)
+                {
+                    var texturecoords = m.GetTextureCoords(0);
+                    meshBuilder.TextureCoordinates = new PointCollection();
+                    foreach (Assimp.Vector3D vec in m.GetTextureCoords(0))
+                    {
+                        meshBuilder.TextureCoordinates.Add(new System.Windows.Point(Convert.ToDouble(vec.X), Convert.ToDouble(vec.Y)));
+                    }
+                }
+
                 //meshBuilder.Normals = m.Normals;
                 //meshBuilder.Tangents = m.Tangents;
                 //meshBuilder.BiTangents = m.BiTangents;

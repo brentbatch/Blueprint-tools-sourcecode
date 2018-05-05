@@ -24,7 +24,7 @@ namespace Advanced_Blueprint_Tools
     {
         MainWindow mainwindow;
         List<Item> usedblocks;
-        List<string> uuidsbackup;
+        HashSet<string> uuidsbackup;
         dynamic backuplist;
         public BlockProperties(MainWindow mainwindow)
         {
@@ -43,13 +43,13 @@ namespace Advanced_Blueprint_Tools
         public void Update()
         {
 
-            if (uuidsbackup != BP.Useduuids)
+            if (uuidsbackup != BP.GetUsedUuids())
             {
                 usedblocks = new List<Item>
                 {
                     new Item("any", "*")
                 };
-                foreach (string uuid in BP.Useduuids)
+                foreach (string uuid in BP.GetUsedUuids())
                 {
                     if (Database.blocks.ContainsKey(uuid))
                     {
@@ -58,10 +58,10 @@ namespace Advanced_Blueprint_Tools
                 }
                 filter_type.Items.Clear();
                 foreach (Item useditem in usedblocks)
-                        filter_type.Items.Add(useditem.Name);
+                        filter_type.Items.Add(useditem);
 
             }
-            uuidsbackup = BP.Useduuids;
+            uuidsbackup = BP.GetUsedUuids(); 
             filter_type.SelectedIndex = 0;
             int i = 0;
             {
@@ -90,13 +90,13 @@ namespace Advanced_Blueprint_Tools
             }
 
             //fill xyz:
-            int x1 = BP.minx, y1 = BP.miny, z1 = BP.minz, x2 = BP.maxx, y2 = BP.maxy, z2 = BP.maxz;
-            filter_x1.Text = x1.ToString();
-            filter_y1.Text = y1.ToString();
-            filter_z1.Text = z1.ToString();
-            filter_x2.Text = x2.ToString();
-            filter_y2.Text = y2.ToString();
-            filter_z2.Text = z2.ToString();
+            dynamic bounds = BP.GetBounds();
+            filter_x1.Text = bounds.minx.ToString();
+            filter_y1.Text = bounds.miny.ToString();
+            filter_z1.Text = bounds.minz.ToString();
+            filter_x2.Text = bounds.maxx.ToString();
+            filter_y2.Text = bounds.maxy.ToString();
+            filter_z2.Text = bounds.maxz.ToString();
 
             filterupdate();
         }
@@ -116,11 +116,20 @@ namespace Advanced_Blueprint_Tools
             TextBox t = (TextBox)sender;
             try
             {
-                if (Convert.ToInt32(t.Text) >= 0 || Convert.ToInt32(t.Text) <= 0) { }
+                if (Convert.ToInt32(t.Text) >= 0) { }
             }
             catch
             {
-                t.Text = "";
+                if (t.Text == "-")
+                {
+                    t.Text = "-0";
+                    t.Select(1, 1);
+                }
+                else
+                {
+                    t.Text = "0";
+                    t.Select(0, 1);
+                }
             }
             if (this.IsLoaded)
                 filterupdate();
@@ -201,8 +210,10 @@ namespace Advanced_Blueprint_Tools
         private void filter_output_update()
         {
 
-            { 
-                int x1 = BP.minx-2, y1 = BP.miny-2, z1 = BP.minz-2, x2 = BP.maxx+2, y2 = BP.maxy+2, z2 = BP.maxz+2;
+            {
+
+                dynamic bounds = BP.GetBounds();
+                int x1 = bounds.minx, y1 = bounds.maxx, z1 = bounds.miny, x2 = bounds.maxy, y2 = bounds.minz, z2 = bounds.maxz;
                 string type = "*";//nullable! = any
 
                 this.Dispatcher.Invoke((Action)(() =>
@@ -217,7 +228,7 @@ namespace Advanced_Blueprint_Tools
                     if (filter_z2.Text != "") z2 = Convert.ToInt32(filter_z2.Text);//0.1! = any
                     if (filter_type.SelectedIndex < 0) filter_type.SelectedIndex = 0;
                     if (filter_type.SelectedIndex >= 0)
-                        type = usedblocks[filter_type.SelectedIndex].UUID.ToLower();
+                        type = ((Item) filter_type.SelectedItem).UUID;
                     this.mainwindow.setMarker2((x1 + x2+0.0f) / 2, (y1 + y2 + 0.0f) / 2, (z1 + z2 + 0.0f) / 2, (x2 - x1), (y2 - y1), (z2 - z1));
                 }));
                 string color = filtercolor;//nullable! = any
@@ -527,7 +538,7 @@ namespace Advanced_Blueprint_Tools
 
             BP.Description.description = BP.Description.description += "++ Applied some block property changes ";
             BP.setblueprint(BP.Blueprint);
-            this.mainwindow.UpdateOpenedBlueprint();
+            this.mainwindow.RenderBlueprint();
             Update();
             w.Close();
         }

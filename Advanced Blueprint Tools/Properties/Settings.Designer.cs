@@ -73,7 +73,7 @@ namespace Advanced_Blueprint_Tools.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("93")]
+        [global::System.Configuration.DefaultSettingValueAttribute("95")]
         public int version {
             get {
                 return ((int)(this["version"]));
@@ -125,17 +125,6 @@ namespace Advanced_Blueprint_Tools.Properties {
             }
             set {
                 this["blobcolor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\scrapshit.mdf" +
-            ";Integrated Security=True;Connect Timeout=30")]
-        public string scrapshitConnectionString {
-            get {
-                return ((string)(this["scrapshitConnectionString"]));
             }
         }
     }
