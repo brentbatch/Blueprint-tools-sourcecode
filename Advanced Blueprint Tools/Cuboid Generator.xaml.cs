@@ -95,11 +95,20 @@ namespace Advanced_Blueprint_Tools
             TextBox t = (TextBox)sender;
             try
             {
-                if (Convert.ToInt32(t.Text) >= 0 || Convert.ToInt32(t.Text) <= 0) { }
+                if (Convert.ToInt32(t.Text) >= 0) { }
             }
             catch
             {
-                t.Text = "0";
+                if (t.Text == "-")
+                {
+                    t.Text = "-0";
+                    t.Select(1, 1);
+                }
+                else
+                {
+                    t.Text = "0";
+                    t.Select(0, 1);
+                }
             }
         }
     }

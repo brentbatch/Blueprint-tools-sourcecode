@@ -64,54 +64,22 @@ namespace Advanced_Blueprint_Tools
         {
             if(this.file != null)
             {
+                flipyz = flipYZ.IsChecked == true;
+                flipxz = flipXZ.IsChecked == true;
+                flipz = flipZ.IsChecked == true ? -1 : 1;
 
+                backgroundWorker = new BackgroundWorker();
+                backgroundWorker.WorkerSupportsCancellation = true;
+                backgroundWorker.WorkerReportsProgress = true;
+                progressWindow = new ProgressWindow(backgroundWorker, "Converting OBJ to Pointlist");
+                progressWindow.Show();
 
-
-                /*int minx = int.MaxValue, maxx = int.MinValue, miny = int.MaxValue, maxy = int.MinValue, minz = int.MaxValue, maxz = int.MinValue;
-
-               foreach(Mesh m in scene.Meshes)
-                   foreach(Face face in m.Faces)
-                       foreach (uint i in face.Indices)
-                       {
-                           double x = m.Vertices[i].X * scale;
-                           double y = m.Vertices[i].Y * scale;
-                           double z = m.Vertices[i].Z * scale;
-                           if (x > maxx) maxx = (int)x;
-                           if (y > maxy) maxx = (int)y;
-                           if (z > maxz) maxx = (int)z;
-                           if (y < miny) minx = (int)y;
-                           if (z < minz) minx = (int)z;
-                           if (x < minx) minx = (int)x;
-                       }*/
-
-                //bool[,,] array = new bool[maxx - minx+2, maxy - miny+2, maxz - minz+2];
-                //int xref = minx-1, yref = miny-1, zref = minz-1;
-                /*
-                System.Windows.MessageBoxResult result = MessageBoxResult.Yes;
-                if (maxx - minx > 300 || maxy - miny > 300 || maxz - minz > 300)
-                    result = System.Windows.MessageBox.Show("Size: \nx: " + (maxx - minx) + "\ny: " + (maxy - miny) + "\nz: " + (maxz - minz) + "\n\nAre you sure you want to continue?","", System.Windows.MessageBoxButton.YesNo);
-                if(result == MessageBoxResult.Yes)*/
-                {
-                    backgroundWorker = new BackgroundWorker();
-                    flipyz = flipYZ.IsChecked == true;
-                    flipxz = flipXZ.IsChecked == true;
-                    flipz = flipZ.IsChecked == true ? -1 : 1;
-                    backgroundWorker.WorkerSupportsCancellation = true;
-                    progressWindow = new ProgressWindow(backgroundWorker);
-                    progressWindow.Show();
-
-                    backgroundWorker.WorkerReportsProgress = true;
-                    backgroundWorker.DoWork += new DoWorkEventHandler(convertobj);
-                    backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(conversioncompleted);
-                    backgroundWorker.ProgressChanged += backgroundWorker1_ProgressChanged;
+                backgroundWorker.DoWork += new DoWorkEventHandler(convertobj);
+                backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(conversioncompleted);
+                backgroundWorker.ProgressChanged += backgroundWorker1_ProgressChanged;
                     
-                    backgroundWorker.RunWorkerAsync();
-
-                    //blueprint = convertobj();
-                    //conversioncompleted(null, null);
-                    
-
-                }
+                backgroundWorker.RunWorkerAsync();
+                
             }
         }
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -141,7 +109,6 @@ namespace Advanced_Blueprint_Tools
 
                     foreach (Face face in m.Faces)
                     {
-                            
                         IList<Point3D> vertices = new List<Point3D>();
                         foreach (uint i in face.Indices)
                         {
@@ -172,68 +139,39 @@ namespace Advanced_Blueprint_Tools
                             vertices.Add(point);
                             pointlist.Add(point);
                         }
-                        Triangle triangle = new Triangle(vertices);
-
-                        if (!triangle.BoundsSmallerThan(bounds))
-                            Splittriangles(triangle);
+                        if (vertices.Count == 3)
+                        {
+                            Triangle triangle = new Triangle(vertices);
+                            if (!triangle.BoundsSmallerThan(bounds))
+                                Splittriangles(triangle);
+                        }
+                        else
+                        { }
                         progress++;
                         backgroundWorker.ReportProgress((progress * 100) / total);
+                        if (backgroundWorker.CancellationPending)
+                            e.Cancel = true;
                     }
 
-                    if (backgroundWorker.CancellationPending)
-                        throw new OperationCanceledException();
                 }
             }
             catch(Exception ex)
             {
                 if(!(ex is OperationCanceledException))
                     System.Windows.MessageBox.Show(ex.Message, "Something went wrong converting the obj");
+                else
+                    e.Cancel = true;
             }
 
             try
             {
                 if (backgroundWorker.CancellationPending)
                     throw new OperationCanceledException();
-                //dynamic pointlist = new JObject();
-                //pointlist[x.tostring() + "." +...] = new jobject() { x y z};
 
-                //can be split in 4 threads: 
-                /*foreach(Triangle triange in splittriangles)//reduce amount of points,  as some triangles use same points
-                {
-                    foreach(Point3D point in triange.vertices)
-                    {
-                        if (!pointlist.Contains(new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z))))
-                            pointlist.Add(new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z)));
-
-                    }
-                }*/
                 dynamic blueprint = new JObject();
                 try
                 {
                     blueprint = BlueprintOptimizer.CreateBlueprintFromPoints(pointlist);
-                    /*
-                    blueprint.version = 1;
-                    blueprint.bodies = new JArray();
-                    blueprint.bodies.Add(new JObject());
-                    blueprint.bodies[0].childs = new JArray();
-                    foreach (Point3D point in pointlist)
-                    {
-                        dynamic child = new JObject();
-                        child.color = "5DB7E7";
-                        child.pos = new JObject();
-                        child.pos.x = -(int)Math.Floor(point.X);
-                        child.pos.z = (int)Math.Floor(point.Y);
-                        child.pos.y = (int)Math.Floor(point.Z);
-                        child.bounds = new JObject();
-                        child.bounds.x = 1;
-                        child.bounds.y = 1;
-                        child.bounds.z = 1;
-                        child.shapeId = "a6c6ce30-dd47-4587-b475-085d55c6a3b4";
-                        child.xaxis = 1;
-                        child.zaxis = 3;
-                        blueprint.bodies[0].childs.Add(child);
-                        amountgenerated++;
-                    }*/
                 }
                 catch(Exception bpex)
                 {
@@ -249,7 +187,10 @@ namespace Advanced_Blueprint_Tools
                 description.name = "generated blueprint" + r.Next();
                 description.type = "Blueprint";
                 description.version = 0;
-                System.Windows.MessageBox.Show(message+"\nPLEASE WAIT for the rendering to complete");
+                new Task(() =>
+                {
+                    System.Windows.MessageBox.Show(message + "\nPLEASE WAIT for the rendering to complete");
+                }).Start();
                 if (BP.Blueprintpath == null)
                 {//no blueprint exists, initialize new one
                     new BP(blueprintpath, blueprint, description);
@@ -269,6 +210,8 @@ namespace Advanced_Blueprint_Tools
 
         private void Splittriangles(Triangle triangle)
         {
+            if (backgroundWorker.CancellationPending)
+                throw new OperationCanceledException();
             //split triangle in 4 triangles:
             Point3D mid1 = Average(triangle.vertices[0], triangle.vertices[1]); 
             Point3D mid2 = Average(triangle.vertices[1], triangle.vertices[2]);
@@ -302,12 +245,16 @@ namespace Advanced_Blueprint_Tools
         {
             return new Point3D((point1.X + point2.X) / 2.0, (point1.Y + point2.Y) / 2.0, (point1.Z + point2.Z) / 2.0);
         }
+
         private void conversioncompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            pointlist.Clear();
             progressWindow.Close();
-            mainWindow.RenderBlueprint();
-            backgroundWorker.Dispose(); 
+            pointlist.Clear();
+            if (!e.Cancelled)
+            {
+                mainWindow.RenderBlueprint();
+            }
+            backgroundWorker.Dispose();
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -341,19 +288,35 @@ namespace Advanced_Blueprint_Tools
             {
                 this.file = file;
                 objPath.Text = file;
-
-                int minx = 1000000, maxx = -1000000, miny = 1000000, maxy = -1000000, minz = 1000000, maxz = -1000000;
-                Scene scene = new AssimpImporter().ImportFile(file);
-                foreach (Assimp.Vector3D m in scene.Meshes[0].Vertices)
+                
+                new Thread(() =>
                 {
-                    if (m.X < minx) minx = (int)m.X;
-                    else if (m.X > maxx) maxx = (int)m.X;
-                    if (m.Y < miny) miny = (int)m.Y;
-                    else if (m.Y > maxy) maxy = (int)m.Y;
-                    if (m.Z < minz) minz = (int)m.Z;
-                    else if (m.Z > maxz) maxz = (int)m.Z;
-                }
-                BoundsBox.Content = @"(" +(maxx - minx) +"x"+(maxy-miny) + "x"+ (maxz-minz) + ")";
+                    try
+                    {
+
+                        int minx = 1000000, maxx = -1000000, miny = 1000000, maxy = -1000000, minz = 1000000, maxz = -1000000;
+                        Scene scene = new AssimpImporter().ImportFile(file);
+                        foreach (Mesh m in scene.Meshes)
+                            foreach (Assimp.Vector3D p in m.Vertices)
+                            {
+                                if (p.X < minx) minx = (int)p.X;
+                                else if (p.X > maxx) maxx = (int)p.X;
+                                if (p.Y < miny) miny = (int)p.Y;
+                                else if (p.Y > maxy) maxy = (int)p.Y;
+                                if (p.Z < minz) minz = (int)p.Z;
+                                else if (p.Z > maxz) maxz = (int)p.Z;
+                            }
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            BoundsBox.Content = @"(" + (maxx - minx) + "x" + (maxy - miny) + "x" + (maxz - minz) + ")";
+                        }));
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show(ex.Message);
+                        this.file = null;
+                    }
+                }).Start();
             }
         }
     }

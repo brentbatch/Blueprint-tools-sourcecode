@@ -73,7 +73,7 @@ namespace Advanced_Blueprint_Tools.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("95")]
+        [global::System.Configuration.DefaultSettingValueAttribute("96")]
         public int version {
             get {
                 return ((int)(this["version"]));

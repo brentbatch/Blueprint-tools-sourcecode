@@ -20,8 +20,10 @@ namespace Advanced_Blueprint_Tools
     /// </summary>
     public partial class Settings : Window
     {
-        public Settings()
+        MainWindow mainWindow;
+        public Settings(MainWindow mainWindow)
         {
+            this.mainWindow = mainWindow;
             InitializeComponent();
             color_wire.Text = Properties.Settings.Default.wirecolor;
             color_blob.Text = Properties.Settings.Default.blobcolor;
@@ -146,7 +148,7 @@ namespace Advanced_Blueprint_Tools
         private void color_SET_Click(object sender, RoutedEventArgs e)
         {
 
-            MainWindow.openpaintpicker();
+            this.mainWindow.openpaintpicker();
             color_wire.Text = PaintSelector.PaintColor;
             Properties.Settings.Default.wirecolor = color_wire.Text;
         }
@@ -154,7 +156,7 @@ namespace Advanced_Blueprint_Tools
         private void color_SET2_Click(object sender, RoutedEventArgs e)
         {
 
-            MainWindow.openpaintpicker();
+            this.mainWindow.openpaintpicker();
             color_blob.Text = PaintSelector.PaintColor;
             Properties.Settings.Default.blobcolor = color_blob.Text;
         }
