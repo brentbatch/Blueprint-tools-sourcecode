@@ -60,7 +60,15 @@ namespace Advanced_Blueprint_Tools
                 }
             }
             if (this.IsLoaded)
-                filterupdate();
+            {
+                int x1 = Convert.ToInt32(filter_x1.Text);
+                int y1 = Convert.ToInt32(filter_y1.Text);
+                int z1 = Convert.ToInt32(filter_z1.Text);
+                int x2 = Convert.ToInt32(filter_x2.Text);
+                int y2 = Convert.ToInt32(filter_y2.Text);
+                int z2 = Convert.ToInt32(filter_z2.Text);
+                this.mainwindow.setMarker2((x1 + x2 + 0.0f) / 2, (y1 + y2 + 0.0f) / 2, (z1 + z2 + 0.0f) / 2, (x2 - x1), (y2 - y1), (z2 - z1));
+            }
         }
         private void filter_type_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -69,7 +77,7 @@ namespace Advanced_Blueprint_Tools
         }
         private void Filter_SET_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             filter_color.Text = PaintSelector.PaintColor;
         }
         private void color_TextChanged(object sender, TextChangedEventArgs e)
@@ -297,18 +305,18 @@ namespace Advanced_Blueprint_Tools
         private void SET_Copy_Click(object sender, RoutedEventArgs e)
         {
 
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             new_sensorcolor.Text = PaintSelector.PaintColor;
 
         }
         private void SET_Copy1_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             new_lampcolor.Text = PaintSelector.PaintColor;
         }
         private void SET_Copy2_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             new_color.Text = PaintSelector.PaintColor;
         }
 

@@ -26,17 +26,21 @@ namespace Advanced_Blueprint_Tools
         private static HashSet<string> Useduuids = new HashSet<string>();
         
         public static bool missingmod = false;
+        public static bool brokenrotation = false;
 
         public static void setblueprint(dynamic bp)
         {
             Blueprint = bp;
             missingmod = false;
+            brokenrotation = false;
             Useduuids.Clear(); GetUsedUuids();
             Wires = new Dictionary<int, dynamic>();
         }
 
         public BP(string bppath, dynamic bp, dynamic desc)
         {
+            missingmod = false;
+            brokenrotation = false;
             Blueprintpath = bppath;
             Blueprint = bp;
             Description = desc;
@@ -45,6 +49,8 @@ namespace Advanced_Blueprint_Tools
 
         public BP(string bppath)
         {
+            missingmod = false;
+            brokenrotation = false;
             Blueprint = null;
             Description = null;
 
@@ -162,6 +168,26 @@ namespace Advanced_Blueprint_Tools
             return new JObject() { ["minx"] = minx, ["maxx"] = maxx, ["miny"] = miny, ["maxy"] = maxy, ["minz"] = minz, ["maxz"] = maxz };
         }
 
+        public static Point3D GetCenterOffMass()
+        {
+            foreach(dynamic body in Blueprint.bodies)
+                foreach(dynamic child in body.children)
+                    if(Database.blocks.ContainsKey(child.shapeId.ToString()))
+                    {
+                        dynamic bounds = new JObject();
+                        if (child.bounds != null)
+                            bounds = child.bounds.DeepClone();
+                        else
+                            bounds = Database.blocks[child.shapeId.ToString()].GetBoundsDynamic();
+                        int weight = Database.blocks[child.shapeId.ToString()].GetWeight(bounds);
+
+
+
+                    }
+
+            return new Point3D();
+        }
+
         public static Tuple<Model3DGroup, Model3DGroup> RenderBlocks()
         {
             Model3DGroup blocks = new Model3DGroup();
@@ -255,6 +281,10 @@ namespace Advanced_Blueprint_Tools
             new Task(() =>
             {
                 if (BP.missingmod) MessageBox.Show("Missing mod for this blueprint! \nPlease download the required mod!\n\nwill work for now tho wiring/moving blocks not recommended!");
+            }).Start();
+            new Task(() =>
+            {
+                if (BP.brokenrotation) MessageBox.Show("Broken Rotation in this blueprint!\n\nTools 'mirror tool', [] ,.. will BREAK your blueprint!");
             }).Start();
             return new Tuple<Model3DGroup, Model3DGroup>(blocks,glass);
         }
@@ -408,7 +438,7 @@ namespace Advanced_Blueprint_Tools
                 IsJoint = true;
                 child.pos = child.posA;
                 child.xaxis = child.xaxisA;
-                child.zaxis = child.zaxisB;
+                child.zaxis = child.zaxisA;
             }
 
             try
@@ -429,6 +459,8 @@ namespace Advanced_Blueprint_Tools
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.z, ["y"] = child.bounds.y, ["z"] = child.bounds.x };
                     }
+                    else
+                        brokenrotation = true;
                 }
                 else if (xaxisabs == 2)
                 {
@@ -441,6 +473,8 @@ namespace Advanced_Blueprint_Tools
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.z, ["y"] = child.bounds.x, ["z"] = child.bounds.y };
                     }
+                    else
+                        brokenrotation = true;
                 }
                 else if (xaxisabs == 1)
                 {
@@ -448,10 +482,14 @@ namespace Advanced_Blueprint_Tools
                     {
                         child.bounds = new JObject { ["x"] = child.bounds.x, ["y"] = child.bounds.z, ["z"] = child.bounds.y };
                     }
+                    else if(zaxisabs != 3)
+                        brokenrotation = true;
                 }
-            
+                else
+                    brokenrotation = true;
+
                 //this updating pos only applies to parts, blocks do not get affected as they always have xaxis 1 zaxis 3
-                if(!IsJoint)
+                if (!IsJoint)
                 {
                     if (xaxis == -1 | zaxis == -1 | (xaxis == 2 && zaxis == 3) | (xaxis == 3 && zaxis == -2) | (xaxis == -2 && zaxis == -3) | (xaxis == -3 && zaxis == 2))
                         child.pos.x -= child.bounds.x;

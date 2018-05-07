@@ -108,13 +108,13 @@ namespace Advanced_Blueprint_Tools
 
         private void Button3_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            window.openpaintpicker();
             textBox_color1.Text = PaintSelector.PaintColor;
         }
 
         private void Button3_Copy_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            window.openpaintpicker();
             textBox_color2.Text = PaintSelector.PaintColor;
         }
 
@@ -180,7 +180,7 @@ namespace Advanced_Blueprint_Tools
 
         private void Color_list_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.window.openpaintpicker();
             PaintSelector.PaintColor = "#" + ((string)((dynamic)color_list.SelectedItem).Background.ToString()).Substring(3,6);
             if (MainWindow.paintSelector.IsLoaded)
                 MainWindow.paintSelector.textbox_color.Text = PaintSelector.PaintColor;

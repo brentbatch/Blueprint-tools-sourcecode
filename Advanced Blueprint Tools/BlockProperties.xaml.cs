@@ -108,7 +108,7 @@ namespace Advanced_Blueprint_Tools
 
         private void Filter_SET_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             filter_color.Text = PaintSelector.PaintColor;
         }
         private void Filter_pos_TextChanged(object sender, TextChangedEventArgs e)
@@ -434,18 +434,18 @@ namespace Advanced_Blueprint_Tools
         private void SET_Copy_Click(object sender, RoutedEventArgs e)
         {
 
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             new_sensorcolor.Text = PaintSelector.PaintColor;
 
         }
         private void SET_Copy1_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             new_lampcolor.Text = PaintSelector.PaintColor;
         }
         private void SET_Copy2_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             new_color.Text = PaintSelector.PaintColor;
         }
 

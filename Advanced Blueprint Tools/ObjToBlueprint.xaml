@@ -15,7 +15,7 @@
         <CheckBox Name="flipYZ" Content="Flip Y/Z" HorizontalAlignment="Left" Margin="219,63,0,0" VerticalAlignment="Top" Width="119" Height="15"/>
         <CheckBox Name="flipXZ" Content="Flip X/Z" HorizontalAlignment="Left" Margin="219,78,0,0" VerticalAlignment="Top"/>
         <CheckBox Name="flipZ" Content="Mirror Z" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="219,93,0,0"/>
-        <Label Name="BoundsBox" Content="" HorizontalAlignment="Left" Margin="0,39,0,0" VerticalAlignment="Top" Width="56" FontSize="8"/>
+        <Label Name="BoundsBox" Content="" HorizontalAlignment="Left" Margin="0,39,0,0" VerticalAlignment="Top" Width="150" FontSize="10"/>
 
     </Grid>
 </Window>

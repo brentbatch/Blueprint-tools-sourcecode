@@ -99,7 +99,7 @@ namespace Advanced_Blueprint_Tools
             }).Start();
             helix.Camera = helix_wires.Camera;
 
-        }
+        } 
 
         public void RenderBlueprint()
         {
@@ -244,9 +244,11 @@ namespace Advanced_Blueprint_Tools
             meshBuilder.AddBox(new Point3D(x, y, z), 1000, 0.2, 0.2);
             // Create a mesh from the builder (and freeze it)
             var Mesh = meshBuilder.ToMesh(true);
+            
             marker.Children.Add(new GeometryModel3D { Geometry = Mesh, Material = material });
             this.Marker = marker;
-            //helix_wires.Camera.AnimateTo(new Point3D(x - centerx, y - centery, z - centerz), helix_wires.Camera.LookDirection, helix_wires.Camera.UpDirection, 1000);
+            
+          
             Image_blueprint.DataContext = "";
             Image_blueprint.DataContext = this;
             helix_wires.Camera.LookAt(new Point3D(x, y, z), 1000);
@@ -413,13 +415,6 @@ namespace Advanced_Blueprint_Tools
         public static PaintSelector paintSelector;
         private void Click_paintpicker(object sender, RoutedEventArgs e) //paint picker
         {
-            if(paintSelector != null)
-            {
-                PaintSelector p = new PaintSelector();
-                p.Owner = this;
-                p.Show();
-            }
-            else
             {
                 paintSelector = new PaintSelector();
                 paintSelector.Owner = this;
@@ -427,13 +422,13 @@ namespace Advanced_Blueprint_Tools
                 //MainWindow.openpainpicker();
             }
         }
-        public static void openpaintpicker()//opens the paintpicker if mainwindow doesn't have one open
+        public void openpaintpicker()//opens the paintpicker if mainwindow doesn't have one open
         {
             
-            if (paintSelector == null || !paintSelector.IsLoaded)
+            if (paintSelector == null || !(paintSelector.IsActive || paintSelector.IsFocused || paintSelector.IsVisible))
             {
                 paintSelector = new PaintSelector();
-                //paintSelector.Owner = this; //static function :(
+                paintSelector.Owner = this; //static function :(
                 paintSelector.Show();
             }
         }
@@ -449,12 +444,17 @@ namespace Advanced_Blueprint_Tools
                     {
                         {
                             dynamic realpos = BP.getposandbounds(block);
+                            
+                            int xaxis = Convert.ToInt32(block.xaxis);
+                            int zaxis = Convert.ToInt32(block.zaxis);
+                            if (!((xaxis == 1 && zaxis == -2) || (Math.Abs(xaxis) == 1 && Math.Abs(zaxis) == 3) || (xaxis == -1 && zaxis == 2)))
+                            {
+                                realpos.xaxis = -xaxis;
+                                realpos.zaxis = Math.Abs( zaxis)==1? -zaxis : zaxis;
 
-
-                            realpos.xaxis = -Convert.ToInt32(block.xaxis);
-                            realpos.zaxis = Convert.ToInt32(block.zaxis);
+                            }
                             //Bounds bounds = Blockobject.BoundsByRotation(new Bounds(realpos.bounds),1,3);
-                            realpos.pos.x = -Convert.ToInt32(block.pos.x) - Convert.ToInt32(realpos.bounds.x);
+                            realpos.pos.x = -Convert.ToInt32(block.pos.x) - ((realpos.pos.x == block.pos.x)? Convert.ToInt32(realpos.bounds.x) :0);
                             //realpos.pos.y = Convert.ToInt32(block.pos.y) - Convert.ToInt32(block.bounds.y);
 
                             block.pos = BP.calcbppos(realpos).pos;
@@ -579,7 +579,7 @@ namespace Advanced_Blueprint_Tools
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
             if (settings != null) settings.Close();
-            settings = new Settings();
+            settings = new Settings(this);
             settings.Owner = this;
             settings.Show();
 
@@ -633,5 +633,34 @@ namespace Advanced_Blueprint_Tools
             new ObjToBlueprint(this) { Owner = this }.Show();
         }
 
+        private void PixelArt_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!");
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!");
+        }
+
+        private void logicgenerator_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!");
+        }
+
+        private void midiconvertor_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!");
+        }
+
+        private void mergecreation_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!");
+        }
+
+        private void gif3d_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!");
+        }
     }
 }

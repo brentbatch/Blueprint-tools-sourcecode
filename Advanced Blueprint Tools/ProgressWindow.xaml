@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="ProgressWindow" Height="100.283" Width="392.782" Background="#8093A0" BorderThickness="0" WindowStyle="SingleBorderWindow" ResizeMode="NoResize" WindowStartupLocation="Manual" VerticalContentAlignment="Center">
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-        <ProgressBar Name="progressbar" Foreground="#5DB7E7" HorizontalAlignment="Center" Height="20" VerticalAlignment="Top" Width="346"/>
+        <ProgressBar Name="progressbar" Foreground="#5DB7E7" HorizontalAlignment="Center" Height="20" VerticalAlignment="Top" Width="346" IsEnabled="False"/>
         <Button Content="Cancel/Stop" HorizontalAlignment="Left" Margin="198,25,0,0" VerticalAlignment="Top" Width="148" Background="#8D5767" Foreground="#fff" FontWeight="Bold" Height="25" Click="Cancel_Click"/>
         <Label Name="doing_label" Content="" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Height="25"/>
 

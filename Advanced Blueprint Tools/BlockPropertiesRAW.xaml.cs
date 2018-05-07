@@ -68,7 +68,7 @@ namespace Advanced_Blueprint_Tools
         }
         private void Filter_SET_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.mainwindow.openpaintpicker();
             filter_color.Text = PaintSelector.PaintColor;
         }
         private void color_TextChanged(object sender, TextChangedEventArgs e)
@@ -349,7 +349,10 @@ namespace Advanced_Blueprint_Tools
         {
             base.OnClosing(e);
             this.mainwindow.Marker = null;
-            this.mainwindow.setMarker2(0, 0, 0, 0, 0, 0);
+            this.mainwindow.Marker2 = null;
+            mainwindow.Image_blueprint.DataContext = null;
+            mainwindow.Image_blueprint.DataContext = mainwindow;
+            this.mainwindow.helix.ResetCamera();
         }
 
     }

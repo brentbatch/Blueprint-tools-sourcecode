@@ -651,6 +651,8 @@ namespace Advanced_Blueprint_Tools
             }
         }
 
+        public abstract int GetWeight(dynamic bounds = null);
+
         public xyzpair BoundsByRotation(xyzpair bounds, int xaxis, int zaxis)
         {
             if (Math.Abs(xaxis) == 3)
@@ -786,6 +788,7 @@ namespace Advanced_Blueprint_Tools
     {
         private dynamic block;
         //private static Dictionary<dynamic,Geometry3D> previousGeometries;
+        private int weight = -1;
 
 
         public Block(string path, string Name, string Modname, JObject block, JObject desc) :base( path,  Name,  Modname, desc)
@@ -793,6 +796,15 @@ namespace Advanced_Blueprint_Tools
             this.block = block;
             if (this.block != null && this.block.glass != null && this.block.glass == true)
                 base.glass = true;
+        }
+
+        public override int GetWeight(dynamic bounds)
+        {
+            if (this.weight != -1) return this.weight;
+            double density = 500;
+            if (this.block.density != null) density = this.block.density;
+            int weight = (int)(density * bounds.x + density * bounds.y + density * bounds.z);
+            return weight;
         }
 
         public Model3D Render(double x, double y, double z, dynamic bounds, string color, int xaxis, int zaxis)
@@ -815,6 +827,7 @@ namespace Advanced_Blueprint_Tools
         private dynamic part;
         private Geometry3D geometry3D;
         private xyzpair bounds;
+        private int weight = -1;
         public enum properties
         {
             unknown,
@@ -923,6 +936,16 @@ namespace Advanced_Blueprint_Tools
                 this.bounds = xyzpair.getPartBounds(part);
             return this.bounds;
         }
+
+        public override int GetWeight(dynamic bounds)
+        {
+            if (this.weight != -1) return this.weight;
+            double density = 500;
+            if (this.part.density != null) density = this.part.density;
+            int weight = (int)(density * bounds.x + density*bounds.y + density * bounds.z);
+            return weight;
+        }
+
         public dynamic GetBoundsDynamic()
         {
             this.GetBounds();

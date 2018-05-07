@@ -21,7 +21,7 @@ namespace Advanced_Blueprint_Tools
     public partial class ProgressWindow : Window
     {
         BackgroundWorker BackgroundWorker;
-        public ProgressWindow(BackgroundWorker backgroundworker, string doing = "")
+        public ProgressWindow(BackgroundWorker backgroundworker, string doing )
         {
             this.BackgroundWorker = backgroundworker;
             InitializeComponent();

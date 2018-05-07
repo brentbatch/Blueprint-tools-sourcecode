@@ -128,7 +128,7 @@ namespace Advanced_Blueprint_Tools
 
         private void button_set_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.openpaintpicker();
+            this.window.openpaintpicker();
             textBox_color1.Text = PaintSelector.PaintColor;
         }
 
