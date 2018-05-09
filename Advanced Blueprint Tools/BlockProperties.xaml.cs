@@ -539,7 +539,7 @@ namespace Advanced_Blueprint_Tools
             BP.Description.description = BP.Description.description += "++ Applied some block property changes ";
             BP.setblueprint(BP.Blueprint);
             this.mainwindow.RenderBlueprint();
-            Update();
+            //Update();
             w.Close();
         }
 

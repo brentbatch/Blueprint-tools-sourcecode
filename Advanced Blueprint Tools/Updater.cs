@@ -132,6 +132,7 @@ namespace Advanced_Blueprint_Tools
                             config.colorwires = Properties.Settings.Default.colorwires;
                             config.wirecolor = Properties.Settings.Default.wirecolor;
                             config.blobcolor = Properties.Settings.Default.blobcolor;
+                            config.coloropacity = Properties.Settings.Default.coloropacity;
 
                             DateTime lasthigh = new DateTime(1900, 1, 1);
                             string findlastversionname = "";

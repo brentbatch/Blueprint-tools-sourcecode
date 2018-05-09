@@ -33,14 +33,13 @@ namespace Advanced_Blueprint_Tools
             Blueprint = bp;
             missingmod = false;
             brokenrotation = false;
-            Useduuids.Clear(); GetUsedUuids();
+            Useduuids.Clear();
+            GetUsedUuids();
             Wires = new Dictionary<int, dynamic>();
         }
 
         public BP(string bppath, dynamic bp, dynamic desc)
         {
-            missingmod = false;
-            brokenrotation = false;
             Blueprintpath = bppath;
             Blueprint = bp;
             Description = desc;
@@ -49,8 +48,6 @@ namespace Advanced_Blueprint_Tools
 
         public BP(string bppath)
         {
-            missingmod = false;
-            brokenrotation = false;
             Blueprint = null;
             Description = null;
 
@@ -84,6 +81,48 @@ namespace Advanced_Blueprint_Tools
                 foreach(dynamic joint in Blueprint.joints)
                         Useduuids.Add(joint.shapeId.ToString());
             return Useduuids;
+        }
+
+        public static Dictionary<string, Tuple<string, BitmapSource, int>> GetUsedPartsList()
+        {
+            Dictionary<string, int> uuidamounts = new Dictionary<string, int>();
+            try
+            {
+
+                if (Blueprint.bodies != null)
+                    foreach (dynamic body in Blueprint.bodies)
+                        foreach (dynamic child in body.childs)
+                        {
+                            int modifier = 1;
+                            if (child.bounds != null)
+                                modifier = Convert.ToInt32(child.bounds.x.ToString()) * Convert.ToInt32(child.bounds.y.ToString()) * Convert.ToInt32(child.bounds.z.ToString());
+                            string uuid = child.shapeId.ToString();
+                            if (!uuidamounts.ContainsKey(uuid))
+                                uuidamounts.Add(uuid, modifier);
+                            else
+                                uuidamounts[uuid]+=modifier;
+                        }
+                if (Blueprint.joints != null)
+                    foreach (dynamic joint in Blueprint.joints)
+                    {
+                        string uuid = joint.shapeId.ToString();
+                        if (!uuidamounts.ContainsKey(uuid))
+                            uuidamounts.Add(uuid, 1);
+                        else
+                            uuidamounts[uuid]++;
+                    }
+                Dictionary<string, Tuple<string, BitmapSource, int>> list = new Dictionary<string, Tuple<string, BitmapSource, int>>();
+                foreach (string uuid in uuidamounts.Keys)
+                {
+                    if (Database.blocks.ContainsKey(uuid))
+                    {
+                        list.Add(uuid, new Tuple<string, BitmapSource, int>(Database.blocks[uuid].Name, null, uuidamounts[uuid]));
+                    }
+                }
+
+                return list;
+            }
+            catch { return null; }
         }
 
         public static Dictionary<int, dynamic> GetWires()
@@ -168,24 +207,25 @@ namespace Advanced_Blueprint_Tools
             return new JObject() { ["minx"] = minx, ["maxx"] = maxx, ["miny"] = miny, ["maxy"] = maxy, ["minz"] = minz, ["maxz"] = maxz };
         }
 
-        public static Point3D GetCenterOffMass()
+        public static Tuple<Point3D,int> GetCenterOffMass()
         {
+            Point3D center = new Point3D(0, 0, 0);
+            int totalweight = 0;
+            
             foreach(dynamic body in Blueprint.bodies)
-                foreach(dynamic child in body.children)
+                foreach(dynamic child in body.childs)
                     if(Database.blocks.ContainsKey(child.shapeId.ToString()))
                     {
-                        dynamic bounds = new JObject();
-                        if (child.bounds != null)
-                            bounds = child.bounds.DeepClone();
-                        else
-                            bounds = Database.blocks[child.shapeId.ToString()].GetBoundsDynamic();
-                        int weight = Database.blocks[child.shapeId.ToString()].GetWeight(bounds);
+                        dynamic realpos = getposandbounds(child);
+                        int weight = Database.blocks[child.shapeId.ToString()].GetWeight(realpos.bounds);
 
+                        var point = new Point3D((int)realpos.pos.x + (int)realpos.bounds.x/ 2.0, (int)realpos.pos.y + (int)realpos.bounds.y / 2.0, (int)realpos.pos.z + (int)realpos.bounds.z / 2.0);
 
-
+                        int tot = totalweight + weight;
+                        center = new Point3D((center.X * totalweight + point.X * weight) / tot, (center.Y * totalweight + point.Y * weight) / tot, (center.Z * totalweight + point.Z * weight) / tot);
+                        totalweight = tot;
                     }
-
-            return new Point3D();
+            return new Tuple<Point3D, int>(center, totalweight);
         }
 
         public static Tuple<Model3DGroup, Model3DGroup> RenderBlocks()

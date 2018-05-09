@@ -39,6 +39,7 @@ namespace Advanced_Blueprint_Tools
             Text_Version.Content = "Version: \tV" + Properties.Settings.Default.version.ToString();
             Button_wires.Content = "Wires: \t\t" + (Properties.Settings.Default.wires == true ? "ON" : "OFF");
             Button_colorwires.Content = "ColorWires:\t" + (Properties.Settings.Default.colorwires == true ? "ON" : "OFF");
+            WiresOpacity.Text = Properties.Settings.Default.coloropacity.ToString();
         }
 
         private void Button_Branch_Click(object sender, RoutedEventArgs e)
@@ -159,6 +160,22 @@ namespace Advanced_Blueprint_Tools
             this.mainWindow.openpaintpicker();
             color_blob.Text = PaintSelector.PaintColor;
             Properties.Settings.Default.blobcolor = color_blob.Text;
+        }
+
+        private void Opacity_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox t = (TextBox)sender;
+            try
+            {
+                if (Convert.ToInt32(t.Text) < 0) t.Text = "0";
+                if (Convert.ToInt32(t.Text) >255) t.Text = "255";
+            }
+            catch
+            {
+                t.Text = "0";
+                t.Select(0, 1);
+            }
+            Properties.Settings.Default.coloropacity = Convert.ToByte(t.Text);
         }
     }
 }

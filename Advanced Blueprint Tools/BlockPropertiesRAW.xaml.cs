@@ -303,8 +303,8 @@ namespace Advanced_Blueprint_Tools
                             //Update(); 
                             w.Close();
                             MessageBox.Show("edit successful");
-                            Thread.Sleep(1000);
-                            Update();
+
+                            filterupdate();
                             return;
                         }
                         i++;
@@ -321,8 +321,7 @@ namespace Advanced_Blueprint_Tools
                         //Update();
                         w.Close();
                         MessageBox.Show("edit successful");
-                        Thread.Sleep(1000);
-                        Update();
+                        filterupdate();
                         return;
                     }
                     i++;

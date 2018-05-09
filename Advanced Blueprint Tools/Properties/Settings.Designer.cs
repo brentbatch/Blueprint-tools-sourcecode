@@ -73,7 +73,7 @@ namespace Advanced_Blueprint_Tools.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("96")]
+        [global::System.Configuration.DefaultSettingValueAttribute("97")]
         public int version {
             get {
                 return ((int)(this["version"]));
@@ -125,6 +125,18 @@ namespace Advanced_Blueprint_Tools.Properties {
             }
             set {
                 this["blobcolor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public byte coloropacity {
+            get {
+                return ((byte)(this["coloropacity"]));
+            }
+            set {
+                this["coloropacity"] = value;
             }
         }
     }
