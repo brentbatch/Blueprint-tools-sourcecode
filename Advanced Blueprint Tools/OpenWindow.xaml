@@ -22,7 +22,7 @@
         <ListBox x:Name="listBox_blueprints" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="510" VerticalAlignment="Center" Width="380" Background="#8093A0" SelectionChanged="ListBox_Selectionchanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Grid.Column="3" Grid.ColumnSpan="3" Orientation="Horizontal" Background="{x:Null}" HorizontalAlignment="Center">
+                    <StackPanel Grid.Column="3" Grid.ColumnSpan="3" Orientation="Vertical" Background="{x:Null}" HorizontalAlignment="Center">
                         <!--<TextBlock Margin="3" Text="{Binding Name}"/>-->
 
                         <Image Height="100" Width="100" Margin="3" Source="{Binding imsource}" Stretch="Fill" />

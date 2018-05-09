@@ -113,9 +113,12 @@ namespace Advanced_Blueprint_Tools
                 this.Model = renders.Item1;
                 this.Glass = renders.Item2;
                 this.Marker = null;
+                CenterMass.Content = null;
                 this.Marker2 = new Model3DGroup();
 
                 RenderWires();
+                if (listBox_parts.Visibility == Visibility.Visible)
+                    fillparts();
                 Image_blueprint.DataContext = null;
                 Image_blueprint.DataContext = this;
                 helix.ResetCamera();
@@ -129,7 +132,6 @@ namespace Advanced_Blueprint_Tools
                     paint.IsEnabled = true;
                     fixcreation.IsEnabled = true;
                     areaproperties.IsEnabled = true;
-                    //areaproperties.IsEnabled = false;
                     swapblocks.IsEnabled = true;
                     paintpicker.IsEnabled = true;
                     mirrorcreation.IsEnabled = true;
@@ -142,8 +144,9 @@ namespace Advanced_Blueprint_Tools
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Failed to import into rendering box!");
+                MessageBox.Show(e.Message + "\nin most cases the creation should be fine, something just went wrong while rendering", "failed to render");
             }
+            
         }
 
         public void RenderWires()
@@ -164,7 +167,8 @@ namespace Advanced_Blueprint_Tools
                 }
                 Image_blueprint.DataContext = null;
                 Image_blueprint.DataContext = this;
-            }
+                }
+
         }
         private void ToggleWires_Click(object sender, RoutedEventArgs e)
         {
@@ -184,6 +188,30 @@ namespace Advanced_Blueprint_Tools
 
         }
 
+
+        private void CenterMass_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (CenterMass.Content == null)
+                {
+                    Point3D point = BP.GetCenterOffMass().Item1;
+
+                    Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(255,230,30,30)));
+                    var meshBuilder = new MeshBuilder(false, false);
+
+                    meshBuilder.AddSphere(point, 0.3);
+                    var Mesh = meshBuilder.ToMesh(true);
+                    CenterMass.Content = new GeometryModel3D { Geometry = Mesh, Material = material };
+                }
+                else
+                    CenterMass.Content = null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         public void Addblob(dynamic pos, string color)
         {
             try
@@ -191,7 +219,7 @@ namespace Advanced_Blueprint_Tools
                 if (!Properties.Settings.Default.colorwires)
                     color = Properties.Settings.Default.blobcolor.Substring(1,6);
 
-                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180,
+                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(Properties.Settings.Default.coloropacity,
                             Convert.ToByte(color.Substring(0, 2), 16), Convert.ToByte(color.Substring(2, 2), 16), Convert.ToByte(color.Substring(4, 2), 16))));
                 var meshBuilder = new MeshBuilder(false, false);
 
@@ -213,7 +241,7 @@ namespace Advanced_Blueprint_Tools
             {
                 if (!Properties.Settings.Default.colorwires)
                     color = Properties.Settings.Default.wirecolor.Substring(1, 6);
-                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(180,
+                Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(Properties.Settings.Default.coloropacity,
                         Convert.ToByte(color.Substring(0, 2), 16), Convert.ToByte(color.Substring(2, 2), 16), Convert.ToByte(color.Substring(4, 2), 16))));
 
                 var meshBuilder = new MeshBuilder(false, false);
@@ -635,32 +663,119 @@ namespace Advanced_Blueprint_Tools
 
         private void PixelArt_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("coming soon!");
+            MessageBox.Show("coming soon!","create 2d/3d pixelart, be able to import png");
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void Enable_Mode_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("coming soon!");
+            MessageBox.Show("coming soon!","Enable Mods, make certain mods invisible in features");
         }
 
         private void logicgenerator_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("coming soon!");
+            MessageBox.Show("coming soon!","Logic Diagram to Blueprint convertor");
         }
 
         private void midiconvertor_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("coming soon!");
+            MessageBox.Show("coming soon!", "import MIDI track, convert to blueprint");
         }
 
         private void mergecreation_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("coming soon!");
+            MessageBox.Show("coming soon!", "hold creation in ram, import new, merge");
         }
 
         private void gif3d_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("coming soon!");
+            MessageBox.Show("coming soon!", "import multiple blueprints, craft a 3dgif with them");
+        }
+
+        private void dupecreation_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("coming soon!", "stack/dupe creation in x/y/z");
+        }
+
+        private void listBox_parts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void label_desc_Click(object sender, RoutedEventArgs e)
+        {
+
+            var bc = new BrushConverter();
+            label_desc.Background = (Brush)bc.ConvertFrom("#FFFBD300");
+            label_parts.Background = (Brush)bc.ConvertFrom("#FF61737C");
+            TextBox_Description.Visibility = Visibility.Visible;
+            listBox_parts.Visibility = Visibility.Hidden;
+        }
+
+        private void label_parts_Click(object sender, RoutedEventArgs e)
+        {
+            //thread:
+            var bc = new BrushConverter();
+            label_desc.Background = (Brush)bc.ConvertFrom("#FF61737C");
+            label_parts.Background = (Brush)bc.ConvertFrom("#FFFBD300");
+            TextBox_Description.Visibility = Visibility.Hidden;
+            listBox_parts.Visibility = Visibility.Visible;
+            fillparts();
+        }
+        Dictionary<string, Tuple<string, BitmapSource, int>> parts;
+        public void fillparts()
+        {
+            var parts = BP.GetUsedPartsList();
+            if (parts != null)
+                if (!parts.Equals(this.parts) || true)
+                {
+                    new Thread(() =>
+                    {
+                        List<Part_listitem> part_Listitems = new List<Part_listitem>();
+                        foreach (var uuid in parts.Keys)
+                        {
+                            part_Listitems.Add(new Part_listitem()
+                            { name = parts[uuid].Item1, amount = parts[uuid].Item3.ToString(), uuid = uuid});
+                        }
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            //listBox_parts.ItemsSource = null;
+                            listBox_parts.ItemsSource = part_Listitems;
+                        }));
+                        ImageToBitmapSourceConverter converter = new ImageToBitmapSourceConverter();
+                        foreach (Part_listitem item in part_Listitems)
+                        {
+                            var bmp = Database.blocks[item.uuid].GetIcon(item.uuid);
+                            if(bmp != null)
+                            {
+                                item.icon = (BitmapSource)converter.Convert(bmp.Clone(),null, typeof(BitmapSource),null);
+                                item.emptysurface = 0;
+                                item.iconheight = 100;
+                            }
+                        }
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            listBox_parts.ItemsSource = null;
+                            listBox_parts.ItemsSource = part_Listitems;
+                        }));
+
+                    }
+                    ).Start();
+                    this.parts = parts;
+                }
+        }
+
+    }
+    public class Part_listitem
+    {
+        public int emptysurface { get; set; } = 100;
+        public int iconheight { get; set; } = 0;
+        public BitmapSource icon { get; set; } = null;
+        public string uuid { get; set; }
+        public string name { get; set; } = "unnamed";
+        public string amount { get; set; }
+        public override string ToString()
+        {
+            return name + "\n" + amount;
         }
     }
 }

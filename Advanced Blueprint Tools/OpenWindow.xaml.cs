@@ -164,6 +164,13 @@ namespace Advanced_Blueprint_Tools
             {
                 try
                 {
+                    if(((Blueprint)listBox_blueprints.SelectedItem).blueprintpath.Contains(Database.steamapps))
+                    {
+                        MessageBoxResult res2 = MessageBox.Show("Removing a workshop blueprint will result in the game complaining:\n'failed to find blahblah, verify integrity'!\n\nAre you sure you want to continue?\nYou will have to 'verify integrity' through steam", "WORKSHOP BLUEPRINT!", MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
+                        if (res2 == MessageBoxResult.No)
+                            throw new OperationCanceledException("Canceled removing workshop blueprint");
+
+                    }
                     Directory.Delete(((Blueprint)listBox_blueprints.SelectedItem).blueprintpath, true);
                     //Database.LoadBpsIn(Database.User_ + "\\blueprints");
                     Database.blueprints.Remove(((Blueprint)listBox_blueprints.SelectedItem).blueprintpath);

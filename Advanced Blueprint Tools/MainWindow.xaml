@@ -44,11 +44,12 @@
                 <MenuItem Name="requiredmods" Header="Check Required mods" Click="Click_requiredmods" IsEnabled="False" />
                 <MenuItem Name="swapblocks" Header="Swap Blocks" Click="Click_swapblocks" IsEnabled="False" />
                 <MenuItem Name="mirrorcreation" Header="Mirror Creation" Click="Click_mirrormode" IsEnabled="False" />
-                <MenuItem Name="mergecreation" Header="Merge Creations" IsEnabled="False" Click="mergecreation_Click" />
+                <MenuItem Name="mergecreation" Header="Merge Creations" Click="mergecreation_Click" Foreground="SlateGray" />
+                <MenuItem Name="dupecreation" Header="Dupe/stack Creation" Click="dupecreation_Click" Foreground="SlateGray"/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="help" Click="Help_Click"/>
-                <MenuItem Header="Mods" Click="MenuItem_Click"/>
+                <MenuItem Header="Mods" Click="Enable_Mode_Click"/>
                 <MenuItem Header="settings" Click="Settings_Click"/>
                 <MenuItem Header="about" Click="About_Click"/>
             </MenuItem>
@@ -57,13 +58,13 @@
                 <MenuItem Name="spheregenerator" Header="Sphere Generator" Click="Click_ellipsoidgenerator"/>
                 <MenuItem Name="cuboidgenerator" Header="Cuboid Generator" Click="Click_cuboidgenerator"/>
                 <MenuItem Name="ObjToBlueprint" Header="3DModel (obj,mesh,fbx...) To Blueprint" Click="ObjToBlueprint_Click"/>
-                <MenuItem Name="pixelart" Header="PixelArt Generator" Click="PixelArt_Click" IsEnabled="False"/>
-                <MenuItem Name="gif3d" Header="3Dgif Generator" Click="gif3d_Click" IsEnabled="False"/>
-                <MenuItem Name="logicgenerator" Header="Circuit diagram to logic" Click="logicgenerator_Click"  IsEnabled="False"/>
-                <MenuItem Name="midiconvertor" Header="MIDI to blueprint" Click="midiconvertor_Click" IsEnabled="False"/>
+                <MenuItem Name="pixelart" Header="PixelArt (2D &amp; 3D) Generator" Click="PixelArt_Click"  Foreground="SlateGray"/>
+                <MenuItem Name="gif3d" Header="3Dgif Generator" Click="gif3d_Click" Foreground="SlateGray"/>
+                <MenuItem Name="logicgenerator" Header="Circuit diagram to logic" Click="logicgenerator_Click"  Foreground="SlateGray"/>
+                <MenuItem Name="midiconvertor" Header="MIDI to blueprint" Click="midiconvertor_Click"  Foreground="SlateGray"/>
             </MenuItem>
             <MenuItem Margin="50,0,0,0" Header="Toggle Wires" Click="ToggleWires_Click"/>
-            <MenuItem Margin="50,0,0,0" Header="Toggle Center of mass" IsHitTestVisible="False"/>
+            <MenuItem Margin="50,0,0,0" Header="Show Center of mass" Click="CenterMass_Click"/>
             <MenuItem Margin="50,0,0,0" Header="Validation Checks">
                 <MenuItem Header="Joints - indeces" IsEnabled="False"/>
                 <MenuItem Header="Joints - posA/posB" IsEnabled="False"/>
@@ -92,7 +93,7 @@
                     <HelixToolkit:SunLight/>
 
                     <!-- The content of this visual is defined in MainViewModel.cs -->
-                    <ModelVisual3D Content="{Binding Model}"/>
+                    <ModelVisual3D Content="{Binding Model}" x:Name="Models"/>
                     <ModelVisual3D Content="{Binding Marker}"/>
                     <ModelVisual3D Content="{Binding Marker2}"/>
                     <ModelVisual3D Content="{Binding Glass}"/>
@@ -107,19 +108,43 @@
 
                     <!-- The content of this visual is defined in MainViewModel.cs -->
                     <ModelVisual3D Content="{Binding Wires}"/>
+                    <ModelVisual3D x:Name="CenterMass"/>
 
                     <!-- You can also add elements here in the xaml -->
                 </HelixToolkit:HelixViewport3D>
 
             </Grid>
 
-            <Label x:Name="label_desc" Content="Description" HorizontalAlignment="Right" Margin="0,30,566,0" FontSize="24" VerticalAlignment="Top" Foreground="#fff" Background="#61737C" BorderThickness="0" FontWeight="Bold" Width="149"/>
-            <TextBox x:Name="TextBox_Description" HorizontalAlignment="Right" Height="432" Margin="0,98,44,0" TextWrapping="Wrap" Text="..." FontSize="24" Foreground="#fff" VerticalAlignment="Top" Width="671" Background="#61737C" BorderThickness="5" AcceptsReturn="True" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+            <Button x:Name="label_desc" Content="Description" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Margin="0,30,565,0" FontSize="24" VerticalAlignment="Top" Foreground="#fff" Background="#FBD300" BorderThickness="0" FontWeight="Bold" Width="150" Height="42" Click="label_desc_Click"/>
+            <Button x:Name="label_parts" HorizontalContentAlignment="Center" Content="Parts" HorizontalAlignment="Right" Margin="0,30,404,0" FontSize="24" VerticalAlignment="Top" Foreground="#fff" Background="#61737C" BorderThickness="0" FontWeight="Bold" Width="150" Height="42" Click="label_parts_Click"/>
             <Button x:Name="button_overwrite" Content="SAVE/OVERWRITE" HorizontalAlignment="Right" Margin="0,540,395,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7"  FontWeight="Bold" Click="button_overwrite_click" />
             <Button x:Name="button_save" Content="SAVE AS NEW" HorizontalAlignment="Right" Margin="0,540,44,0" VerticalAlignment="Top" Width="320" Height="60" FontSize="24" Foreground="#fff" Background="#5DB7E7" FontWeight="Bold" Click="button_save_click"  />
             <TextBox x:Name="TextBox_Name" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="24" TextWrapping="Wrap" Text="NAME" VerticalAlignment="Top" Foreground="#fff" FontWeight="Bold" Background="#FBD300" Margin="34,540,735,30" Width="500" Height="60" BorderThickness="0"/>
-            <Label Margin="714,0,0,557" MouseDoubleClick="Label_MouseDoubleClick"/>
+            <Label Margin="911,0,0,557" MouseDoubleClick="Label_MouseDoubleClick"/>
             <Button x:Name="Notifications" Content="0" HorizontalAlignment="Right" Padding="10,0,10,0" VerticalContentAlignment="Center" Margin="0,30,44,0" VerticalAlignment="Top" Height="42"  FontSize="24" Foreground="#fff" Background="#FF954444" FontWeight="Bold" Visibility="Collapsed" Click="Notifications_Click"/>
+            
+            <TextBox x:Name="TextBox_Description" HorizontalAlignment="Right" Height="432" Margin="0,98,44,0" TextWrapping="Wrap" Text="..." FontSize="24" Foreground="#fff" VerticalAlignment="Top" Width="671" Background="#61737C" BorderThickness="5" AcceptsReturn="True" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto" />
+            <ListBox x:Name="listBox_parts" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="432" VerticalAlignment="Center" Width="671" Background="{x:Null}" Margin="560,98,44,120" BorderThickness="0" SelectionChanged="listBox_parts_SelectionChanged" Visibility="Hidden">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Grid.Column="3" Grid.ColumnSpan="3" Orientation="Vertical" Background="{x:Null}" HorizontalAlignment="Center" Margin="6" Width="108" Height="160">
+                            <!--<TextBlock Margin="3" Text="{Binding Name}"/>  Source="{Binding imgsource}" Stretch="Fill"-->
+
+                            <Image Height="{Binding iconheight}" Width="100" Margin="3" Source="{Binding icon}" Stretch="Fill" />
+                            <TextBlock Height="{Binding emptysurface}" Width="100" Margin="3" Background="#61737C" HorizontalAlignment="Center" />
+                            <TextBlock Height="18" Foreground="#fff" FontSize="15" FontWeight="Bold" Text="{Binding amount}" TextWrapping="Wrap" HorizontalAlignment="Center"/>
+                            <TextBlock Height="50" Foreground="#fff" FontWeight="Bold" Text="{Binding name}" TextWrapping="Wrap" HorizontalAlignment="Center"/>
+                            <!--Source="{Binding image}"-->
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+
         </Grid>
     </DockPanel>
 </Window>

@@ -17,6 +17,7 @@ using System.Windows.Threading;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
+using System.Xml;
 
 namespace Advanced_Blueprint_Tools
 {
@@ -83,7 +84,7 @@ namespace Advanced_Blueprint_Tools
                 if (config.steamapps != null)
                 {
                     steamapps = config.steamapps.ToString();
-                    Properties.Settings.Default.steamapps = steamapps;
+                    Properties.Settings.Default.steamapps = config.steamapps.ToString();
                 }
                 if (config.times != null)
                     Properties.Settings.Default.times = Convert.ToInt32(config.times.ToString());
@@ -97,6 +98,8 @@ namespace Advanced_Blueprint_Tools
                     Properties.Settings.Default.wirecolor = config.wirecolor;
                 if (config.blobcolor != null)
                     Properties.Settings.Default.blobcolor = config.blobcolor;
+                if (config.coloropacity != null)
+                    Properties.Settings.Default.coloropacity = Convert.ToByte(config.coloropacity.ToString());
 
             }
             Properties.Settings.Default.times++;
@@ -153,7 +156,7 @@ namespace Advanced_Blueprint_Tools
                 ModDatabase = steamapps + @"\workshop\content\387990";
 
             Properties.Settings.Default.steamapps = steamapps;
-
+            Properties.Settings.Default.Save();
             return steamapps;
         }
 
@@ -262,8 +265,7 @@ namespace Advanced_Blueprint_Tools
         {
             string inventorydecpath = ScrapData + @"\Gui\Language\English\InventoryItemDescriptions.json";
             JObject inventoryitemdesc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(inventorydecpath)) as dynamic;
-
-
+            
             //VANILLA BLOCKS: 
             dynamic blockz = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(
                 System.IO.File.ReadAllText(ScrapData + @"\Objects\Database\basicmaterials.json"));
@@ -635,7 +637,7 @@ namespace Advanced_Blueprint_Tools
         public string Mod { get; private set; } = "";//modname
         public string Name { get; private set; } = "unnamed shape";//block name
         public int id { get; private set; }//mod id
-
+        private Bitmap icon;
         
 
         public bool glass { get; protected set; } = false;
@@ -649,6 +651,32 @@ namespace Advanced_Blueprint_Tools
             {
                 this.id = desc.fileId;
             }
+        }
+
+        public Bitmap GetIcon(string uuid)
+        {
+            if(File.Exists(this.Path + @"\Gui\IconMap.png") && File.Exists(this.Path + @"\Gui\IconMap.xml"))
+            {
+                Bitmap IconMap = new Bitmap(this.Path + @"\Gui\IconMap.png");
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(File.ReadAllText(this.Path + @"\Gui\IconMap.xml"));
+                string iconstring = Newtonsoft.Json.JsonConvert.SerializeXmlNode(doc).Replace("@", "");
+                dynamic icons = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(iconstring);
+
+                string[] size = icons.MyGUI.Resource.Group.size.ToString().Split(' ');
+
+                foreach (dynamic icon in icons.MyGUI.Resource.Group.Index)
+                {
+                    if(icon.@name.ToString() == uuid)
+                    {
+                        string[] point = icon.Frame.point.ToString().Split(' ');
+                        Bitmap bmp = IconMap.Clone(new System.Drawing.Rectangle(Convert.ToInt32(point[0]), Convert.ToInt32(point[1]), Convert.ToInt32(size[0]), Convert.ToInt32(size[1])), IconMap.PixelFormat);
+                        IconMap.Dispose();
+                        return bmp;
+                    }
+                }
+            }
+            return null;
         }
 
         public abstract int GetWeight(dynamic bounds = null);
@@ -803,7 +831,7 @@ namespace Advanced_Blueprint_Tools
             if (this.weight != -1) return this.weight;
             double density = 500;
             if (this.block.density != null) density = this.block.density;
-            int weight = (int)(density * bounds.x + density * bounds.y + density * bounds.z);
+            int weight = (int)(density * (int)bounds.x + density * (int)bounds.y + density * (int)bounds.z);
             return weight;
         }
 
@@ -942,7 +970,7 @@ namespace Advanced_Blueprint_Tools
             if (this.weight != -1) return this.weight;
             double density = 500;
             if (this.part.density != null) density = this.part.density;
-            int weight = (int)(density * bounds.x + density*bounds.y + density * bounds.z);
+            int weight = (int)(density * (int)bounds.x + density* (int)bounds.y + density * (int)bounds.z);
             return weight;
         }
 
@@ -1029,28 +1057,32 @@ namespace Advanced_Blueprint_Tools
                 Scene a = new AssimpImporter().ImportFile(location);
 
 
-                Mesh m = a.Meshes[0];
+                //Mesh m = a.Meshes[0];
                 //a.Materials[0]
 
                 var meshBuilder = new MeshBuilder(false, false);
-                foreach (Face face in m.Faces)
+                foreach(Mesh m in a.Meshes)
                 {
 
-                    IList<Point3D> vertices = new List<Point3D>();
-                    foreach (uint i in face.Indices)
+                    foreach (Face face in m.Faces)
                     {
-                        vertices.Add(new Point3D(m.Vertices[i].X, m.Vertices[i].Y, m.Vertices[i].Z));
+
+                        IList<Point3D> vertices = new List<Point3D>();
+                        foreach (uint i in face.Indices)
+                        {
+                            vertices.Add(new Point3D(m.Vertices[i].X, m.Vertices[i].Y, m.Vertices[i].Z));
+                        }
+                        meshBuilder.AddPolygon(vertices);
+                        vertices = new List<Point3D>();
                     }
-                    meshBuilder.AddPolygon(vertices);
-                    vertices = new List<Point3D>();
-                }
-                if (false)
-                {
-                    var texturecoords = m.GetTextureCoords(0);
-                    meshBuilder.TextureCoordinates = new PointCollection();
-                    foreach (Assimp.Vector3D vec in m.GetTextureCoords(0))
+                    if (false)
                     {
-                        meshBuilder.TextureCoordinates.Add(new System.Windows.Point(Convert.ToDouble(vec.X), Convert.ToDouble(vec.Y)));
+                        var texturecoords = m.GetTextureCoords(0);
+                        meshBuilder.TextureCoordinates = new PointCollection();
+                        foreach (Assimp.Vector3D vec in m.GetTextureCoords(0))
+                        {
+                            meshBuilder.TextureCoordinates.Add(new System.Windows.Point(Convert.ToDouble(vec.X), Convert.ToDouble(vec.Y)));
+                        }
                     }
                 }
 
