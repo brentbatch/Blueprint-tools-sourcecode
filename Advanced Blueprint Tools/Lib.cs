@@ -655,6 +655,7 @@ namespace Advanced_Blueprint_Tools
 
         public Bitmap GetIcon(string uuid)
         {
+            if (icon != null) return icon;
             if(File.Exists(this.Path + @"\Gui\IconMap.png") && File.Exists(this.Path + @"\Gui\IconMap.xml"))
             {
                 Bitmap IconMap = new Bitmap(this.Path + @"\Gui\IconMap.png");
@@ -672,6 +673,7 @@ namespace Advanced_Blueprint_Tools
                         string[] point = icon.Frame.point.ToString().Split(' ');
                         Bitmap bmp = IconMap.Clone(new System.Drawing.Rectangle(Convert.ToInt32(point[0]), Convert.ToInt32(point[1]), Convert.ToInt32(size[0]), Convert.ToInt32(size[1])), IconMap.PixelFormat);
                         IconMap.Dispose();
+                        this.icon = bmp;
                         return bmp;
                     }
                 }
@@ -1056,14 +1058,10 @@ namespace Advanced_Blueprint_Tools
 
                 Scene a = new AssimpImporter().ImportFile(location);
 
-
-                //Mesh m = a.Meshes[0];
-                //a.Materials[0]
-
                 var meshBuilder = new MeshBuilder(false, false);
                 foreach(Mesh m in a.Meshes)
                 {
-
+                    
                     foreach (Face face in m.Faces)
                     {
 
@@ -1077,11 +1075,18 @@ namespace Advanced_Blueprint_Tools
                     }
                     if (false)
                     {
-                        var texturecoords = m.GetTextureCoords(0);
-                        meshBuilder.TextureCoordinates = new PointCollection();
-                        foreach (Assimp.Vector3D vec in m.GetTextureCoords(0))
+                        try
                         {
-                            meshBuilder.TextureCoordinates.Add(new System.Windows.Point(Convert.ToDouble(vec.X), Convert.ToDouble(vec.Y)));
+                            var texturecoords = m.GetTextureCoords(0);
+                            meshBuilder.TextureCoordinates = new PointCollection();
+                            foreach (Assimp.Vector3D vec in m.GetTextureCoords(0))
+                            {
+                                meshBuilder.TextureCoordinates.Add(new System.Windows.Point(Convert.ToDouble(vec.X), Convert.ToDouble(vec.Y)));
+                            }
+                        }
+                        catch (Exception edd)
+                        {
+                            MessageBox.Show(edd.Message);
                         }
                     }
                 }

@@ -5,17 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
         mc:Ignorable="d"
-        Title="ObjToBlueprint" Height="154.761" Width="495.381" Background="#8093A0"  HorizontalAlignment="Center" VerticalAlignment="Center" >
-    <Grid>
-        <TextBox Name="objPath" HorizontalAlignment="Left" Height="47" Margin="76,10,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="398" VerticalContentAlignment="Center" MouseDoubleClick="objPath_MouseDoubleClick" ToolTip="Double Click me!" HorizontalScrollBarVisibility="Auto" TextChanged="objPath_TextChanged" Text="C://"/>
-        <Label Content=".Obj Path:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="47" />
-        <Button Content="Generate Blueprint" HorizontalAlignment="Left" Margin="343,62,0,0" VerticalAlignment="Top" Width="131" Height="46" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button_Click"/>
-        <Label Content="Scale:" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="10,62,0,0" VerticalAlignment="Top" Height="46"/>
-        <TextBox Name="Textbox_Scale" HorizontalAlignment="Left" Height="46" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="76,62,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="138" TextChanged="TextBox_TextChanged"/>
-        <CheckBox Name="flipYZ" Content="Flip Y/Z" HorizontalAlignment="Left" Margin="219,63,0,0" VerticalAlignment="Top" Width="119" Height="15"/>
-        <CheckBox Name="flipXZ" Content="Flip X/Z" HorizontalAlignment="Left" Margin="219,78,0,0" VerticalAlignment="Top"/>
-        <CheckBox Name="flipZ" Content="Mirror Z" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="219,93,0,0"/>
+        Title="ObjToBlueprint" Height="199.761" Width="495.381" Background="#8093A0"  HorizontalAlignment="Center" VerticalAlignment="Center" ResizeMode="NoResize">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBox Name="objPath" HorizontalAlignment="Left" Height="47" Margin="66,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="401" VerticalContentAlignment="Center" MouseDoubleClick="objPath_MouseDoubleClick" ToolTip="Double Click me!" HorizontalScrollBarVisibility="Auto" TextChanged="objPath_TextChanged" Text="C://"/>
+        <Label Content=".Obj Path:" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="47" />
+        <Button Content="Generate Blueprint" HorizontalAlignment="Left" Margin="336,104,0,0" VerticalAlignment="Top" Width="131" Height="46" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="Button_Click"/>
+        <Label Content="Scale:" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="0,104,0,0" VerticalAlignment="Top" Height="46"/>
+        <TextBox Name="Textbox_Scale" HorizontalAlignment="Left" Height="46" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="66,104,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="141" TextChanged="TextBox_TextChanged"/>
+        <CheckBox Name="flipYZ" Content="Flip Y/Z" HorizontalAlignment="Left" Margin="212,105,0,0" VerticalAlignment="Top" Width="119" Height="15"/>
+        <CheckBox Name="flipXZ" Content="Flip X/Z" HorizontalAlignment="Left" Margin="212,120,0,0" VerticalAlignment="Top"/>
+        <CheckBox Name="flipZ" Content="Mirror Z" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="212,135,0,0"/>
         <Label Name="BoundsBox" Content="" HorizontalAlignment="Left" Margin="0,39,0,0" VerticalAlignment="Top" Width="150" FontSize="10"/>
+        <Label Content="Texture: " HorizontalAlignment="Left" Margin="0,52,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="47" />
+        <TextBox x:Name="TexturePath" HorizontalAlignment="Left" Height="47" Margin="66,52,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="401" VerticalContentAlignment="Center" MouseDoubleClick="TexturePath_MouseDoubleClick" ToolTip="Double Click me!" HorizontalScrollBarVisibility="Auto" TextChanged="TexturePath_TextChanged" Text="C://"/>
 
     </Grid>
 </Window>
