@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Advanced_Blueprint_Tools"
         mc:Ignorable="d"
         Background="#61737D"
-        Title="MainWindow" Height="720" Width="1280" WindowStartupLocation="CenterScreen">
+        Title="Advanced Blueprint Tools" Height="720" Width="1280" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Color x:Key="Color1">#FF607380</Color>
     </Window.Resources>
@@ -38,7 +38,7 @@
                 <MenuItem Name="connections" Header="Advanced Connections" Click="Click_advancedwiring" IsEnabled="False"/>
                 <MenuItem Name="paint" Header="Advanced Paint" Click="Click_advancedcolor" IsEnabled="False" />
                 <MenuItem Name="blockproperties" Header="Block Properties" Click="Click_blockproperties" IsEnabled="False" />
-                <MenuItem Name="blockpropertiesRAW" Header="blockpropertiesRAW" Click="Click_blockpropertiesRAW" IsEnabled="False"/>
+                <MenuItem Name="blockpropertiesRAW" Header="BlockpropertiesRAW" Click="Click_blockpropertiesRAW" IsEnabled="False"/>
                 <MenuItem Name="areaproperties" Header="Areaproperties" Click="Click_areaproperties" IsEnabled="False"/>
                 <MenuItem Name="fixcreation" Header="Fix invalid json (Removes joints)" Click="Click_fixcreation" IsEnabled="False" />
                 <MenuItem Name="requiredmods" Header="Check Required mods" Click="Click_requiredmods" IsEnabled="False" />
@@ -48,13 +48,13 @@
                 <MenuItem Name="dupecreation" Header="Dupe/stack Creation" Click="dupecreation_Click" Foreground="SlateGray"/>
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="help" Click="Help_Click"/>
+                <MenuItem Header="Help" Click="Help_Click"/>
                 <MenuItem Header="Mods" Click="Enable_Mode_Click"/>
-                <MenuItem Header="settings" Click="Settings_Click"/>
-                <MenuItem Header="about" Click="About_Click"/>
+                <MenuItem Header="Settings" Click="Settings_Click"/>
+                <MenuItem Header="About" Click="About_Click"/>
             </MenuItem>
             <MenuItem Name="paintpicker" Header="Paint Selector" Click="Click_paintpicker" Background="#71838D"/>
-            <MenuItem Header="Generators">
+            <MenuItem Margin="50,0,0,0" Header="Generators">
                 <MenuItem Name="spheregenerator" Header="Sphere Generator" Click="Click_ellipsoidgenerator"/>
                 <MenuItem Name="cuboidgenerator" Header="Cuboid Generator" Click="Click_cuboidgenerator"/>
                 <MenuItem Name="ObjToBlueprint" Header="3DModel (obj,mesh,fbx...) To Blueprint" Click="ObjToBlueprint_Click"/>
@@ -64,14 +64,14 @@
                 <MenuItem Name="midiconvertor" Header="MIDI to blueprint" Click="midiconvertor_Click"  Foreground="SlateGray"/>
             </MenuItem>
             <MenuItem Margin="50,0,0,0" Header="Toggle Wires" Click="ToggleWires_Click"/>
-            <MenuItem Margin="50,0,0,0" Header="Show Center of mass" Click="CenterMass_Click"/>
+            <MenuItem Margin="50,0,0,0" Header="Show Center of Mass" Click="CenterMass_Click"/>
             <MenuItem Margin="50,0,0,0" Header="Validation Checks">
                 <MenuItem Header="Joints - indeces" IsEnabled="False"/>
                 <MenuItem Header="Joints - posA/posB" IsEnabled="False"/>
-                <MenuItem Header="joints-blocks contact" IsEnabled="False"/>
-                <MenuItem Header="blocks bodies" IsEnabled="False"/>
-                <MenuItem Header="blocks - properties for type" IsEnabled="False"/>
-                <MenuItem Header="rotationsets" IsEnabled="False"/>
+                <MenuItem Header="Joints-blocks contact" IsEnabled="False"/>
+                <MenuItem Header="Blocks bodies" IsEnabled="False"/>
+                <MenuItem Header="Blocks - properties for type" IsEnabled="False"/>
+                <MenuItem Header="Rotationsets" IsEnabled="False"/>
                 <MenuItem Header="Wires - logic" IsEnabled="False"/>
                 <MenuItem Header="Wires - joints" IsEnabled="False"/>
             </MenuItem>

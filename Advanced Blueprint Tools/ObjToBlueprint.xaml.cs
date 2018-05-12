@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Threading;
 using System.IO;
+using System.Drawing;
 
 namespace Advanced_Blueprint_Tools
 {
@@ -28,11 +29,12 @@ namespace Advanced_Blueprint_Tools
     {
         MainWindow mainWindow;
         string file;
+        string texture;
         double scale=1;
         Assimp.Vector3D bounds = new Assimp.Vector3D(1, 1, 1);
         BackgroundWorker backgroundWorker = new BackgroundWorker();
         ProgressWindow progressWindow;
-        HashSet<Point3D> pointlist = new HashSet<Point3D>();
+        HashSet<Point3D> pointlist = new HashSet<Point3D>();//Tuple<Point3D,color>
         bool flipyz = false;
         bool flipxz = false;
         int flipz = 1;
@@ -59,6 +61,72 @@ namespace Advanced_Blueprint_Tools
             }
 
         }
+        private void objPath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string file = objPath.Text;
+            if (file != null && file != "" && File.Exists(file))
+            {
+                this.file = file;
+                //objPath.Text = file;
+
+                new Thread(() =>
+                {
+                    try
+                    {
+
+                        int minx = 1000000, maxx = -1000000, miny = 1000000, maxy = -1000000, minz = 1000000, maxz = -1000000;
+                        Scene scene = new AssimpImporter().ImportFile(file);
+                        foreach (Mesh m in scene.Meshes)
+                            foreach (Assimp.Vector3D p in m.Vertices)
+                            {
+                                if (p.X < minx) minx = (int)p.X;
+                                else if (p.X > maxx) maxx = (int)p.X;
+                                if (p.Y < miny) miny = (int)p.Y;
+                                else if (p.Y > maxy) maxy = (int)p.Y;
+                                if (p.Z < minz) minz = (int)p.Z;
+                                else if (p.Z > maxz) maxz = (int)p.Z;
+                            }
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            BoundsBox.Content = @"(" + (maxx - minx) + "x" + (maxy - miny) + "x" + (maxz - minz) + ")";
+                        }));
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show(ex.Message, "Couldn't load mesh file");
+                        this.file = null;
+                    }
+                }).Start();
+            }
+        }
+        private void TexturePath_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.DefaultExt = ".png";
+            openFileDialog.Filter = "png files (*.png)|*.png|jpg files (*.jpg)|*.jpg|All Files(*.*)|*.*";
+            openFileDialog.InitialDirectory = Database.ScrapData;
+
+            openFileDialog.ShowDialog();
+
+            string file = openFileDialog.FileName;
+            if (file != null && file != "")
+            {
+                TexturePath.Text = file;
+            }
+            
+
+        }
+        private void TexturePath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string file = TexturePath.Text;
+            if (file != null && file != "" && File.Exists(file))
+            {
+                this.texture = file;
+            }
+            else this.texture = null;
+
+        }
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -74,20 +142,145 @@ namespace Advanced_Blueprint_Tools
                 progressWindow = new ProgressWindow(backgroundWorker, "Converting OBJ to Pointlist");
                 progressWindow.Show();
 
-                backgroundWorker.DoWork += new DoWorkEventHandler(convertobj);
+                if(this.texture == null)
+                    backgroundWorker.DoWork += new DoWorkEventHandler(Convertobj);
+                else
+                    backgroundWorker.DoWork += new DoWorkEventHandler(Convertobjwtexture);
                 backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(conversioncompleted);
-                backgroundWorker.ProgressChanged += backgroundWorker1_ProgressChanged;
+                backgroundWorker.ProgressChanged += BackgroundWorker1_ProgressChanged;
                     
                 backgroundWorker.RunWorkerAsync();
                 
             }
         }
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BackgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressWindow.UpdateProgress(e.ProgressPercentage);
         }
         
-        private void convertobj(object sender, DoWorkEventArgs e)
+        private void Convertobjwtexture(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                Scene scene = new AssimpImporter().ImportFile(file, PostProcessSteps.Triangulate);
+                Bitmap IconMap = new Bitmap(this.texture);
+
+                //List<Triangle> splittriangles = new List<Triangle>();
+                pointlist = new HashSet<Point3D>();
+                
+                //pointlist.ToDictionary<>
+                int progress = 0;
+                int total = 0;
+
+                foreach (Mesh m in scene.Meshes)
+                    foreach (Face face in m.Faces)
+                        total++;
+                foreach (Mesh m in scene.Meshes)
+                {
+
+                    foreach (Face face in m.Faces)
+                    {
+                        IList<Point3D> vertices = new List<Point3D>();
+                        foreach (uint i in face.Indices)
+                        {
+                            double x = m.Vertices[i].X * scale;
+                            double y = m.Vertices[i].Y * scale;
+                            double z = m.Vertices[i].Z * scale;
+                            Point3D point;
+                            if (flipyz)
+                            {
+                                if (flipxz)
+                                {
+                                    point = new Point3D((int)Math.Floor(y), (int)Math.Floor(z), flipz * (int)Math.Floor(x));
+                                }
+                                else
+                                {
+                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(z), flipz * (int)Math.Floor(y));
+                                }
+                            }
+                            else
+                            {
+                                if (flipxz)
+                                {
+                                    point = new Point3D((int)Math.Floor(z), (int)Math.Floor(y), flipz * (int)Math.Floor(x));
+                                }
+                                else
+                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(y), flipz * (int)Math.Floor(z));
+                            }
+                            vertices.Add(point);
+                            pointlist.Add(point);
+                        }
+                        if (vertices.Count == 3)
+                        {
+                            Triangle triangle = new Triangle(vertices);
+                            if (!triangle.BoundsSmallerThan(bounds))
+                                Splittriangles(triangle);
+                        }
+                        else
+                        { }
+                        progress++;
+                        backgroundWorker.ReportProgress((progress * 100) / total);
+                        if (backgroundWorker.CancellationPending)
+                            e.Cancel = true;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is OperationCanceledException))
+                    System.Windows.MessageBox.Show(ex.Message, "Something went wrong converting the obj");
+                else
+                    e.Cancel = true;
+            }
+
+            try
+            {
+                if (backgroundWorker.CancellationPending)
+                    throw new OperationCanceledException();
+
+                dynamic blueprint = new JObject();
+                try
+                {
+                    blueprint = BlueprintOptimizer.CreateBlueprintFromPoints(pointlist);
+                }
+                catch (Exception bpex)
+                {
+                    System.Windows.MessageBox.Show(bpex.Message, "Something went wrong building the blueprint");
+                }
+                int amountgenerated = blueprint.bodies[0].childs.Count;
+                string message = "converted obj to blueprint with " + amountgenerated + " blocks !";
+                //MessageBox.Show(message+"\n\nOptimized to: "+count+" shapes");
+                Random r = new Random();
+                string blueprintpath = Database.User_ + "\\Blueprints\\Generatedblueprintobj-" + r.Next() + r.Next();
+                dynamic description = new JObject();
+                description.description = "generated obj blueprint with " + amountgenerated + " block";
+                description.name = "generated blueprint" + r.Next();
+                description.type = "Blueprint";
+                description.version = 0;
+                new Task(() =>
+                {
+                    System.Windows.MessageBox.Show(message + "\nPLEASE WAIT for the rendering to complete");
+                }).Start();
+                if (BP.Blueprintpath == null)
+                {//no blueprint exists, initialize new one
+                    new BP(blueprintpath, blueprint, description);
+                }
+                else
+                {//overwrite current blueprint
+                    BP.setblueprint(blueprint);
+                    BP.Description.description += message;
+                }
+            }
+            catch (Exception exc)
+            {
+                System.Windows.MessageBox.Show(exc.Message, "error");
+            }
+
+
+        }
+
+        private void Convertobj(object sender, DoWorkEventArgs e)
         {
 
             Scene scene = new AssimpImporter().ImportFile(file, PostProcessSteps.Triangulate);
@@ -281,44 +474,7 @@ namespace Advanced_Blueprint_Tools
             this.scale = Convert.ToDouble(t.Text);
         }
 
-        private void objPath_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            string file = objPath.Text;
-            if (file != null && file != ""&& File.Exists(file))
-            {
-                this.file = file;
-                objPath.Text = file;
-                
-                new Thread(() =>
-                {
-                    try
-                    {
 
-                        int minx = 1000000, maxx = -1000000, miny = 1000000, maxy = -1000000, minz = 1000000, maxz = -1000000;
-                        Scene scene = new AssimpImporter().ImportFile(file);
-                        foreach (Mesh m in scene.Meshes)
-                            foreach (Assimp.Vector3D p in m.Vertices)
-                            {
-                                if (p.X < minx) minx = (int)p.X;
-                                else if (p.X > maxx) maxx = (int)p.X;
-                                if (p.Y < miny) miny = (int)p.Y;
-                                else if (p.Y > maxy) maxy = (int)p.Y;
-                                if (p.Z < minz) minz = (int)p.Z;
-                                else if (p.Z > maxz) maxz = (int)p.Z;
-                            }
-                        this.Dispatcher.Invoke((Action)(() =>
-                        {
-                            BoundsBox.Content = @"(" + (maxx - minx) + "x" + (maxy - miny) + "x" + (maxz - minz) + ")";
-                        }));
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Windows.MessageBox.Show(ex.Message);
-                        this.file = null;
-                    }
-                }).Start();
-            }
-        }
     }
 
 
@@ -336,6 +492,16 @@ namespace Advanced_Blueprint_Tools
             return (Math.Abs(vertices[0].X - vertices[1].X) < bounds.X && Math.Abs(vertices[0].X - vertices[2].X) < bounds.X && Math.Abs(vertices[2].X - vertices[1].X) < bounds.X &&
                     Math.Abs(vertices[0].Y - vertices[1].Y) < bounds.Y && Math.Abs(vertices[0].Y - vertices[2].Y) < bounds.Y && Math.Abs(vertices[2].Y - vertices[1].Y) < bounds.Y &&
                     Math.Abs(vertices[0].Z - vertices[1].Z) < bounds.Z && Math.Abs(vertices[0].Z - vertices[2].Z) < bounds.Z && Math.Abs(vertices[2].Z - vertices[1].Z) < bounds.Z);
+        }
+    }
+
+    public class ColorTriangle : Triangle
+    {
+        public IList<Point3D> texturecoords;
+
+        public ColorTriangle(IList<Point3D> vertices, IList<Point3D> texturecoords) : base(vertices)
+        {
+            this.texturecoords = texturecoords;
         }
     }
 }
