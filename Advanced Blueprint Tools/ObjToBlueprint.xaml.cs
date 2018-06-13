@@ -30,6 +30,7 @@ namespace Advanced_Blueprint_Tools
         MainWindow mainWindow;
         string file;
         string texture;
+        Dictionary<Point3D, Point3D> coloredpoints;
         double scale=1;
         Assimp.Vector3D bounds = new Assimp.Vector3D(1, 1, 1);
         BackgroundWorker backgroundWorker = new BackgroundWorker();
@@ -38,6 +39,7 @@ namespace Advanced_Blueprint_Tools
         bool flipyz = false;
         bool flipxz = false;
         int flipz = 1;
+        bool texturepossible = false;
         public ObjToBlueprint(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
@@ -73,10 +75,12 @@ namespace Advanced_Blueprint_Tools
                 {
                     try
                     {
-
+                        this.texturepossible = false;
                         int minx = 1000000, maxx = -1000000, miny = 1000000, maxy = -1000000, minz = 1000000, maxz = -1000000;
                         Scene scene = new AssimpImporter().ImportFile(file);
                         foreach (Mesh m in scene.Meshes)
+                        {
+                            if (m.TextureCoordsChannelCount>0) this.texturepossible = true;
                             foreach (Assimp.Vector3D p in m.Vertices)
                             {
                                 if (p.X < minx) minx = (int)p.X;
@@ -86,6 +90,7 @@ namespace Advanced_Blueprint_Tools
                                 if (p.Z < minz) minz = (int)p.Z;
                                 else if (p.Z > maxz) maxz = (int)p.Z;
                             }
+                        }
                         this.Dispatcher.Invoke((Action)(() =>
                         {
                             BoundsBox.Content = @"(" + (maxx - minx) + "x" + (maxy - miny) + "x" + (maxz - minz) + ")";
@@ -142,10 +147,10 @@ namespace Advanced_Blueprint_Tools
                 progressWindow = new ProgressWindow(backgroundWorker, "Converting OBJ to Pointlist");
                 progressWindow.Show();
 
-                if(this.texture == null)
-                    backgroundWorker.DoWork += new DoWorkEventHandler(Convertobj);
-                else
+                if(this.texture != null && this.texturepossible)
                     backgroundWorker.DoWork += new DoWorkEventHandler(Convertobjwtexture);
+                else
+                    backgroundWorker.DoWork += new DoWorkEventHandler(Convertobj);
                 backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(conversioncompleted);
                 backgroundWorker.ProgressChanged += BackgroundWorker1_ProgressChanged;
                     
@@ -157,17 +162,17 @@ namespace Advanced_Blueprint_Tools
         {
             progressWindow.UpdateProgress(e.ProgressPercentage);
         }
-        
         private void Convertobjwtexture(object sender, DoWorkEventArgs e)
         {
             try
             {
                 Scene scene = new AssimpImporter().ImportFile(file, PostProcessSteps.Triangulate);
-                Bitmap IconMap = new Bitmap(this.texture);
 
+                coloredpoints = new Dictionary<Point3D, Point3D>();
                 //List<Triangle> splittriangles = new List<Triangle>();
-                pointlist = new HashSet<Point3D>();
-                
+                //pointlist = new HashSet<Point3D>();
+
+
                 //pointlist.ToDictionary<>
                 int progress = 0;
                 int total = 0;
@@ -177,44 +182,52 @@ namespace Advanced_Blueprint_Tools
                         total++;
                 foreach (Mesh m in scene.Meshes)
                 {
+                    var texturecoords = m.GetTextureCoords(0);
 
                     foreach (Face face in m.Faces)
                     {
+                        
                         IList<Point3D> vertices = new List<Point3D>();
+                        IList<Point3D> texturepoints = new List<Point3D>();
                         foreach (uint i in face.Indices)
                         {
                             double x = m.Vertices[i].X * scale;
                             double y = m.Vertices[i].Y * scale;
                             double z = m.Vertices[i].Z * scale;
                             Point3D point;
+                            Assimp.Vector3D texturep = texturecoords[i];
+                            Point3D texturepoint = new Point3D(texturep.X,1-texturep.Y,texturep.Z);
                             if (flipyz)
                             {
                                 if (flipxz)
                                 {
-                                    point = new Point3D((int)Math.Floor(y), (int)Math.Floor(z), flipz * (int)Math.Floor(x));
+                                    point = new Point3D(y, z, flipz * x);
                                 }
                                 else
                                 {
-                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(z), flipz * (int)Math.Floor(y));
+                                    point = new Point3D(x, z, flipz * y);
                                 }
                             }
                             else
                             {
                                 if (flipxz)
                                 {
-                                    point = new Point3D((int)Math.Floor(z), (int)Math.Floor(y), flipz * (int)Math.Floor(x));
+                                    point = new Point3D(z, y, flipz * x);
                                 }
                                 else
-                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(y), flipz * (int)Math.Floor(z));
+                                    point = new Point3D(x, y, flipz * z);
                             }
                             vertices.Add(point);
-                            pointlist.Add(point);
+                            texturepoints.Add(texturepoint);
+                            Point3D flooredpoint = new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z));
+                            if (!coloredpoints.ContainsKey(flooredpoint))
+                                coloredpoints.Add(flooredpoint, texturepoint);
                         }
                         if (vertices.Count == 3)
                         {
-                            Triangle triangle = new Triangle(vertices);
+                            ColorTriangle triangle = new ColorTriangle(vertices,texturepoints);
                             if (!triangle.BoundsSmallerThan(bounds))
-                                Splittriangles(triangle);
+                                Splitcolortriangles(triangle);
                         }
                         else
                         { }
@@ -229,11 +242,11 @@ namespace Advanced_Blueprint_Tools
             catch (Exception ex)
             {
                 if (!(ex is OperationCanceledException))
-                    System.Windows.MessageBox.Show(ex.Message, "Something went wrong converting the obj");
+                    System.Windows.MessageBox.Show(ex.Message, "Something went wrong converting the obj+texture");
                 else
                     e.Cancel = true;
             }
-
+            
             try
             {
                 if (backgroundWorker.CancellationPending)
@@ -242,7 +255,36 @@ namespace Advanced_Blueprint_Tools
                 dynamic blueprint = new JObject();
                 try
                 {
-                    blueprint = BlueprintOptimizer.CreateBlueprintFromPoints(pointlist);
+                    Bitmap texturemap = new Bitmap(this.texture);
+                    HashSet<Tuple<Point3D, string>> pointswithcolor = new HashSet<Tuple<Point3D, string>>();
+                    int width = texturemap.Width;
+                    int height = texturemap.Height;
+                    foreach (var pair in coloredpoints)
+                    {
+                        int x = (int)(pair.Value.X * width);
+                        int y = (int)(pair.Value.Y * height);
+                        if (pair.Value.Y > 1)
+                        {
+
+                        }
+                        while (y < 0)
+                            y ++;
+                        while (x < 0)
+                            x ++;
+                        if(Math.Abs(x)>width/2)
+                        {
+
+                        }
+                        while (x >= width)
+                            x -= width;
+                        while (y>= height)
+                            y -= height;
+                        System.Drawing.Color color = texturemap.GetPixel(x , y);
+                        string c = color.Name.Substring(2);
+                        pointswithcolor.Add(new Tuple<Point3D, string>(pair.Key, c));
+                    }
+                    coloredpoints.Clear();
+                    blueprint = BlueprintOptimizer.CreateBlueprintFromPointsAndColor(pointswithcolor);
                 }
                 catch (Exception bpex)
                 {
@@ -279,6 +321,52 @@ namespace Advanced_Blueprint_Tools
 
 
         }
+        private void Splitcolortriangles(ColorTriangle triangle)
+        {
+            if (backgroundWorker.CancellationPending)
+                throw new OperationCanceledException();
+            //split triangle in 4 triangles:
+            Point3D mid1 = Average(triangle.vertices[0], triangle.vertices[1]);
+            Point3D mid2 = Average(triangle.vertices[1], triangle.vertices[2]);
+            Point3D mid3 = Average(triangle.vertices[0], triangle.vertices[2]);
+            Point3D tmid1 = Average(triangle.texturecoords[0], triangle.texturecoords[1]);
+            Point3D tmid2 = Average(triangle.texturecoords[1], triangle.texturecoords[2]);
+            Point3D tmid3 = Average(triangle.texturecoords[0], triangle.texturecoords[2]);
+            List<ColorTriangle> triangles = new List<ColorTriangle>
+            {
+                new ColorTriangle(new List<Point3D> { mid1, mid2, mid3 }, new List<Point3D>{ tmid1, tmid2, tmid3 }),
+                new ColorTriangle(new List<Point3D> { mid1, mid3, triangle.vertices[0] },new List<Point3D> { tmid1, tmid3, triangle.texturecoords[0] }),
+                new ColorTriangle(new List<Point3D> { mid1, mid2, triangle.vertices[1] },new List<Point3D> { tmid1, tmid2, triangle.texturecoords[1] }),
+                new ColorTriangle(new List<Point3D> { mid2, mid3, triangle.vertices[2] },new List<Point3D> { tmid2, tmid3, triangle.texturecoords[2] })
+            };
+
+            Point3D flooredpoint1 = new Point3D((int)Math.Floor(mid1.X), (int)Math.Floor(mid1.Y), (int)Math.Floor(mid1.Z));
+            if (!coloredpoints.ContainsKey(flooredpoint1))
+                coloredpoints.Add(flooredpoint1, tmid1);
+            Point3D flooredpoint2 = new Point3D((int)Math.Floor(mid2.X), (int)Math.Floor(mid2.Y), (int)Math.Floor(mid2.Z));
+            if (!coloredpoints.ContainsKey(flooredpoint2))
+                coloredpoints.Add(flooredpoint2, tmid2);
+            Point3D flooredpoint3 = new Point3D((int)Math.Floor(mid3.X), (int)Math.Floor(mid3.Y), (int)Math.Floor(mid3.Z));
+            if (!coloredpoints.ContainsKey(flooredpoint3))
+                coloredpoints.Add(flooredpoint3, tmid3);
+           // coloredpoints.Add(new Tuple<Point3D,Point3D>( new Point3D((int)Math.Floor(mid1.X), (int)Math.Floor(mid1.Y), (int)Math.Floor(mid1.Z)),tmid1));
+           // coloredpoints.Add(new Tuple<Point3D,Point3D>( new Point3D((int)Math.Floor(mid2.X), (int)Math.Floor(mid2.Y), (int)Math.Floor(mid2.Z)),tmid2));
+           // coloredpoints.Add(new Tuple<Point3D,Point3D>( new Point3D((int)Math.Floor(mid3.X), (int)Math.Floor(mid3.Y), (int)Math.Floor(mid3.Z)),tmid3));
+            //triangles.Add(new Triangle(new List<Point3D> { mid1, mid2, mid3 }));
+            //triangles.Add(new Triangle(new List<Point3D> { mid1, mid3, triangle.vertices[0] }));
+            //triangles.Add(new Triangle(new List<Point3D> { mid1, mid2, triangle.vertices[1] }));
+            //triangles.Add(new Triangle(new List<Point3D> { mid2, mid3, triangle.vertices[2] }));
+            //check for each triangle if bounds are smaller than 1x1x1, if not, split each again:
+            foreach (ColorTriangle splittriangle in triangles)
+            {
+                // foreach(Point3D point in splittriangle.vertices)
+                //   pointlist.Add(new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z)));
+
+                if (!splittriangle.BoundsSmallerThan(bounds))
+                    Splitcolortriangles(splittriangle);
+            }
+            //return splittriangles;
+        }
 
         private void Convertobj(object sender, DoWorkEventArgs e)
         {
@@ -313,24 +401,24 @@ namespace Advanced_Blueprint_Tools
                             {
                                 if(flipxz)
                                 {
-                                    point = new Point3D((int)Math.Floor(y), (int)Math.Floor(z), flipz * (int)Math.Floor(x));
+                                    point = new Point3D(y,z, flipz * x);
                                 }
                                 else
                                 {
-                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(z), flipz * (int)Math.Floor(y));
+                                    point = new Point3D(x,z, flipz * y);
                                 }
                             }
                             else
                             {
                                 if (flipxz)
                                 {
-                                    point = new Point3D((int)Math.Floor(z), (int)Math.Floor(y), flipz * (int)Math.Floor(x));
+                                    point = new Point3D(z,y, flipz * x);
                                 }
                                 else
-                                    point = new Point3D((int)Math.Floor(x), (int)Math.Floor(y), flipz * (int)Math.Floor(z));
+                                    point = new Point3D(x,y, flipz * z);
                             }
                             vertices.Add(point);
-                            pointlist.Add(point);
+                            pointlist.Add(new Point3D((int)Math.Floor(point.X), (int)Math.Floor(point.Y), (int)Math.Floor(point.Z)));
                         }
                         if (vertices.Count == 3)
                         {
@@ -401,6 +489,7 @@ namespace Advanced_Blueprint_Tools
 
         }
 
+        
         private void Splittriangles(Triangle triangle)
         {
             if (backgroundWorker.CancellationPending)
@@ -434,6 +523,7 @@ namespace Advanced_Blueprint_Tools
             }
             //return splittriangles;
         }
+
         private Point3D Average(Point3D point1, Point3D point2)
         {
             return new Point3D((point1.X + point2.X) / 2.0, (point1.Y + point2.Y) / 2.0, (point1.Z + point2.Z) / 2.0);

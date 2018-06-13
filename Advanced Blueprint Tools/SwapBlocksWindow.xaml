@@ -12,7 +12,7 @@
             <Label x:Name="label1" Content="Old:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="31"/>
             <Label x:Name="label1_Copy" Content="New:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="37"/>
             <ComboBox x:Name="comboBox_old" HorizontalAlignment="Left" Margin="47,10,0,0" VerticalAlignment="Top" Width="105" Height="26" SelectionChanged="comboBox_old_SelectionChanged"/>
-            <ComboBox x:Name="comboBox_new" HorizontalAlignment="Left" Margin="47,41,0,0" VerticalAlignment="Top" Width="105" Height="26"/>
+            <ComboBox x:Name="comboBox_new" HorizontalAlignment="Left" Margin="47,41,0,0" VerticalAlignment="Top" Width="105" Height="26" SelectionChanged="comboBox_new_SelectionChanged"/>
             <TextBox x:Name="textBox_color1" HorizontalAlignment="Left" Height="26" Margin="157,10,0,0" TextWrapping="Wrap" Text="#eeeeee" VerticalAlignment="Top" Width="93" FontWeight="Bold" VerticalContentAlignment="Center" Background="#eeeeee" BorderThickness="0" TextChanged="textBox_color1_TextChanged"/>
             <Button x:Name="button_set" Content="&lt; SET" HorizontalAlignment="Left" Margin="255,10,0,0" VerticalAlignment="Top" Width="51" Height="26"  Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button_set_Click"/>
             <Button x:Name="button_swap" Content="Swap!" HorizontalAlignment="Center" Margin="255,41,10,0" VerticalAlignment="Top" Width="51" Height="26" Background="#5DB7E7" Foreground="#fff" FontWeight="Bold" Click="button_swap_Click"/>

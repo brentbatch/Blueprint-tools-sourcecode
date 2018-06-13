@@ -513,6 +513,13 @@ namespace Advanced_Blueprint_Tools
                             child.color = new_color.Text;
                             child.xaxis = Convert.ToInt32(new_xaxis.Text);
                             child.zaxis = Convert.ToInt32(new_zaxis.Text);
+
+                            dynamic selectedblock = ((dynamic)filter_output.SelectedItem);
+                            selectedblock.pos.x = child.pos.x;
+                            selectedblock.pos.y = child.pos.y;
+                            selectedblock.pos.z = child.pos.z;
+                            selectedblock.xaxis = child.xaxis;
+                            selectedblock.zaxis = child.zaxis;
                         }
                         if(Edit_sensor.IsVisible)
                         {
@@ -540,6 +547,18 @@ namespace Advanced_Blueprint_Tools
             BP.setblueprint(BP.Blueprint);
             this.mainwindow.RenderBlueprint();
             //Update();
+            dynamic bounds = BP.GetBounds();
+            int x1 = bounds.minx, y1 = bounds.maxx, z1 = bounds.miny, x2 = bounds.maxy, y2 = bounds.minz, z2 = bounds.maxz;
+            this.Dispatcher.Invoke((Action)(() =>
+            {//this refer to form in WPF application 
+                if (filter_x1.Text != "") x1 = Convert.ToInt32(filter_x1.Text);
+                if (filter_y1.Text != "") y1 = Convert.ToInt32(filter_y1.Text);
+                if (filter_z1.Text != "") z1 = Convert.ToInt32(filter_z1.Text);
+                if (filter_x2.Text != "") x2 = Convert.ToInt32(filter_x2.Text);
+                if (filter_y2.Text != "") y2 = Convert.ToInt32(filter_y2.Text);
+                if (filter_z2.Text != "") z2 = Convert.ToInt32(filter_z2.Text);//0.1! = any
+                this.mainwindow.setMarker2((x1 + x2 + 0.0f) / 2, (y1 + y2 + 0.0f) / 2, (z1 + z2 + 0.0f) / 2, (x2 - x1), (y2 - y1), (z2 - z1));
+            }));
             w.Close();
         }
 

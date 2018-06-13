@@ -55,6 +55,7 @@
             </MenuItem>
             <MenuItem Name="paintpicker" Header="Paint Selector" Click="Click_paintpicker" Background="#71838D"/>
             <MenuItem Margin="50,0,0,0" Header="Generators">
+                <MenuItem Name="circlegenerator" Header="Circle Generator" Click="circlegenerator_Click" />
                 <MenuItem Name="spheregenerator" Header="Sphere Generator" Click="Click_ellipsoidgenerator"/>
                 <MenuItem Name="cuboidgenerator" Header="Cuboid Generator" Click="Click_cuboidgenerator"/>
                 <MenuItem Name="ObjToBlueprint" Header="3DModel (obj,mesh,fbx...) To Blueprint" Click="ObjToBlueprint_Click"/>

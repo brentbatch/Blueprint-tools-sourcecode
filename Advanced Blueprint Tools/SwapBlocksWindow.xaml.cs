@@ -109,7 +109,7 @@ namespace Advanced_Blueprint_Tools
                             bounds = ((Part)Database.blocks[uuid]).GetBoundsDynamic();
                         }
 
-                        if (bounds == null || (selectedblok.bounds != null && bounds == selectedblok.bounds))
+                        //if (bounds == null || (selectedblok.bounds != null && bounds == selectedblok.bounds))
                         {
                             dynamic block = new JObject();
                             block.name = Database.blocks[uuid].Name;
@@ -124,6 +124,10 @@ namespace Advanced_Blueprint_Tools
                 catch { }
 
             }
+        }
+        private void comboBox_new_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
 
         private void button_set_Click(object sender, RoutedEventArgs e)
@@ -217,5 +221,6 @@ namespace Advanced_Blueprint_Tools
             }
             return bounds;
         }
+
     }
 }
