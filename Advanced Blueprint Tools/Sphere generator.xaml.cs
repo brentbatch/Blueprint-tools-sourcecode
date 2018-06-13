@@ -52,7 +52,7 @@ namespace Advanced_Blueprint_Tools
                     {
 
                         if ((Math.Pow(x / X, 2) + Math.Pow(y / Y, 2) + Math.Pow(z / Z, 2)) < 0.95 &&
-                            (Math.Pow((x + (x > 0 ? t : -t)) / X, 2) + Math.Pow((y + (y > 0 ? t : -t)) / Y, 2) + Math.Pow((z + (z > 0 ? t : -t)) / Z, 2)) > 0.95)
+                            (Math.Pow(x  / (X-t), 2) + Math.Pow((y ) / (Y-t), 2) + Math.Pow(z / (Z-t), 2)) > 0.95)
                         {
                             if (blocksXYZ[x.ToString()] == null)
                                 blocksXYZ[x.ToString()] = new JObject();

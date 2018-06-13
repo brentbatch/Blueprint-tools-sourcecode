@@ -879,11 +879,15 @@ namespace Advanced_Blueprint_Tools
             spring,
             radio,
             horn,
-            tone
+            tone,
+            scripted
         }
         private properties property = properties.unknown;
 
-        public bool IsConnectable { get { return (GetProperty() != properties.noninteractive) && (this.property != properties.bearing) && (this.property != properties.spring); } private set { } }
+        public bool IsConnectable {
+            get { return (GetProperty() != properties.noninteractive) && (this.property != properties.bearing) && (this.property != properties.spring); }
+            private set { }
+        }
 
         public properties GetProperty()
         {
@@ -942,6 +946,9 @@ namespace Advanced_Blueprint_Tools
                 else
                 if (part.tone != null)
                     this.property = properties.tone;
+                else
+                if (part.scripted != null)
+                    this.property = properties.scripted;
                 else
                     this.property = properties.noninteractive;
             }

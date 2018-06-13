@@ -31,7 +31,7 @@
     <ProductName>Advanced Blueprint Tools</ProductName>
     <PublisherName>Brent Batch</PublisherName>
     <SuiteName>BB corp.</SuiteName>
-    <ApplicationRevision>100</ApplicationRevision>
+    <ApplicationRevision>103</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -102,9 +102,11 @@
       <HintPath>..\..\..\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -134,6 +136,9 @@
       <DependentUpon>BlockPropertiesRAW.xaml</DependentUpon>
     </Compile>
     <Compile Include="BlueprintOptimizer.cs" />
+    <Compile Include="Circle generator.xaml.cs">
+      <DependentUpon>Circle generator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Cuboid Generator.xaml.cs">
       <DependentUpon>Cuboid Generator.xaml</DependentUpon>
     </Compile>
@@ -173,6 +178,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BlockPropertiesRAW.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Circle generator.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -306,6 +315,7 @@
     <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_headlight_off.obj" />
     <Content Include="Meshes\Data\Objects\Mesh\spaceship\obj_spaceship_shipdoor.obj" />
     <Content Include="Meshes\Data\Objects\Mesh\vehicle\tire.obj" />
+    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_mountablespudgun_off.obj" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -50,6 +50,8 @@ namespace Advanced_Blueprint_Tools
         public BlockProperties blockProperties;
         public AreaProperties areaProperties;
         public BlockPropertiesRAW blockPropertiesRAW;
+
+        Circle_generator circle_generator;
         Ellipsoid_Generator ellpisoid_generator;
         Cuboid_Generator cuboid_Generator;
 
@@ -103,12 +105,12 @@ namespace Advanced_Blueprint_Tools
 
         public void RenderBlueprint()
         {
-            TextBox_Name.Text = BP.Description.name;
-            TextBox_Description.Text = BP.Description.description;
             
             try
             {
-            
+                TextBox_Name.Text = BP.Description.name;
+                TextBox_Description.Text = BP.Description.description;
+
                 Tuple<Model3DGroup, Model3DGroup> renders = BP.RenderBlocks();//backgroundtask ?
                 this.Model = renders.Item1;
                 this.Glass = renders.Item2;
@@ -525,7 +527,15 @@ namespace Advanced_Blueprint_Tools
             ellpisoid_generator.Show();
 
         }
-        
+
+        private void circlegenerator_Click(object sender, RoutedEventArgs e)
+        {
+            if (circle_generator != null) circle_generator.Close();
+            circle_generator = new Circle_generator(this);
+            circle_generator.Owner = this;
+            circle_generator.Show();
+        }
+
         private void Click_cuboidgenerator(object sender, RoutedEventArgs e)
         {
             if (cuboid_Generator != null) cuboid_Generator.Close();
