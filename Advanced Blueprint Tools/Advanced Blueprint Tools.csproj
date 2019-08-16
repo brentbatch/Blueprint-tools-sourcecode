@@ -31,7 +31,7 @@
     <ProductName>Advanced Blueprint Tools</ProductName>
     <PublisherName>Brent Batch</PublisherName>
     <SuiteName>BB corp.</SuiteName>
-    <ApplicationRevision>103</ApplicationRevision>
+    <ApplicationRevision>104</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -58,7 +58,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>52EFF00B0016DDE001558D63A846949C89F47353</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>6C3C7BDAC475A144FC7CC4A57EB85EB4246910D2</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Advanced Blueprint Tools_TemporaryKey.pfx</ManifestKeyFile>
@@ -83,7 +83,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Advanced Blueprint Tools_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
@@ -281,7 +282,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="Advanced Blueprint Tools_TemporaryKey.pfx" />
     <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
     <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
     <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna01.obj" />
@@ -316,6 +316,7 @@
     <Content Include="Meshes\Data\Objects\Mesh\spaceship\obj_spaceship_shipdoor.obj" />
     <Content Include="Meshes\Data\Objects\Mesh\vehicle\tire.obj" />
     <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_mountablespudgun_off.obj" />
+    <None Include="Advanced Blueprint Tools_TemporaryKey.pfx" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

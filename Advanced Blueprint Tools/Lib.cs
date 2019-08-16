@@ -268,7 +268,7 @@ namespace Advanced_Blueprint_Tools
             
             //VANILLA BLOCKS: 
             dynamic blockz = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(
-                System.IO.File.ReadAllText(ScrapData + @"\Objects\Database\basicmaterials.json"));
+                System.IO.File.ReadAllText(ScrapData + @"\Objects\Database\ShapeSets\blocks.json"));
 
             foreach (dynamic prop in blockz)
             {

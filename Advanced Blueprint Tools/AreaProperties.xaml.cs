@@ -244,8 +244,8 @@ namespace Advanced_Blueprint_Tools
                         }
                         if(Edit_Timer.IsVisible && new_timerseconds.Text != null)
                         {
-                            child.controller.seconds = Convert.ToInt32(new_timerseconds);
-                            child.controller.ticks = Convert.ToInt32(new_timerticks);
+                            child.controller.seconds = Convert.ToInt32(new_timerseconds.Text);
+                            child.controller.ticks = Convert.ToInt32(new_timerticks.Text);
                         }
 
                     }
