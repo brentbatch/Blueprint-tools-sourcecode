@@ -73,9 +73,9 @@ namespace Advanced_Blueprint_Tools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] obj_fittings_ac {
+        internal static byte[] obj_fittings_ac1 {
             get {
-                object obj = ResourceManager.GetObject("obj_fittings_ac", resourceCulture);
+                object obj = ResourceManager.GetObject("obj_fittings_ac1", resourceCulture);
                 return ((byte[])(obj));
             }
         }

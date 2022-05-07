@@ -73,7 +73,7 @@ namespace Advanced_Blueprint_Tools
                         if (child.color.ToString().StartsWith("#"))
                             child.color = child.color.ToString().Substring(1);
                         child.blueprintIndex = i;
-                        child.blockname = Database.blocks[child.shapeId.ToString()].Name;
+                        child.blockname = Database.blocks.ContainsKey(child.shapeId.ToString()) ? Database.blocks[child.shapeId.ToString()].Name : "unknown part";
                         dynamic realpos = BP.getposandbounds(child);
 
                         if (backuplist[realpos.pos.x.ToString()] == null) backuplist[realpos.pos.x.ToString()] = new JObject();

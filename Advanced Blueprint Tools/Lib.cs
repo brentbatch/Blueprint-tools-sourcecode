@@ -18,6 +18,8 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
 using System.Xml;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Advanced_Blueprint_Tools
 {
@@ -26,6 +28,7 @@ namespace Advanced_Blueprint_Tools
         public static string steamapps { get; private set; }
         public static string User_ { get; private set; } //path
         public static string ScrapData { get; private set; } = "";
+        public static string SurvivalData { get; private set; } = "";
         private static string ModDatabase = "";
 
         public static long UserID { get; private set; }
@@ -80,7 +83,9 @@ namespace Advanced_Blueprint_Tools
                 {
                     config = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(File.ReadAllText("steamapps"));
                 }
-                catch { }
+                catch {
+
+                }
                 if (config.steamapps != null)
                 {
                     steamapps = config.steamapps.ToString();
@@ -152,6 +157,9 @@ namespace Advanced_Blueprint_Tools
             if (ScrapData == "")
                 ScrapData = steamapps + @"\common\Scrap Mechanic\Data";
 
+            if (SurvivalData == "")
+                SurvivalData = steamapps + @"\common\Scrap Mechanic\Survival";
+            
             if (steamapps != "")
                 ModDatabase = steamapps + @"\workshop\content\387990";
 
@@ -325,6 +333,7 @@ namespace Advanced_Blueprint_Tools
                 }
             }
         }
+        
 
         private static void LoadModObjects()
         {
@@ -368,18 +377,20 @@ namespace Advanced_Blueprint_Tools
                                 dynamic parts = null;
                                 try
                                 {
-                                    parts = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(file));
+                                    //try to parse the usual way
+                                    string text = System.IO.File.ReadAllText(file); 
+                                    parts = Newtonsoft.Json.Linq.JObject.Parse(text);
                                 }
-                                catch
+                                catch (Exception e)
                                 {//not parseable, add to naughty list
                                     if (!workshoppages.Contains("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder)))
-                                       workshoppages.Add("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder));
+                                        workshoppages.Add("http://steamcommunity.com/sharedfiles/filedetails/?id=" + System.IO.Path.GetFileName(folder));
 
                                     Notifications.Add(new Notification(
                                         "unparseable file",
                                         new Task(() =>
                                         {
-                                            System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("unparseable file found:\n"+file, "unparseable file!", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
+                                            System.Windows.MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("unparseable file found:\n" + file, "unparseable file!\nError:\n" + e.Message, System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Asterisk, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly);
                                             if (messageBoxResult == MessageBoxResult.Yes)
                                             {
                                                 System.Diagnostics.Process.Start(file);
@@ -389,6 +400,8 @@ namespace Advanced_Blueprint_Tools
                                 }
 
 
+                                dynamic moddesc = Newtonsoft.Json.Linq.JObject.Parse(System.IO.File.ReadAllText(folder + @"\description.json"));
+
                                 if (parts != null)
                                     foreach (dynamic prop in parts)
                                     {
@@ -396,7 +409,11 @@ namespace Advanced_Blueprint_Tools
                                         {
                                             try
                                             {
-                                                dynamic moddesc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(folder + @"\description.json"));
+
+                                                if (!(part is JObject))
+                                                {
+                                                    continue;
+                                                }
 
                                                 if (moddesc.name != null)
                                                 {
@@ -524,7 +541,7 @@ namespace Advanced_Blueprint_Tools
                                 dynamic parts = null;
                                 try
                                 {
-                                    parts = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(file));
+                                    parts = Newtonsoft.Json.Linq.JObject.Parse(System.IO.File.ReadAllText(file));
                                 }
                                 catch (Exception e)
                                 {
@@ -539,17 +556,29 @@ namespace Advanced_Blueprint_Tools
                                     ));
                                 }
 
+                                dynamic moddesc = Newtonsoft.Json.Linq.JObject.Parse(System.IO.File.ReadAllText(folder + @"\description.json"));
+
                                 if (parts != null)
                                     foreach (dynamic prop in parts)
                                     {
                                         foreach (dynamic part in parts[prop.Name])
                                         {
+
                                             try
                                             {
-                                                dynamic moddesc = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(System.IO.File.ReadAllText(folder + @"\description.json"));
+
+                                                if (!(part is JObject))
+                                                {
+                                                    continue;
+                                                }
 
                                                 if (moddesc.name != null)
                                                 {
+                                                    if (moddesc.fileId == null)
+                                                    {
+                                                        Random r = new Random();//fucking jank fix
+                                                        moddesc.fileId = r.Next().ToString();
+                                                    }
                                                     usedmods[moddesc.fileId.ToString()] = moddesc.name.ToString();
 
                                                     string name = "unnamed shape " + part.uuid.ToString();
@@ -958,6 +987,51 @@ namespace Advanced_Blueprint_Tools
         public Part(string path, string Name, string Modname, JObject part, JObject desc, bool prerender = false ) : base(path, Name, Modname, desc)
         {
             this.part = part;
+
+            if (!(this.part.renderable is JObject))
+            {
+                String render = this.part.renderable.ToString().Replace(@"/", @"\");
+                String renderablePath = render;// = this.Path + r.Substring(r.IndexOf('/')).Replace(@"/", @"\");
+                if (render.ToLower().StartsWith("$game_data"))
+                {
+                    renderablePath = Database.ScrapData + render.Substring(10);
+                }
+                if (render.ToLower().StartsWith("$mod_data"))
+                {
+                    renderablePath = base.Path + render.Substring(9);
+                }
+                if (render.ToLower().StartsWith("$survival_data"))
+                {
+                    renderablePath = Database.SurvivalData + render.Substring(14);
+                }
+                if (render.ToLower().StartsWith("../data"))
+                {
+                    renderablePath = base.Path + render.Substring(7);
+                }
+                String json = System.IO.File.ReadAllText(renderablePath);
+                // FIX THE FUCKING SHIT JSON BY DEVS:
+                String reverseJson = new string(json.Reverse().ToArray());
+                int curlyOpenBracketCount = reverseJson.Count<char>(f => f == '{');
+                int curlyCloseBracketCount = reverseJson.Count<char>(f => f == '}');
+                while (curlyCloseBracketCount > curlyOpenBracketCount)
+                {
+                    reverseJson = reverseJson.Substring(reverseJson.IndexOf('}')+1);
+                    curlyOpenBracketCount = reverseJson.Count<char>(f => f == '{');
+                    curlyCloseBracketCount = reverseJson.Count<char>(f => f == '}');
+                }
+                int blockyOpenBracketCount = reverseJson.Count<char>(f => f == '[');
+                int blockyCloseBracketCount = reverseJson.Count<char>(f => f == ']');
+                while (blockyCloseBracketCount > blockyOpenBracketCount)
+                {
+                    reverseJson = reverseJson.Substring(reverseJson.IndexOf(']') + 1);
+                    blockyOpenBracketCount = reverseJson.Count<char>(f => f == '[');
+                    blockyCloseBracketCount = reverseJson.Count<char>(f => f == ']');
+                }
+                json = new string(reverseJson.Reverse().ToArray());
+                dynamic renderable = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json) as dynamic;
+                this.part.renderable = renderable;
+            }
+
             this.uuid = this.part.uuid;
             if (prerender == true)
             {
@@ -1003,11 +1077,11 @@ namespace Advanced_Blueprint_Tools
         {
             if(geometry3D != null)
                 return geometry3D;
-
-            if (part.renderable.lodList[0].subMeshList != null)
-                foreach (dynamic submesh in part.renderable.lodList[0].subMeshList)
-                    if (submesh.material.ToString() == "Glass")
-                        base.glass = true;
+            
+           //if (part.renderable.lodList[0].subMeshList != null)
+           //    foreach (dynamic submesh in part.renderable.lodList[0].subMeshList)
+           //        if (submesh.material.ToString() == "Glass")
+           //            base.glass = true;
 
             //part.renderable.lodList[].subMeshList[].textureList[]
             //part.renderable.lodList[].subMeshMap.Shark.textureList[]
@@ -1038,6 +1112,11 @@ namespace Advanced_Blueprint_Tools
                 {
                     meshlocation = meshlocation.Substring(9);
                     meshlocation = base.Path + meshlocation;
+                }
+                if (meshlocation.ToLower().StartsWith("$survival_data"))
+                {
+                    meshlocation = meshlocation.Substring(14);
+                    meshlocation = Database.SurvivalData + meshlocation;
                 }
                 if (meshlocation.ToLower().StartsWith("../data"))
                 {
@@ -1104,7 +1183,7 @@ namespace Advanced_Blueprint_Tools
                 geometry = meshBuilder.ToMesh(true);
 
             }
-            catch
+            catch (Exception e)
             {
                 bool devmode = false;
 

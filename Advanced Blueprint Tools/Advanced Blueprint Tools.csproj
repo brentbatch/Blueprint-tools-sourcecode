@@ -17,7 +17,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
     <HockeyAppResourceId>0717e418d7b74ac49a7d0a35cf3d81f2</HockeyAppResourceId>
-    <PublishUrl>D:\youtube\Scrap Mechanic Advanced Blueprint Tools\Advanced Blueprint Tools\Advanced Blueprint Tools\Publish\</PublishUrl>
+    <PublishUrl>e:\Users\Brent\Desktop\other junk\scrap\Blueprint-tools-sourcecode-master\publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -31,7 +31,7 @@
     <ProductName>Advanced Blueprint Tools</ProductName>
     <PublisherName>Brent Batch</PublisherName>
     <SuiteName>BB corp.</SuiteName>
-    <ApplicationRevision>104</ApplicationRevision>
+    <ApplicationRevision>106</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -67,7 +67,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>
@@ -97,7 +97,7 @@
       <HintPath>.\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="HelixToolkit.Wpf">
-      <HintPath>..\..\helix-toolkit\Source\HelixToolkit.Wpf\bin\Debug\HelixToolkit.Wpf.dll</HintPath>
+      <HintPath>Resources\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\Newtonsoft.Json.dll</HintPath>
@@ -152,6 +152,11 @@
     </Compile>
     <Compile Include="ProgressWindow.xaml.cs">
       <DependentUpon>ProgressWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="required mods.xaml.cs">
       <DependentUpon>required mods.xaml</DependentUpon>
@@ -267,11 +272,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -279,84 +279,16 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna01.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna02.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antennatower.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_satellite01.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_satellite03.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass01.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass02.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass03.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_bathtub.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_button_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_engineelectric_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_gasengine_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_horn01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_logicgate_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_piston_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_radio_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_raftshark_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotbasshead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotbliphead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotdrumhead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotsynthhead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_sensor_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_suspensionoffroad_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_suspensionsport_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_switch_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_thruster_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_timer_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_beamframelight_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_headlight_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\spaceship\obj_spaceship_shipdoor.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\vehicle\tire.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_mountablespudgun_off.obj" />
-    <None Include="Advanced Blueprint Tools_TemporaryKey.pfx" />
-    <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna01.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antenna02.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_antennatower.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_satellite01.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_satellite03.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass01.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass02.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\industrial\obj_industrial_windowglass03.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_bathtub.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_button_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_engineelectric_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_gasengine_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_horn01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_logicgate_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_piston_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_radio_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_raftshark_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotbasshead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotbliphead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotdrumhead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_robotsynthhead01_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_sensor_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_suspensionoffroad_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_suspensionsport_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_switch_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_thruster_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_timer_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_beamframelight_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\lights\obj_light_headlight_off.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\spaceship\obj_spaceship_shipdoor.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\vehicle\tire.obj" />
-    <Content Include="Meshes\Data\Objects\Mesh\interactive\obj_interactive_mountablespudgun_off.obj" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Resources\Meshes\Data\Objects\Mesh\fittings\obj_fittings_ac.obj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

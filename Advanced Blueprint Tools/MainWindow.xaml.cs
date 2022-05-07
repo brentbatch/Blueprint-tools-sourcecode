@@ -60,20 +60,46 @@ namespace Advanced_Blueprint_Tools
 
         public MainWindow()
         {
+
+            new Thread(() =>
+            {
+                MessageBox.Show("This version of the tool should work with scrap mechanic 0.4.5, if for any reason this breaks or you found a bug: contact Brent Batch#9261");
+            }).Start();
             InitializeComponent();
             //LOAD RESOURCES:
             Database.findPaths();
             new Thread(() =>
             {
-                Database.LoadAllBlocks();
+                try
+                {
+                    Database.LoadAllBlocks();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not load parts. Further program functions may fail.\n" + e.Message);
+                }
             }).Start();
             new Thread(() =>
             {
-                Database.LoadAllBlueprints();
+                try
+                { 
+                    Database.LoadAllBlueprints();
+                }
+                    catch (Exception e)
+                {
+                    MessageBox.Show("Error: Could not load Blueprints. Further program functions may fail.\n" + e.Message);
+                }
             }).Start();
             new Task(() =>
             {
-                new Updater().CheckForUpdates();
+                try
+                { 
+                    new Updater().CheckForUpdates();
+                }
+                    catch (Exception e)
+                {
+                    MessageBox.Show("Error: could not check for an updated version.\n" + e.Message);
+                }
             }).Start();
             new Thread(() =>
             {
